@@ -308,7 +308,9 @@
         let activeTab = 'combined';
 
         async function loadCSV(filename) {
-            const response = await fetch(filename);
+            // Add timestamp to prevent caching issues
+            const cacheBuster = new Date().getTime();
+            const response = await fetch(`${filename}?v=${cacheBuster}`);
             const text = await response.text();
             return parseCSV(text);
         }
