@@ -1,0 +1,14 @@
+GitHub Pages Links for HTML Files
+=====================================
+
+Repository: some-dude-999/BI
+Base URL: https://some-dude-999.github.io/BI/
+
+HTML Files:
+-----------
+
+1. Gen Era Business/Gen Era Business.html
+   https://some-dude-999.github.io/BI/Gen%20Era%20Business/Gen%20Era%20Business.html
+
+Note: Make sure GitHub Pages is enabled in your repository settings.
+To enable: Settings > Pages > Source > Select branch (usually 'main' or 'gh-pages')
