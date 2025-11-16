@@ -264,8 +264,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Gen Era Business - LLM Idea Evaluations</h1>
-        <p class="subtitle">Comparative analysis of business ideas across multiple AI models</p>
+        <h1>🚀 Gen Era Business - Consolidated Idea Evaluations</h1>
+        <p class="subtitle">Deduplicated and consolidated business ideas from multiple AI model evaluations</p>
 
         <div class="controls">
             <div class="control-section">
@@ -291,21 +291,10 @@
     </div>
 
     <script>
-        const CSV_FILES = [
-            'kimi_run1_Gen_Era_Business.csv',
-            'kimi_run2_Gen_Era_Business.csv',
-            'claude_run1_Gen_Era_Business.csv',
-            'claude_run2_Gen_Era_Business.csv',
-            'chatgpt_run1_Gen_Era_Business.csv',
-            'chatgpt_run2_Gen_Era_Business.csv',
-            'grok_run1_Gen_Era_Business.csv',
-            'grok_run2_Gen_Era_Business.csv',
-            'gemini_run1_Gen_Era_Business.csv',
-            'gemini_run2_Gen_Era_Business.csv'
-        ];
+        const CONSOLIDATED_CSV = 'consolidated_ideas.csv';
 
-        let allData = {};
-        let activeTab = 'combined';
+        let consolidatedData = [];
+        let activeTab = 'consolidated';
 
         async function loadCSV(filename) {
             const response = await fetch(filename);
@@ -314,8 +303,33 @@
         }
 
         function parseCSV(text) {
-            const lines = text.trim().split('\n');
-            const headers = lines[0].split(',');
+            const lines = [];
+            let current = '';
+            let inQuotes = false;
+
+            // First, split into proper lines respecting quotes
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                    current += char;
+                } else if (char === '\n' && !inQuotes) {
+                    if (current.trim()) {
+                        lines.push(current);
+                    }
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            if (current.trim()) {
+                lines.push(current);
+            }
+
+            if (lines.length === 0) return [];
+
+            const headers = parseCSVLine(lines[0]);
             const data = [];
 
             for (let i = 1; i < lines.length; i++) {
@@ -339,7 +353,13 @@
                 const char = line[i];
 
                 if (char === '"') {
-                    inQuotes = !inQuotes;
+                    if (inQuotes && line[i + 1] === '"') {
+                        // Handle escaped quotes
+                        current += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
                 } else if (char === ',' && !inQuotes) {
                     result.push(current);
                     current = '';
@@ -349,7 +369,7 @@
             }
             result.push(current);
 
-            return result.map(val => val.replace(/^"|"$/g, ''));
+            return result;
         }
 
         function getScoreClass(score) {
@@ -391,78 +411,8 @@
             `;
         }
 
-        function combineData(omitOutliers) {
-            const included = [];
-            document.querySelectorAll('.table-checkbox:checked').forEach(cb => {
-                included.push(cb.value);
-            });
-
-            const ideaMap = {};
-
-            included.forEach(key => {
-                const data = allData[key];
-                data.forEach(row => {
-                    const ideaName = row.Idea || '';
-                    if (!ideaName) return;
-
-                    if (!ideaMap[ideaName]) {
-                        ideaMap[ideaName] = {
-                            idea: ideaName,
-                            scores: [],
-                            freeProps: new Set(),
-                            paidProps: new Set(),
-                            reasons: []
-                        };
-                    }
-
-                    const score = parseFloat(row.Score);
-                    if (!isNaN(score)) {
-                        ideaMap[ideaName].scores.push(score);
-                    }
-
-                    if (row.Free_Value_Prop) ideaMap[ideaName].freeProps.add(row.Free_Value_Prop);
-                    if (row.Paid_Value_Prop) ideaMap[ideaName].paidProps.add(row.Paid_Value_Prop);
-                    if (row.Why_This_Score) ideaMap[ideaName].reasons.push(row.Why_This_Score);
-                });
-            });
-
-            const combined = [];
-            let num = 1;
-
-            Object.values(ideaMap).forEach(item => {
-                if (item.scores.length === 0) return;
-
-                let scores = [...item.scores];
-                let avgScore;
-
-                if (omitOutliers && scores.length > 2) {
-                    scores.sort((a, b) => a - b);
-                    scores = scores.slice(1, -1); // Remove min and max
-                    avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
-                } else {
-                    avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
-                }
-
-                combined.push({
-                    Number: num++,
-                    Idea: item.idea,
-                    Score: avgScore.toFixed(1),
-                    OriginalScores: item.scores,
-                    ScoresUsed: scores,
-                    Free_Value_Prop: Array.from(item.freeProps).join(' | '),
-                    Paid_Value_Prop: Array.from(item.paidProps).join(' | '),
-                    Why_This_Score: item.reasons.join(' // ')
-                });
-            });
-
-            combined.sort((a, b) => parseFloat(b.Score) - parseFloat(a.Score));
-            combined.forEach((item, index) => item.Number = index + 1);
-
-            return combined;
-        }
-
-        function createCombinedTable(omitOutliers) {
-            const data = combineData(omitOutliers);
+        function createConsolidatedTable() {
+            const data = consolidatedData;
 
             return `
                 <div class="table-wrapper">
@@ -471,30 +421,25 @@
                             <tr>
                                 <th class="num-col">#</th>
                                 <th>Idea</th>
-                                <th class="score-col">Avg Score</th>
+                                <th class="score-col">Score</th>
                                 <th>Free Value Prop</th>
                                 <th>Paid Value Prop</th>
-                                <th>Why This Score (Combined)</th>
+                                <th>Why This Score</th>
+                                <th>LLM Source</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${data.map(row => `
                                 <tr>
-                                    <td class="num-col">${row.Number}</td>
-                                    <td class="idea-name">${row.Idea}</td>
+                                    <td class="num-col">${row.Number || ''}</td>
+                                    <td class="idea-name">${row.Idea || ''}</td>
                                     <td class="score-col">
-                                        <span class="score ${getScoreClass(parseFloat(row.Score))}">${row.Score}</span>
-                                        <div class="combined-stats">
-                                            <span class="avg-badge">${row.OriginalScores.length} evals</span>
-                                            ${omitOutliers && row.OriginalScores.length > 2 ?
-                                                `<span style="font-size:11px">Used: ${row.ScoresUsed.join(', ')}</span>` :
-                                                `<span style="font-size:11px">All: ${row.OriginalScores.join(', ')}</span>`
-                                            }
-                                        </div>
+                                        <span class="score ${getScoreClass(parseFloat(row.Score))}">${row.Score || ''}</span>
                                     </td>
-                                    <td>${row.Free_Value_Prop}</td>
-                                    <td>${row.Paid_Value_Prop}</td>
-                                    <td>${row.Why_This_Score}</td>
+                                    <td>${(row.Free_Value_Prop || '').replace(/\n/g, '<br>')}</td>
+                                    <td>${(row.Paid_Value_Prop || '').replace(/\n/g, '<br>')}</td>
+                                    <td style="white-space: pre-wrap;">${row.Why_This_Score || ''}</td>
+                                    <td>${row.LLM_Source || ''}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -504,42 +449,36 @@
         }
 
         function updateStats() {
-            const included = [];
-            document.querySelectorAll('.table-checkbox:checked').forEach(cb => {
-                included.push(cb.value);
-            });
-
-            let totalIdeas = 0;
+            const totalIdeas = consolidatedData.length;
             const allScores = [];
 
-            included.forEach(key => {
-                const data = allData[key];
-                totalIdeas += data.length;
-                data.forEach(row => {
-                    const score = parseFloat(row.Score);
-                    if (!isNaN(score)) allScores.push(score);
-                });
+            consolidatedData.forEach(row => {
+                const score = parseFloat(row.Score);
+                if (!isNaN(score)) allScores.push(score);
             });
 
             const avgScore = allScores.length > 0 ?
                 (allScores.reduce((a, b) => a + b, 0) / allScores.length).toFixed(1) : 0;
 
+            const maxScore = allScores.length > 0 ? Math.max(...allScores).toFixed(1) : 0;
+            const minScore = allScores.length > 0 ? Math.min(...allScores).toFixed(1) : 0;
+
             const statsHTML = `
                 <div class="stat-card">
-                    <div class="stat-label">Total Evaluations</div>
+                    <div class="stat-label">Total Ideas</div>
                     <div class="stat-value">${totalIdeas}</div>
                 </div>
                 <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                    <div class="stat-label">LLMs Included</div>
-                    <div class="stat-value">${included.length}</div>
-                </div>
-                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
                     <div class="stat-label">Average Score</div>
                     <div class="stat-value">${avgScore}</div>
                 </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="stat-label">Highest Score</div>
+                    <div class="stat-value">${maxScore}</div>
+                </div>
                 <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                    <div class="stat-label">Unique Ideas (Combined)</div>
-                    <div class="stat-value">${Object.keys(combineData(document.getElementById('omit-outliers').checked)).length}</div>
+                    <div class="stat-label">Lowest Score</div>
+                    <div class="stat-value">${minScore}</div>
                 </div>
             `;
 
@@ -547,74 +486,28 @@
         }
 
         function render() {
-            const omitOutliers = document.getElementById('omit-outliers').checked;
+            // Hide tabs and checkboxes since we only have one consolidated view now
+            document.getElementById('tabs').style.display = 'none';
 
-            const tabsHTML = `
-                <button class="tab ${activeTab === 'combined' ? 'active' : ''}" onclick="switchTab('combined')">
-                    📊 Combined Analysis
-                </button>
-                ${CSV_FILES.map((file, index) => {
-                    const name = file.replace('_Gen_Era_Business.csv', '');
-                    return `
-                        <button class="tab ${activeTab === file ? 'active' : ''}" onclick="switchTab('${file}')">
-                            ${name}
-                        </button>
-                    `;
-                }).join('')}
-            `;
-
-            document.getElementById('tabs').innerHTML = tabsHTML;
-
-            const contentsHTML = `
-                <div class="tab-content ${activeTab === 'combined' ? 'active' : ''}" id="content-combined">
-                    ${createCombinedTable(omitOutliers)}
-                </div>
-                ${CSV_FILES.map(file => `
-                    <div class="tab-content ${activeTab === file ? 'active' : ''}" id="content-${file}">
-                        ${createTable(allData[file], file)}
-                    </div>
-                `).join('')}
-            `;
-
+            const contentsHTML = createConsolidatedTable();
             document.getElementById('tab-contents').innerHTML = contentsHTML;
             updateStats();
         }
 
-        function switchTab(tab) {
-            activeTab = tab;
-            render();
-        }
-
         async function init() {
             try {
-                for (const file of CSV_FILES) {
-                    allData[file] = await loadCSV(file);
-                }
+                consolidatedData = await loadCSV(CONSOLIDATED_CSV);
 
-                const checkboxesHTML = CSV_FILES.map((file, index) => {
-                    const name = file.replace('_Gen_Era_Business.csv', '');
-                    return `
-                        <div class="checkbox-item">
-                            <input type="checkbox" class="table-checkbox" id="cb-${index}" value="${file}" checked>
-                            <label for="cb-${index}">${name}</label>
-                        </div>
-                    `;
-                }).join('');
-
-                document.getElementById('table-checkboxes').innerHTML = checkboxesHTML;
-
-                document.querySelectorAll('.table-checkbox').forEach(cb => {
-                    cb.addEventListener('change', render);
-                });
-
-                document.getElementById('omit-outliers').addEventListener('change', render);
+                // Hide the controls section since we don't need filters anymore
+                document.querySelector('.controls').style.display = 'none';
 
                 render();
 
             } catch (error) {
                 document.querySelector('.container').innerHTML = `
                     <div class="error">
-                        <strong>Error loading data:</strong> ${error.message}
+                        <strong>Error loading data:</strong> ${error.message}<br>
+                        <small>Make sure the consolidated_ideas.csv file is in the same directory as this HTML file.</small>
                     </div>
                 `;
             }
