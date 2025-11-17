@@ -4,6 +4,12 @@ GitHub Pages Links for HTML Files
 Repository: some-dude-999/BI
 Base URL: https://some-dude-999.github.io/BI/
 
+HTML Files:
+-----------
+
+1. AGI Panel.html
+   https://some-dude-999.github.io/BI/AGI%20Panel.html
+
 Pull Requests:
 --------------
 
