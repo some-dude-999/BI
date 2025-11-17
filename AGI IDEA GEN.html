@@ -497,6 +497,7 @@
         let updateTimeout;
         let sortDirection = {}; // Track sort direction per tab
         let currentCombinedData = []; // Store current combined data for popups
+        let currentLLMData = {}; // Store current LLM data for popups
 
         // Show modal with content
         function showModal(header, body) {
@@ -571,32 +572,30 @@
         }
 
         // Get row color based on score (continuous gradient)
+        // Color table: 10=dark green, 7.5=white, 0=dark red
         function getRowColor(score) {
-            // Green (good) → White (neutral) → Red (bad)
-            // Green: 9-10 (excellent ideas)
-            // White: 7.5 (neutral/breakeven)
-            // Red: 0-6 (bad ideas)
+            // Clamp score between 0 and 10
+            score = Math.max(0, Math.min(10, score));
 
-            if (score >= 9) {
-                // Dark green at 10, lighter green towards 9
-                const ratio = (score - 9) / 1; // 0 to 1
-                const intensity = Math.floor(255 - (ratio * 100)); // 255 at 9, 155 at 10
-                return `rgb(${intensity}, 255, ${intensity})`;
-            } else if (score >= 7.5) {
-                // Green to white gradient: 9 is light green, 7.5 is white
-                const ratio = (score - 7.5) / 1.5; // 0 to 1
-                const intensity = Math.floor(255 - (ratio * 55)); // 255 at 7.5, 200 at 9
-                return `rgb(${intensity}, 255, ${intensity})`;
-            } else if (score >= 6) {
-                // White to red gradient: 7.5 is white, 6 is light red
-                const ratio = (7.5 - score) / 1.5; // 0 to 1
-                const intensity = Math.floor(255 - (ratio * 55)); // 255 at 7.5, 200 at 6
-                return `rgb(255, ${intensity}, ${intensity})`;
+            // Define color breakpoints
+            // 10.0 → rgb(144, 238, 144)  Light green
+            // 7.5  → rgb(255, 255, 255)  White (neutral)
+            // 0.0  → rgb(255, 182, 193)  Light pink/red
+
+            if (score >= 7.5) {
+                // Interpolate from white (7.5) to light green (10)
+                const t = (score - 7.5) / 2.5; // 0 to 1
+                const r = Math.round(255 - (111 * t)); // 255 → 144
+                const g = Math.round(255 - (17 * t));  // 255 → 238
+                const b = Math.round(255 - (111 * t)); // 255 → 144
+                return `rgb(${r}, ${g}, ${b})`;
             } else {
-                // Red gradient: 6 is light red, 0 is dark red
-                const ratio = score / 6; // 0 to 1
-                const intensity = Math.floor(ratio * 100 + 155); // 155 at 0, 255 at 6
-                return `rgb(255, ${intensity}, ${intensity})`;
+                // Interpolate from light pink (0) to white (7.5)
+                const t = score / 7.5; // 0 to 1
+                const r = 255; // Always 255 for red side
+                const g = Math.round(182 + (73 * t)); // 182 → 255
+                const b = Math.round(193 + (62 * t)); // 193 → 255
+                return `rgb(${r}, ${g}, ${b})`;
             }
         }
 
@@ -734,6 +733,14 @@
             const currentSort = sortDirection[llm] || 'desc';
             const data = sortLLMData(llm, currentSort);
 
+            // Filter data for rocket-only mode and store
+            const filteredData = data.filter(idea => {
+                const isRocket = idea.name.includes('🚀');
+                return !rocketOnly || isRocket;
+            });
+
+            currentLLMData[llm] = filteredData; // Store for popup access
+
             const sortClass = currentSort === 'desc' ? 'desc' : (currentSort === 'asc' ? 'asc' : '');
 
             let html = `
@@ -748,33 +755,44 @@
                     <tbody>
             `;
 
-            for (const idea of data) {
-                const isRocket = idea.name.includes('🚀');
-                if (rocketOnly && !isRocket) continue;
-
+            filteredData.forEach((idea, index) => {
                 const rowColor = getRowColor(idea.score);
-                const escapedName = idea.name.replace(/'/g, "\\'");
-                const escapedReasoning = idea.reasoning.replace(/'/g, "\\'").replace(/`/g, '\\`');
 
                 html += `
                     <tr style="background-color: ${rowColor};">
                         <td>${idea.name}</td>
                         <td>
-                            <span class="score-clickable" onclick='showIndividualScore("${escapedName}", "${llm}", ${idea.score}, \`${escapedReasoning}\`)'>
+                            <span class="score-clickable" onclick="showLLMScore('${llm}', ${index})">
                                 ${getScoreBadge(idea.score)}
                             </span>
                         </td>
                         <td>
-                            <button class="show-comment-btn" onclick='showComment("${escapedName}", \`${escapedReasoning}\`)'>
+                            <button class="show-comment-btn" onclick="showLLMComment('${llm}', ${index})">
                                 📝 Show Comment
                             </button>
                         </td>
                     </tr>
                 `;
-            }
+            });
 
             html += '</tbody></table>';
             return html;
+        }
+
+        // Show LLM table comment by index
+        function showLLMComment(llm, index) {
+            const idea = currentLLMData[llm]?.[index];
+            if (idea) {
+                showModal(`Comments for: ${idea.name}`, `<div style="line-height: 1.8;">${idea.reasoning}</div>`);
+            }
+        }
+
+        // Show LLM table score by index
+        function showLLMScore(llm, index) {
+            const idea = currentLLMData[llm]?.[index];
+            if (idea) {
+                showIndividualScore(idea.name, llm, idea.score, idea.reasoning);
+            }
         }
 
         // Sort combined data
@@ -810,20 +828,18 @@
 
             data.forEach((idea, index) => {
                 const rowColor = getRowColor(idea.avgScore);
-                const escapedName = idea.name.replace(/'/g, "\\'");
-                const escapedComments = idea.comments.replace(/'/g, "\\'");
 
                 html += `
                     <tr style="background-color: ${rowColor};">
                         <td>${idea.name}</td>
                         <td>
-                            <span class="score-clickable" onclick='showScoreCalculation("${escapedName}", ${JSON.stringify(idea.scoresWithLLM)}, ${JSON.stringify(idea.rawScores)}, ${idea.avgScore})'>
+                            <span class="score-clickable" onclick="showCombinedScore(${index})">
                                 ${getScoreBadge(idea.avgScore)}
                             </span>
                         </td>
                         <td><span class="llm-count">${idea.llmCount} LLMs</span></td>
                         <td>
-                            <button class="show-comment-btn" onclick='showComment("${escapedName}", \`${escapedComments}\`)'>
+                            <button class="show-comment-btn" onclick="showCombinedComment(${index})">
                                 📝 Show Comment
                             </button>
                         </td>
@@ -833,6 +849,22 @@
 
             html += '</tbody></table>';
             return html;
+        }
+
+        // Show combined table comment by index
+        function showCombinedComment(index) {
+            const idea = currentCombinedData[index];
+            if (idea) {
+                showModal(`Comments for: ${idea.name}`, `<div style="line-height: 1.8;">${idea.comments}</div>`);
+            }
+        }
+
+        // Show combined table score by index
+        function showCombinedScore(index) {
+            const idea = currentCombinedData[index];
+            if (idea) {
+                showScoreCalculation(idea.name, idea.scoresWithLLM, idea.rawScores, idea.avgScore);
+            }
         }
 
         // Switch tab
