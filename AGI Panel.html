@@ -141,6 +141,7 @@
         .checkbox-item {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 10px;
             padding: 10px;
             background: rgba(0, 255, 136, 0.05);
@@ -154,17 +155,33 @@
             border-color: rgba(0, 255, 136, 0.5);
         }
 
-        .checkbox-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: #00ff88;
-        }
-
         .checkbox-item label {
-            cursor: pointer;
             font-size: 1em;
             user-select: none;
+            flex: 1;
+        }
+
+        .checkbox-item select {
+            width: 60px;
+            padding: 5px;
+            background: rgba(0, 20, 40, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 5px;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item select:hover {
+            border-color: #00ccff;
+            background: rgba(0, 20, 40, 1);
+        }
+
+        .checkbox-item select:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
         }
 
         .prompt-section {
@@ -478,24 +495,84 @@
         
         <div class="checkboxes">
             <div class="checkbox-item">
-                <input type="checkbox" id="claude" checked>
                 <label for="claude">Claude</label>
+                <select id="claude">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
             </div>
             <div class="checkbox-item">
-                <input type="checkbox" id="kimi" checked>
                 <label for="kimi">Kimi</label>
+                <select id="kimi">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
             </div>
             <div class="checkbox-item">
-                <input type="checkbox" id="chatgpt" checked>
                 <label for="chatgpt">ChatGPT</label>
+                <select id="chatgpt">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
             </div>
             <div class="checkbox-item">
-                <input type="checkbox" id="grok" checked>
                 <label for="grok">Grok</label>
+                <select id="grok">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
             </div>
             <div class="checkbox-item">
-                <input type="checkbox" id="gemini" checked>
                 <label for="gemini">Gemini</label>
+                <select id="gemini">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
             </div>
         </div>
 
@@ -535,13 +612,16 @@
             let delay = 0;
 
             order.forEach(ai => {
-                const checkbox = document.getElementById(ai);
-                if (checkbox && checkbox.checked) {
-                    setTimeout(() => {
-                        window.open(AI_URLS[ai], '_blank');
-                    }, delay);
-                    delay += 300; // 300ms delay between each tab
-                    openedCount++;
+                const select = document.getElementById(ai);
+                if (select) {
+                    const count = parseInt(select.value);
+                    for (let i = 0; i < count; i++) {
+                        setTimeout(() => {
+                            window.open(AI_URLS[ai], '_blank');
+                        }, delay);
+                        delay += 500; // 500ms delay between each tab
+                        openedCount++;
+                    }
                 }
             });
 
