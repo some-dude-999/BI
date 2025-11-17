@@ -313,6 +313,47 @@
             outline: none;
             box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
         }
+
+        .prompt-box-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .prompt-box-wrapper {
+            position: relative;
+        }
+
+        .remove-prompt-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 0, 100, 0.3);
+            border: 1px solid #ff0066;
+            color: #ff0066;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .remove-prompt-btn:hover {
+            background: rgba(255, 0, 100, 0.6);
+            transform: scale(1.1);
+        }
+
+        .prompt-name-label {
+            color: #00ccff;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -346,23 +387,27 @@
         </div>
 
         <div class="prompt-section">
-            <div class="prompt-label">📋 Query Template</div>
-            <textarea 
-                class="prompt-box" 
-                id="promptBox"
-                onclick="copyPromptToClipboard()"
-                placeholder="Click to copy prompt...">Think about what sources will give you maximum insight on this topic and output as a CSV with no other explanations or content outside of this CSV table. The CSV must only have the following columns. Column 1: XXXXXXXX</textarea>
-            
-            <div class="button-group">
-                <button class="action-button" onclick="copyPromptToClipboard()">📋 Copy Prompt</button>
-                <button class="action-button" onclick="showSavePrompt()">💾 Save Prompt</button>
+            <div class="prompt-label">📋 Query Templates</div>
+
+            <div class="prompt-box-container">
+                <div class="prompt-name-label">Default Prompt</div>
+                <div class="prompt-box-wrapper">
+                    <textarea
+                        class="prompt-box"
+                        id="promptBox"
+                        placeholder="Enter your prompt here...">Think about what sources will give you maximum insight on this topic and output as a CSV with no other explanations or content outside of this CSV table. The CSV must only have the following columns. Column 1: XXXXXXXX</textarea>
+                </div>
+                <div class="button-group">
+                    <button class="action-button" onclick="copyPromptToClipboard('promptBox')">📋 Copy Prompt</button>
+                    <button class="action-button" onclick="showSavePrompt()">💾 Save Prompt</button>
+                </div>
             </div>
 
             <div id="savePromptSection" style="display: none;">
-                <input 
-                    type="text" 
-                    class="save-prompt-input" 
-                    id="promptName" 
+                <input
+                    type="text"
+                    class="save-prompt-input"
+                    id="promptName"
                     placeholder="Enter prompt name..."
                     onkeypress="if(event.key === 'Enter') savePrompt()">
                 <div class="button-group" style="margin-top: 10px;">
@@ -371,9 +416,7 @@
                 </div>
             </div>
 
-            <div class="saved-prompts" id="savedPrompts">
-                <div class="prompt-label" style="margin-top: 20px;">💾 Saved Prompts</div>
-            </div>
+            <div id="savedPromptsContainer"></div>
         </div>
     </div>
 
@@ -409,8 +452,8 @@
             }
         }
 
-        function copyPromptToClipboard() {
-            const promptBox = document.getElementById('promptBox');
+        function copyPromptToClipboard(textareaId) {
+            const promptBox = document.getElementById(textareaId);
             promptBox.select();
             navigator.clipboard.writeText(promptBox.value).then(() => {
                 showNotification('✓ Prompt copied to clipboard!');
@@ -446,6 +489,8 @@
             document.getElementById('promptName').value = '';
         }
 
+        let promptCounter = 0;
+
         function savePrompt() {
             const promptName = document.getElementById('promptName').value.trim();
             const promptText = document.getElementById('promptBox').value;
@@ -457,82 +502,90 @@
 
             // Get existing prompts from localStorage
             let savedPrompts = JSON.parse(localStorage.getItem('agiPrompts') || '{}');
-            
+
             // Save the new prompt
             savedPrompts[promptName] = promptText;
             localStorage.setItem('agiPrompts', JSON.stringify(savedPrompts));
 
+            // Create a new prompt box
+            createPromptBox(promptName, promptText);
+
             showNotification(`✓ Prompt "${promptName}" saved!`);
             cancelSave();
-            loadSavedPrompts();
+        }
+
+        function createPromptBox(name, text) {
+            const container = document.getElementById('savedPromptsContainer');
+            const promptId = `prompt_${promptCounter++}`;
+
+            const promptContainer = document.createElement('div');
+            promptContainer.className = 'prompt-box-container';
+            promptContainer.id = `container_${promptId}`;
+
+            const nameLabel = document.createElement('div');
+            nameLabel.className = 'prompt-name-label';
+            nameLabel.textContent = name;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'prompt-box-wrapper';
+
+            const textarea = document.createElement('textarea');
+            textarea.className = 'prompt-box';
+            textarea.id = promptId;
+            textarea.value = text;
+            textarea.placeholder = 'Enter your prompt here...';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-prompt-btn';
+            removeBtn.textContent = '✕';
+            removeBtn.onclick = () => removePromptBox(name, promptId);
+
+            const buttonGroup = document.createElement('div');
+            buttonGroup.className = 'button-group';
+
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'action-button';
+            copyBtn.textContent = '📋 Copy Prompt';
+            copyBtn.onclick = () => copyPromptToClipboard(promptId);
+
+            wrapper.appendChild(textarea);
+            wrapper.appendChild(removeBtn);
+
+            buttonGroup.appendChild(copyBtn);
+
+            promptContainer.appendChild(nameLabel);
+            promptContainer.appendChild(wrapper);
+            promptContainer.appendChild(buttonGroup);
+
+            container.appendChild(promptContainer);
+        }
+
+        function removePromptBox(name, promptId) {
+            if (confirm(`Remove prompt "${name}"?`)) {
+                // Remove from DOM
+                const container = document.getElementById(`container_${promptId}`);
+                if (container) {
+                    container.remove();
+                }
+
+                // Remove from localStorage
+                let savedPrompts = JSON.parse(localStorage.getItem('agiPrompts') || '{}');
+                delete savedPrompts[name];
+                localStorage.setItem('agiPrompts', JSON.stringify(savedPrompts));
+
+                showNotification(`✓ Removed prompt: "${name}"`);
+            }
         }
 
         function loadSavedPrompts() {
             const savedPrompts = JSON.parse(localStorage.getItem('agiPrompts') || '{}');
-            const container = document.getElementById('savedPrompts');
-            
-            // Clear existing prompts (except the label)
-            const label = container.querySelector('.prompt-label');
+            const container = document.getElementById('savedPromptsContainer');
             container.innerHTML = '';
-            if (label) {
-                container.appendChild(label);
-            } else {
-                const newLabel = document.createElement('div');
-                newLabel.className = 'prompt-label';
-                newLabel.style.marginTop = '20px';
-                newLabel.textContent = '💾 Saved Prompts';
-                container.appendChild(newLabel);
-            }
 
-            // Add saved prompts
+            // Create a prompt box for each saved prompt
             Object.keys(savedPrompts).forEach(name => {
-                const item = document.createElement('div');
-                item.className = 'saved-prompt-item';
-                
-                const nameSpan = document.createElement('span');
-                nameSpan.className = 'saved-prompt-name';
-                nameSpan.textContent = name;
-                nameSpan.onclick = () => loadPrompt(name);
-                
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-button';
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    deletePrompt(name);
-                };
-                
-                item.appendChild(nameSpan);
-                item.appendChild(deleteBtn);
-                container.appendChild(item);
+                createPromptBox(name, savedPrompts[name]);
             });
-
-            if (Object.keys(savedPrompts).length === 0) {
-                const empty = document.createElement('div');
-                empty.style.color = 'rgba(0, 255, 136, 0.5)';
-                empty.style.fontSize = '0.85em';
-                empty.style.fontStyle = 'italic';
-                empty.style.marginTop = '10px';
-                empty.textContent = 'No saved prompts yet';
-                container.appendChild(empty);
-            }
-        }
-
-        function loadPrompt(name) {
-            const savedPrompts = JSON.parse(localStorage.getItem('agiPrompts') || '{}');
-            const promptBox = document.getElementById('promptBox');
-            promptBox.value = savedPrompts[name] || '';
-            showNotification(`✓ Loaded prompt: "${name}"`);
-        }
-
-        function deletePrompt(name) {
-            if (confirm(`Delete prompt "${name}"?`)) {
-                let savedPrompts = JSON.parse(localStorage.getItem('agiPrompts') || '{}');
-                delete savedPrompts[name];
-                localStorage.setItem('agiPrompts', JSON.stringify(savedPrompts));
-                showNotification(`✓ Deleted prompt: "${name}"`);
-                loadSavedPrompts();
-            }
         }
 
         // Load saved prompts on page load
