@@ -320,26 +320,31 @@
 
         // Get row color based on score (continuous gradient)
         function getRowColor(score) {
-            // Adjusted for actual data range (most scores are 6-10)
-            // Red (bad): 0-6.5
-            // Yellow/White (medium): 6.5-8.5
-            // Green (good): 8.5-10
+            // Green (good) → White (neutral) → Red (bad)
+            // Green: 9-10 (excellent ideas)
+            // White: 7.5 (neutral/breakeven)
+            // Red: 0-6 (bad ideas)
 
-            if (score < 6.5) {
-                // Red gradient: darker red at 0, lighter towards 6.5
-                const ratio = score / 6.5;
-                const intensity = Math.floor(ratio * 100 + 155); // 155-255
-                return `rgb(255, ${intensity}, ${intensity})`;
-            } else if (score < 8.5) {
-                // Yellow to white gradient: 6.5 is yellow (255,255,200), 8.5 is white (255,255,255)
-                const ratio = (score - 6.5) / 2.0; // 0 to 1
-                const yellowIntensity = Math.floor(200 + (55 * ratio)); // 200-255
-                return `rgb(255, 255, ${yellowIntensity})`;
-            } else {
-                // Green gradient: 8.5 is light green, 10 is darker green
-                const ratio = (score - 8.5) / 1.5; // 0 to 1
-                const intensity = Math.floor(255 - (ratio * 100)); // 255-155
+            if (score >= 9) {
+                // Dark green at 10, lighter green towards 9
+                const ratio = (score - 9) / 1; // 0 to 1
+                const intensity = Math.floor(255 - (ratio * 100)); // 255 at 9, 155 at 10
                 return `rgb(${intensity}, 255, ${intensity})`;
+            } else if (score >= 7.5) {
+                // Green to white gradient: 9 is light green, 7.5 is white
+                const ratio = (score - 7.5) / 1.5; // 0 to 1
+                const intensity = Math.floor(255 - (ratio * 55)); // 255 at 7.5, 200 at 9
+                return `rgb(${intensity}, 255, ${intensity})`;
+            } else if (score >= 6) {
+                // White to red gradient: 7.5 is white, 6 is light red
+                const ratio = (7.5 - score) / 1.5; // 0 to 1
+                const intensity = Math.floor(255 - (ratio * 55)); // 255 at 7.5, 200 at 6
+                return `rgb(255, ${intensity}, ${intensity})`;
+            } else {
+                // Red gradient: 6 is light red, 0 is dark red
+                const ratio = score / 6; // 0 to 1
+                const intensity = Math.floor(ratio * 100 + 155); // 155 at 0, 255 at 6
+                return `rgb(255, ${intensity}, ${intensity})`;
             }
         }
 
