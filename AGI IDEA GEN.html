@@ -103,6 +103,28 @@
             cursor: pointer;
         }
 
+        .rocket-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #ff6b6b;
+            border-radius: 20px;
+        }
+
+        .rocket-control input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .rocket-control label {
+            font-weight: 600;
+            color: #ff6b6b;
+            cursor: pointer;
+        }
+
         .tabs {
             display: flex;
             overflow-x: auto;
@@ -174,8 +196,32 @@
             border-bottom: 1px solid #e0e0e0;
         }
 
+        tbody tr {
+            transition: all 0.2s ease;
+        }
+
         tbody tr:hover {
-            background: #f8f9fa;
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .comment-cell {
+            max-width: 400px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: help;
+            position: relative;
+        }
+
+        .comment-cell:hover {
+            overflow: visible;
+            white-space: normal;
+            z-index: 100;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
         }
 
         .score-high {
@@ -211,6 +257,10 @@
             font-size: 0.9em;
             font-weight: bold;
         }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -221,6 +271,11 @@
             <div class="outlier-control">
                 <input type="checkbox" id="removeOutliers" checked>
                 <label for="removeOutliers">Remove Outliers</label>
+            </div>
+
+            <div class="rocket-control">
+                <input type="checkbox" id="rocketOnly">
+                <label for="rocketOnly">🚀 Our Ideas Only</label>
             </div>
 
             <div class="llm-checkboxes" id="llmCheckboxes"></div>
@@ -260,7 +315,28 @@
 
         let selectedLLMs = new Set(Object.keys(llmFiles));
         let removeOutliers = true;
+        let rocketOnly = false;
         let updateTimeout;
+
+        // Get row color based on score (continuous gradient)
+        function getRowColor(score) {
+            // Score range: 0-10
+            // Red (bad): 0-4
+            // White (medium): 5
+            // Green (good): 6-10
+
+            if (score < 5) {
+                // Red gradient: darker red at 0, lighter towards 5
+                const intensity = Math.floor((score / 5) * 100 + 155); // 155-255
+                return `rgb(255, ${intensity}, ${intensity})`;
+            } else if (score === 5) {
+                return 'rgb(255, 255, 255)'; // White
+            } else {
+                // Green gradient: lighter green at 6, darker towards 10
+                const intensity = Math.floor(((10 - score) / 5) * 100 + 155); // 255-155
+                return `rgb(${intensity}, 255, ${intensity})`;
+            }
+        }
 
         // Parse CSV
         function parseCSV(text) {
@@ -361,11 +437,15 @@
 
             const combined = [];
             for (const [name, data] of ideasMap) {
+                const isRocket = name.includes('🚀');
+                if (rocketOnly && !isRocket) continue;
+
                 combined.push({
                     name,
                     avgScore: calculateAverage(data.scores),
                     llmCount: data.scores.length,
-                    comments: data.comments.join('<br><br>')
+                    comments: data.comments.join('<br><br>'),
+                    isRocket
                 });
             }
 
@@ -388,11 +468,15 @@
             `;
 
             for (const idea of data) {
+                const isRocket = idea.name.includes('🚀');
+                if (rocketOnly && !isRocket) continue;
+
+                const rowColor = getRowColor(idea.score);
                 html += `
-                    <tr>
+                    <tr style="background-color: ${rowColor};">
                         <td>${idea.name}</td>
                         <td>${getScoreBadge(idea.score)}</td>
-                        <td>${idea.reasoning}</td>
+                        <td class="comment-cell" title="${idea.reasoning.replace(/"/g, '&quot;')}">${idea.reasoning}</td>
                     </tr>
                 `;
             }
@@ -418,12 +502,13 @@
             `;
 
             for (const idea of data) {
+                const rowColor = getRowColor(idea.avgScore);
                 html += `
-                    <tr>
+                    <tr style="background-color: ${rowColor};">
                         <td>${idea.name}</td>
                         <td>${getScoreBadge(idea.avgScore)}</td>
                         <td><span class="llm-count">${idea.llmCount} LLMs</span></td>
-                        <td>${idea.comments}</td>
+                        <td class="comment-cell" title="${idea.comments.replace(/"/g, '&quot;').replace(/<br><br>/g, ' | ')}">${idea.comments}</td>
                     </tr>
                 `;
             }
@@ -445,14 +530,28 @@
             document.getElementById(`content-${tabName}`).classList.add('active');
         }
 
+        // Update all tables
+        function updateAllTables() {
+            // Update combined table
+            const combinedContent = document.getElementById('content-Combined');
+            if (combinedContent) {
+                combinedContent.innerHTML = createCombinedTable();
+            }
+
+            // Update individual LLM tables
+            for (const llm of Object.keys(llmFiles)) {
+                const content = document.getElementById(`content-${llm}`);
+                if (content) {
+                    content.innerHTML = createLLMTable(llm);
+                }
+            }
+        }
+
         // Update combined table with delay
         function scheduleUpdate() {
             clearTimeout(updateTimeout);
             updateTimeout = setTimeout(() => {
-                const combinedContent = document.getElementById('content-Combined');
-                if (combinedContent) {
-                    combinedContent.innerHTML = createCombinedTable();
-                }
+                updateAllTables();
             }, 500);
         }
 
@@ -482,6 +581,12 @@
             // Outlier checkbox
             document.getElementById('removeOutliers').addEventListener('change', (e) => {
                 removeOutliers = e.target.checked;
+                scheduleUpdate();
+            });
+
+            // Rocket only checkbox
+            document.getElementById('rocketOnly').addEventListener('change', (e) => {
+                rocketOnly = e.target.checked;
                 scheduleUpdate();
             });
 
