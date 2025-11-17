@@ -40,13 +40,41 @@
             padding: 20px;
             background: #f8f9fa;
             border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .tabs-per-llm-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 20px;
+        }
+
+        .tabs-per-llm-control label {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .tabs-per-llm-control select {
+            padding: 5px 15px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            background: white;
         }
 
         .llm-checkboxes {
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
-            margin-bottom: 20px;
         }
 
         .llm-checkbox {
@@ -86,7 +114,6 @@
             background: white;
             border: 2px solid #28a745;
             border-radius: 20px;
-            width: fit-content;
         }
 
         .outlier-control input[type="checkbox"] {
@@ -176,11 +203,6 @@
             background: #f8f9fa;
         }
 
-        .rocket {
-            color: #ff6b6b;
-            font-size: 1.2em;
-        }
-
         .score-high {
             background: #d4edda;
             color: #155724;
@@ -214,28 +236,30 @@
             font-size: 0.9em;
             font-weight: bold;
         }
-
-        .info-badge {
-            display: inline-block;
-            background: #17a2b8;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.85em;
-            margin-left: 5px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>=€ AGI Idea Generation Analysis Dashboard</h1>
+        <h1>ðŸš€ AGI Idea Generation Analysis Dashboard</h1>
 
         <div class="controls">
-            <div class="llm-checkboxes" id="llmCheckboxes"></div>
+            <div class="tabs-per-llm-control">
+                <label for="tabsPerLLM">Tabs per LLM:</label>
+                <select id="tabsPerLLM">
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+
             <div class="outlier-control">
                 <input type="checkbox" id="removeOutliers" checked>
-                <label for="removeOutliers">Remove Outliers (Highest & Lowest Scores)</label>
+                <label for="removeOutliers">Remove Outliers</label>
             </div>
+
+            <div class="llm-checkboxes" id="llmCheckboxes"></div>
         </div>
 
         <div class="tabs" id="tabs"></div>
@@ -272,7 +296,9 @@
 
         let selectedLLMs = new Set(Object.keys(llmFiles));
         let removeOutliers = true;
+        let tabsPerLLM = 2;
         let updateTimeout;
+        let rebuildTimeout;
 
         // Parse CSV
         function parseCSV(text) {
@@ -341,8 +367,8 @@
 
             if (removeOutliers && scores.length >= 3) {
                 const sorted = [...scores].sort((a, b) => a - b);
-                sorted.shift(); // Remove lowest
-                sorted.pop();   // Remove highest
+                sorted.shift();
+                sorted.pop();
                 return sorted.reduce((a, b) => a + b, 0) / sorted.length;
             }
 
@@ -400,7 +426,6 @@
             `;
 
             for (const idea of data) {
-                const hasRocket = idea.name.includes('=€');
                 html += `
                     <tr>
                         <td>${idea.name}</td>
@@ -446,7 +471,7 @@
         }
 
         // Switch tab
-        function switchTab(tabName) {
+        function switchTab(tabId) {
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -454,8 +479,8 @@
                 content.classList.remove('active');
             });
 
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-            document.getElementById(`content-${tabName}`).classList.add('active');
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(`content-${tabId}`).classList.add('active');
         }
 
         // Update combined table with delay
@@ -467,6 +492,57 @@
                     combinedContent.innerHTML = createCombinedTable();
                 }
             }, 500);
+        }
+
+        // Rebuild all tabs with delay
+        function scheduleRebuild() {
+            clearTimeout(rebuildTimeout);
+            rebuildTimeout = setTimeout(() => {
+                buildTabs();
+            }, 500);
+        }
+
+        // Build tabs
+        function buildTabs() {
+            const tabsContainer = document.getElementById('tabs');
+            const tabContents = document.getElementById('tabContents');
+
+            tabsContainer.innerHTML = '';
+            tabContents.innerHTML = '';
+
+            // Combined tab first
+            const combinedTab = document.createElement('button');
+            combinedTab.className = 'tab active';
+            combinedTab.textContent = 'Combined';
+            combinedTab.dataset.tab = 'Combined';
+            combinedTab.addEventListener('click', () => switchTab('Combined'));
+            tabsContainer.appendChild(combinedTab);
+
+            const combinedContent = document.createElement('div');
+            combinedContent.id = 'content-Combined';
+            combinedContent.className = 'tab-content active';
+            combinedContent.innerHTML = createCombinedTable();
+            tabContents.appendChild(combinedContent);
+
+            // Individual LLM tabs (multiple copies based on tabsPerLLM)
+            for (const llm of Object.keys(llmFiles)) {
+                for (let i = 1; i <= tabsPerLLM; i++) {
+                    const tabId = `${llm}-${i}`;
+
+                    const tab = document.createElement('button');
+                    tab.className = 'tab';
+                    tab.textContent = `${llm} (${i})`;
+                    tab.dataset.tab = tabId;
+                    tab.addEventListener('click', () => switchTab(tabId));
+                    tabsContainer.appendChild(tab);
+
+                    const content = document.createElement('div');
+                    content.id = `content-${tabId}`;
+                    content.className = 'tab-content';
+                    content.innerHTML = createLLMTable(llm);
+                    tabContents.appendChild(content);
+                }
+            }
         }
 
         // Initialize UI
@@ -492,45 +568,19 @@
                 });
             }
 
+            // Tabs per LLM dropdown
+            document.getElementById('tabsPerLLM').addEventListener('change', (e) => {
+                tabsPerLLM = parseInt(e.target.value);
+                scheduleRebuild();
+            });
+
             // Outlier checkbox
             document.getElementById('removeOutliers').addEventListener('change', (e) => {
                 removeOutliers = e.target.checked;
                 scheduleUpdate();
             });
 
-            // Create tabs
-            const tabsContainer = document.getElementById('tabs');
-            const tabContents = document.getElementById('tabContents');
-
-            // Combined tab first
-            const combinedTab = document.createElement('button');
-            combinedTab.className = 'tab active';
-            combinedTab.textContent = 'Combined';
-            combinedTab.dataset.tab = 'Combined';
-            combinedTab.addEventListener('click', () => switchTab('Combined'));
-            tabsContainer.appendChild(combinedTab);
-
-            const combinedContent = document.createElement('div');
-            combinedContent.id = 'content-Combined';
-            combinedContent.className = 'tab-content active';
-            combinedContent.innerHTML = createCombinedTable();
-            tabContents.appendChild(combinedContent);
-
-            // Individual LLM tabs
-            for (const llm of Object.keys(llmFiles)) {
-                const tab = document.createElement('button');
-                tab.className = 'tab';
-                tab.textContent = llm;
-                tab.dataset.tab = llm;
-                tab.addEventListener('click', () => switchTab(llm));
-                tabsContainer.appendChild(tab);
-
-                const content = document.createElement('div');
-                content.id = `content-${llm}`;
-                content.className = 'tab-content';
-                content.innerHTML = createLLMTable(llm);
-                tabContents.appendChild(content);
-            }
+            buildTabs();
         }
 
         // Load data on page load
