@@ -319,6 +319,101 @@
             margin-bottom: 20px;
         }
 
+        .prompt-box-container.color-1 {
+            background: rgba(0, 255, 136, 0.05);
+            border-left: 4px solid #00ff88;
+            padding-left: 15px;
+        }
+
+        .prompt-box-container.color-1 .prompt-box-wrapper textarea,
+        .prompt-box-container.color-1 .prompt-name-label {
+            border-color: #00ff88;
+        }
+
+        .prompt-box-container.color-2 {
+            background: rgba(0, 204, 255, 0.05);
+            border-left: 4px solid #00ccff;
+            padding-left: 15px;
+        }
+
+        .prompt-box-container.color-2 .prompt-box-wrapper textarea,
+        .prompt-box-container.color-2 .prompt-name-label {
+            border-color: #00ccff;
+            color: #00ccff;
+        }
+
+        .prompt-box-container.color-3 {
+            background: rgba(255, 0, 255, 0.05);
+            border-left: 4px solid #ff00ff;
+            padding-left: 15px;
+        }
+
+        .prompt-box-container.color-3 .prompt-box-wrapper textarea,
+        .prompt-box-container.color-3 .prompt-name-label {
+            border-color: #ff00ff;
+            color: #ff00ff;
+        }
+
+        .prompt-box-container.color-4 {
+            background: rgba(255, 170, 0, 0.05);
+            border-left: 4px solid #ffaa00;
+            padding-left: 15px;
+        }
+
+        .prompt-box-container.color-4 .prompt-box-wrapper textarea,
+        .prompt-box-container.color-4 .prompt-name-label {
+            border-color: #ffaa00;
+            color: #ffaa00;
+        }
+
+        .prompt-box-container.color-5 {
+            background: rgba(255, 0, 102, 0.05);
+            border-left: 4px solid #ff0066;
+            padding-left: 15px;
+        }
+
+        .prompt-box-container.color-5 .prompt-box-wrapper textarea,
+        .prompt-box-container.color-5 .prompt-name-label {
+            border-color: #ff0066;
+            color: #ff0066;
+        }
+
+        .prompt-box-container.color-6 {
+            background: rgba(0, 255, 255, 0.05);
+            border-left: 4px solid #00ffff;
+            padding-left: 15px;
+        }
+
+        .prompt-box-container.color-6 .prompt-box-wrapper textarea,
+        .prompt-box-container.color-6 .prompt-name-label {
+            border-color: #00ffff;
+            color: #00ffff;
+        }
+
+        .prompt-box-container.color-7 {
+            background: rgba(136, 255, 0, 0.05);
+            border-left: 4px solid #88ff00;
+            padding-left: 15px;
+        }
+
+        .prompt-box-container.color-7 .prompt-box-wrapper textarea,
+        .prompt-box-container.color-7 .prompt-name-label {
+            border-color: #88ff00;
+            color: #88ff00;
+        }
+
+        .prompt-box-container.color-8 {
+            background: rgba(255, 102, 0, 0.05);
+            border-left: 4px solid #ff6600;
+            padding-left: 15px;
+        }
+
+        .prompt-box-container.color-8 .prompt-box-wrapper textarea,
+        .prompt-box-container.color-8 .prompt-name-label {
+            border-color: #ff6600;
+            color: #ff6600;
+        }
+
         .prompt-box-wrapper {
             position: relative;
         }
@@ -520,7 +615,8 @@
             const promptId = `prompt_${promptCounter++}`;
 
             const promptContainer = document.createElement('div');
-            promptContainer.className = 'prompt-box-container';
+            const colorClass = `color-${(promptCounter % 8) + 1}`;
+            promptContainer.className = `prompt-box-container ${colorClass}`;
             promptContainer.id = `container_${promptId}`;
 
             const nameLabel = document.createElement('div');
