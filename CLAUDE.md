@@ -9,4 +9,11 @@
 
 **MANDATORY: End every response with a link to create the pull request for the changes just made. No link = task not done.**
 
+**HTML File Tracking:**
+- After each run, check LINK.txt
+- If any .html file was created/modified and not in LINK.txt, add it
+- If the path changed, update it
+- If already in there, leave it alone
+- Applies to ALL .html files in any folder
+
 Not on main = useless code.
