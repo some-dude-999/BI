@@ -10,11 +10,17 @@ HTML Files:
 1. AGI Panel.html
    https://some-dude-999.github.io/BI/AGI%20Panel.html
 
+2. AGI IDEA GEN.html
+   https://some-dude-999.github.io/BI/AGI%20IDEA%20GEN.html
+
 Pull Requests:
 --------------
 
-Delete Gen Era Business contents and Python files:
-https://github.com/some-dude-999/BI/pull/new/claude/delete-gen-era-python-files-01SuQfY859cxqvHBsAvtAr3R
+1. Delete Gen Era Business contents and Python files:
+   https://github.com/some-dude-999/BI/pull/new/claude/delete-gen-era-python-files-01SuQfY859cxqvHBsAvtAr3R
+
+2. Consolidate and standardize AGI idea generation data:
+   https://github.com/some-dude-999/BI/pull/new/claude/consolidate-agi-ideas-01YSar5mVZedfUZYTyZHa74M
 
 Note: Make sure GitHub Pages is enabled in your repository settings.
 To enable: Settings > Pages > Source > Select branch (usually 'main' or 'gh-pages')
