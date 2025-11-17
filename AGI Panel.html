@@ -354,6 +354,30 @@
             font-size: 0.85em;
             font-weight: bold;
         }
+
+        #savedPromptsContainer {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        #savedPromptsContainer::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #savedPromptsContainer::-webkit-scrollbar-track {
+            background: rgba(0, 20, 40, 0.6);
+            border-radius: 5px;
+        }
+
+        #savedPromptsContainer::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 136, 0.5);
+            border-radius: 5px;
+        }
+
+        #savedPromptsContainer::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 136, 0.7);
+        }
     </style>
 </head>
 <body>
@@ -548,10 +572,16 @@
             copyBtn.textContent = '📋 Copy Prompt';
             copyBtn.onclick = () => copyPromptToClipboard(promptId);
 
+            const saveCopyBtn = document.createElement('button');
+            saveCopyBtn.className = 'action-button';
+            saveCopyBtn.textContent = '💾 Save Copy';
+            saveCopyBtn.onclick = () => saveCopyOfPrompt(promptId, name);
+
             wrapper.appendChild(textarea);
             wrapper.appendChild(removeBtn);
 
             buttonGroup.appendChild(copyBtn);
+            buttonGroup.appendChild(saveCopyBtn);
 
             promptContainer.appendChild(nameLabel);
             promptContainer.appendChild(wrapper);
@@ -561,20 +591,42 @@
         }
 
         function removePromptBox(name, promptId) {
-            if (confirm(`Remove prompt "${name}"?`)) {
-                // Remove from DOM
-                const container = document.getElementById(`container_${promptId}`);
-                if (container) {
-                    container.remove();
-                }
-
-                // Remove from localStorage
-                let savedPrompts = JSON.parse(localStorage.getItem('agiPrompts') || '{}');
-                delete savedPrompts[name];
-                localStorage.setItem('agiPrompts', JSON.stringify(savedPrompts));
-
-                showNotification(`✓ Removed prompt: "${name}"`);
+            // Remove from DOM
+            const container = document.getElementById(`container_${promptId}`);
+            if (container) {
+                container.remove();
             }
+
+            // Remove from localStorage
+            let savedPrompts = JSON.parse(localStorage.getItem('agiPrompts') || '{}');
+            delete savedPrompts[name];
+            localStorage.setItem('agiPrompts', JSON.stringify(savedPrompts));
+
+            showNotification(`✓ Removed prompt: "${name}"`);
+        }
+
+        function saveCopyOfPrompt(promptId, originalName) {
+            const textarea = document.getElementById(promptId);
+            const currentText = textarea.value;
+
+            // Generate a unique name
+            let copyNumber = 1;
+            let newName = `${originalName} (${copyNumber})`;
+
+            let savedPrompts = JSON.parse(localStorage.getItem('agiPrompts') || '{}');
+            while (savedPrompts[newName]) {
+                copyNumber++;
+                newName = `${originalName} (${copyNumber})`;
+            }
+
+            // Save the new copy
+            savedPrompts[newName] = currentText;
+            localStorage.setItem('agiPrompts', JSON.stringify(savedPrompts));
+
+            // Create a new prompt box
+            createPromptBox(newName, currentText);
+
+            showNotification(`✓ Saved copy as "${newName}"`);
         }
 
         function loadSavedPrompts() {
