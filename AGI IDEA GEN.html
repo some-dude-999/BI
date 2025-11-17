@@ -320,20 +320,25 @@
 
         // Get row color based on score (continuous gradient)
         function getRowColor(score) {
-            // Score range: 0-10
-            // Red (bad): 0-4
-            // White (medium): 5
-            // Green (good): 6-10
+            // Adjusted for actual data range (most scores are 6-10)
+            // Red (bad): 0-6.5
+            // Yellow/White (medium): 6.5-8.5
+            // Green (good): 8.5-10
 
-            if (score < 5) {
-                // Red gradient: darker red at 0, lighter towards 5
-                const intensity = Math.floor((score / 5) * 100 + 155); // 155-255
+            if (score < 6.5) {
+                // Red gradient: darker red at 0, lighter towards 6.5
+                const ratio = score / 6.5;
+                const intensity = Math.floor(ratio * 100 + 155); // 155-255
                 return `rgb(255, ${intensity}, ${intensity})`;
-            } else if (score === 5) {
-                return 'rgb(255, 255, 255)'; // White
+            } else if (score < 8.5) {
+                // Yellow to white gradient: 6.5 is yellow (255,255,200), 8.5 is white (255,255,255)
+                const ratio = (score - 6.5) / 2.0; // 0 to 1
+                const yellowIntensity = Math.floor(200 + (55 * ratio)); // 200-255
+                return `rgb(255, 255, ${yellowIntensity})`;
             } else {
-                // Green gradient: lighter green at 6, darker towards 10
-                const intensity = Math.floor(((10 - score) / 5) * 100 + 155); // 255-155
+                // Green gradient: 8.5 is light green, 10 is darker green
+                const ratio = (score - 8.5) / 1.5; // 0 to 1
+                const intensity = Math.floor(255 - (ratio * 100)); // 255-155
                 return `rgb(${intensity}, 255, ${intensity})`;
             }
         }
