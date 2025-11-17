@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGI Idea Generation Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .llm-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .llm-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .llm-checkbox:hover {
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+
+        .llm-checkbox input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .llm-checkbox label {
+            cursor: pointer;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .outlier-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #28a745;
+            border-radius: 20px;
+            width: fit-content;
+        }
+
+        .outlier-control input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .outlier-control label {
+            font-weight: 600;
+            color: #28a745;
+            cursor: pointer;
+        }
+
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            background: #f8f9fa;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            background: #e9ecef;
+            border: none;
+            border-right: 1px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background: #dee2e6;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            margin-bottom: -3px;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .rocket {
+            color: #ff6b6b;
+            font-size: 1.2em;
+        }
+
+        .score-high {
+            background: #d4edda;
+            color: #155724;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        .score-medium {
+            background: #fff3cd;
+            color: #856404;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        .score-low {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        .llm-count {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .info-badge {
+            display: inline-block;
+            background: #17a2b8;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.85em;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>=€ AGI Idea Generation Analysis Dashboard</h1>
+
+        <div class="controls">
+            <div class="llm-checkboxes" id="llmCheckboxes"></div>
+            <div class="outlier-control">
+                <input type="checkbox" id="removeOutliers" checked>
+                <label for="removeOutliers">Remove Outliers (Highest & Lowest Scores)</label>
+            </div>
+        </div>
+
+        <div class="tabs" id="tabs"></div>
+
+        <div id="tabContents"></div>
+    </div>
+
+    <script>
+        const csvData = {
+            'ChatGPT 1': [],
+            'ChatGPT 2': [],
+            'Claude 1': [],
+            'Claude 2': [],
+            'Gemini 1': [],
+            'Gemini 2': [],
+            'Grok 1': [],
+            'Grok 2': [],
+            'Kimi 1': [],
+            'Kimi 2': []
+        };
+
+        const llmFiles = {
+            'ChatGPT 1': 'AGI IDEA GEN/[ChatGPT 1] AGI IDEA GEN.csv',
+            'ChatGPT 2': 'AGI IDEA GEN/[ChatGPT 2] AGI IDEA GEN.csv',
+            'Claude 1': 'AGI IDEA GEN/Claude 1.csv',
+            'Claude 2': 'AGI IDEA GEN/Claude 2.csv',
+            'Gemini 1': 'AGI IDEA GEN/Gemini 1.csv',
+            'Gemini 2': 'AGI IDEA GEN/Gemini 2.csv',
+            'Grok 1': 'AGI IDEA GEN/Grok 1.csv',
+            'Grok 2': 'AGI IDEA GEN/Grok 2.csv',
+            'Kimi 1': 'AGI IDEA GEN/Kimi 1.csv',
+            'Kimi 2': 'AGI IDEA GEN/Kimi 2.csv'
+        };
+
+        let selectedLLMs = new Set(Object.keys(llmFiles));
+        let removeOutliers = true;
+        let updateTimeout;
+
+        // Parse CSV
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
+            const result = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i];
+                if (!line.trim()) continue;
+
+                const parts = [];
+                let current = '';
+                let inQuotes = false;
+
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        parts.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                parts.push(current.trim());
+
+                if (parts.length >= 3) {
+                    result.push({
+                        name: parts[0].replace(/^"|"$/g, ''),
+                        score: parseFloat(parts[1]),
+                        reasoning: parts[2].replace(/^"|"$/g, '')
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        // Load CSV files
+        async function loadAllCSVs() {
+            for (const [llm, file] of Object.entries(llmFiles)) {
+                try {
+                    const response = await fetch(file);
+                    const text = await response.text();
+                    csvData[llm] = parseCSV(text);
+                } catch (error) {
+                    console.error(`Error loading ${llm}:`, error);
+                }
+            }
+            initializeUI();
+        }
+
+        // Create score badge
+        function getScoreBadge(score) {
+            const rounded = score.toFixed(2);
+            if (score >= 8.5) return `<span class="score-high">${rounded}</span>`;
+            if (score >= 6.5) return `<span class="score-medium">${rounded}</span>`;
+            return `<span class="score-low">${rounded}</span>`;
+        }
+
+        // Calculate average with outlier removal
+        function calculateAverage(scores) {
+            if (scores.length === 0) return 0;
+            if (scores.length === 1) return scores[0];
+
+            if (removeOutliers && scores.length >= 3) {
+                const sorted = [...scores].sort((a, b) => a - b);
+                sorted.shift(); // Remove lowest
+                sorted.pop();   // Remove highest
+                return sorted.reduce((a, b) => a + b, 0) / sorted.length;
+            }
+
+            return scores.reduce((a, b) => a + b, 0) / scores.length;
+        }
+
+        // Get combined data
+        function getCombinedData() {
+            const ideasMap = new Map();
+
+            for (const [llm, ideas] of Object.entries(csvData)) {
+                if (!selectedLLMs.has(llm)) continue;
+
+                for (const idea of ideas) {
+                    if (!ideasMap.has(idea.name)) {
+                        ideasMap.set(idea.name, {
+                            name: idea.name,
+                            scores: [],
+                            comments: []
+                        });
+                    }
+
+                    const entry = ideasMap.get(idea.name);
+                    entry.scores.push(idea.score);
+                    entry.comments.push(`<strong>${llm}:</strong> ${idea.reasoning}`);
+                }
+            }
+
+            const combined = [];
+            for (const [name, data] of ideasMap) {
+                combined.push({
+                    name,
+                    avgScore: calculateAverage(data.scores),
+                    llmCount: data.scores.length,
+                    comments: data.comments.join('<br><br>')
+                });
+            }
+
+            return combined.sort((a, b) => b.avgScore - a.avgScore);
+        }
+
+        // Create table for individual LLM
+        function createLLMTable(llm) {
+            const data = csvData[llm];
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40%">Idea Name</th>
+                            <th width="10%">Score</th>
+                            <th width="50%">Reasoning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            for (const idea of data) {
+                const hasRocket = idea.name.includes('=€');
+                html += `
+                    <tr>
+                        <td>${idea.name}</td>
+                        <td>${getScoreBadge(idea.score)}</td>
+                        <td>${idea.reasoning}</td>
+                    </tr>
+                `;
+            }
+
+            html += '</tbody></table>';
+            return html;
+        }
+
+        // Create combined table
+        function createCombinedTable() {
+            const data = getCombinedData();
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="35%">Idea Name</th>
+                            <th width="10%">Avg Score</th>
+                            <th width="10%">LLM Count</th>
+                            <th width="45%">Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            for (const idea of data) {
+                html += `
+                    <tr>
+                        <td>${idea.name}</td>
+                        <td>${getScoreBadge(idea.avgScore)}</td>
+                        <td><span class="llm-count">${idea.llmCount} LLMs</span></td>
+                        <td>${idea.comments}</td>
+                    </tr>
+                `;
+            }
+
+            html += '</tbody></table>';
+            return html;
+        }
+
+        // Switch tab
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`content-${tabName}`).classList.add('active');
+        }
+
+        // Update combined table with delay
+        function scheduleUpdate() {
+            clearTimeout(updateTimeout);
+            updateTimeout = setTimeout(() => {
+                const combinedContent = document.getElementById('content-Combined');
+                if (combinedContent) {
+                    combinedContent.innerHTML = createCombinedTable();
+                }
+            }, 500);
+        }
+
+        // Initialize UI
+        function initializeUI() {
+            // Create LLM checkboxes
+            const checkboxContainer = document.getElementById('llmCheckboxes');
+            for (const llm of Object.keys(llmFiles)) {
+                const div = document.createElement('div');
+                div.className = 'llm-checkbox';
+                div.innerHTML = `
+                    <input type="checkbox" id="llm-${llm}" checked>
+                    <label for="llm-${llm}">${llm}</label>
+                `;
+                checkboxContainer.appendChild(div);
+
+                div.querySelector('input').addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        selectedLLMs.add(llm);
+                    } else {
+                        selectedLLMs.delete(llm);
+                    }
+                    scheduleUpdate();
+                });
+            }
+
+            // Outlier checkbox
+            document.getElementById('removeOutliers').addEventListener('change', (e) => {
+                removeOutliers = e.target.checked;
+                scheduleUpdate();
+            });
+
+            // Create tabs
+            const tabsContainer = document.getElementById('tabs');
+            const tabContents = document.getElementById('tabContents');
+
+            // Combined tab first
+            const combinedTab = document.createElement('button');
+            combinedTab.className = 'tab active';
+            combinedTab.textContent = 'Combined';
+            combinedTab.dataset.tab = 'Combined';
+            combinedTab.addEventListener('click', () => switchTab('Combined'));
+            tabsContainer.appendChild(combinedTab);
+
+            const combinedContent = document.createElement('div');
+            combinedContent.id = 'content-Combined';
+            combinedContent.className = 'tab-content active';
+            combinedContent.innerHTML = createCombinedTable();
+            tabContents.appendChild(combinedContent);
+
+            // Individual LLM tabs
+            for (const llm of Object.keys(llmFiles)) {
+                const tab = document.createElement('button');
+                tab.className = 'tab';
+                tab.textContent = llm;
+                tab.dataset.tab = llm;
+                tab.addEventListener('click', () => switchTab(llm));
+                tabsContainer.appendChild(tab);
+
+                const content = document.createElement('div');
+                content.id = `content-${llm}`;
+                content.className = 'tab-content';
+                content.innerHTML = createLLMTable(llm);
+                tabContents.appendChild(content);
+            }
+        }
+
+        // Load data on page load
+        loadAllCSVs();
+    </script>
+</body>
+</html>
