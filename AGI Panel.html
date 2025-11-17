@@ -141,7 +141,6 @@
         .checkbox-item {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             gap: 10px;
             padding: 10px;
             background: rgba(0, 255, 136, 0.05);
@@ -153,35 +152,6 @@
         .checkbox-item:hover {
             background: rgba(0, 255, 136, 0.1);
             border-color: rgba(0, 255, 136, 0.5);
-        }
-
-        .checkbox-item label {
-            font-size: 1em;
-            user-select: none;
-            flex: 1;
-        }
-
-        .checkbox-item select {
-            width: 60px;
-            padding: 5px;
-            background: rgba(0, 20, 40, 0.8);
-            border: 2px solid #00ff88;
-            border-radius: 5px;
-            color: #00ff88;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .checkbox-item select:hover {
-            border-color: #00ccff;
-            background: rgba(0, 20, 40, 1);
-        }
-
-        .checkbox-item select:focus {
-            outline: none;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
         }
 
         .prompt-section {
@@ -492,87 +462,44 @@
         <div class="subtitle">Multi-Model Intelligence Deployment System</div>
         
         <button class="main-button" onclick="openAGIPanel()">🚀 OPEN AGI PANEL 🚀</button>
-        
+
+        <div style="margin-bottom: 20px; text-align: center;">
+            <label style="color: #00ccff; font-size: 1.1em; margin-right: 15px;">Tabs per LLM:</label>
+            <select id="tabCount" style="width: 80px; padding: 10px; background: rgba(0, 20, 40, 0.8); border: 2px solid #00ff88; border-radius: 5px; color: #00ff88; font-family: 'Courier New', monospace; font-size: 1em; cursor: pointer;">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+        </div>
+
         <div class="checkboxes">
             <div class="checkbox-item">
-                <label for="claude">Claude</label>
-                <select id="claude">
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2" selected>2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                </select>
+                <input type="checkbox" id="claude" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #00ff88;">
+                <label for="claude" style="cursor: pointer;">Claude</label>
             </div>
             <div class="checkbox-item">
-                <label for="kimi">Kimi</label>
-                <select id="kimi">
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2" selected>2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                </select>
+                <input type="checkbox" id="kimi" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #00ff88;">
+                <label for="kimi" style="cursor: pointer;">Kimi</label>
             </div>
             <div class="checkbox-item">
-                <label for="chatgpt">ChatGPT</label>
-                <select id="chatgpt">
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2" selected>2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                </select>
+                <input type="checkbox" id="chatgpt" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #00ff88;">
+                <label for="chatgpt" style="cursor: pointer;">ChatGPT</label>
             </div>
             <div class="checkbox-item">
-                <label for="grok">Grok</label>
-                <select id="grok">
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2" selected>2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                </select>
+                <input type="checkbox" id="grok" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #00ff88;">
+                <label for="grok" style="cursor: pointer;">Grok</label>
             </div>
             <div class="checkbox-item">
-                <label for="gemini">Gemini</label>
-                <select id="gemini">
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2" selected>2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                </select>
+                <input type="checkbox" id="gemini" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #00ff88;">
+                <label for="gemini" style="cursor: pointer;">Gemini</label>
             </div>
         </div>
 
@@ -608,14 +535,14 @@
 
         function openAGIPanel() {
             const order = ['claude', 'kimi', 'chatgpt', 'grok', 'gemini'];
+            const tabCount = parseInt(document.getElementById('tabCount').value);
             let openedCount = 0;
             let delay = 0;
 
             order.forEach(ai => {
-                const select = document.getElementById(ai);
-                if (select) {
-                    const count = parseInt(select.value);
-                    for (let i = 0; i < count; i++) {
+                const checkbox = document.getElementById(ai);
+                if (checkbox && checkbox.checked) {
+                    for (let i = 0; i < tabCount; i++) {
                         setTimeout(() => {
                             window.open(AI_URLS[ai], '_blank');
                         }, delay);
