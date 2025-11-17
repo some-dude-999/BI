@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGI Command Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1729 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #00ff88;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 255, 136, 0.03) 0px,
+                    transparent 1px,
+                    transparent 2px,
+                    rgba(0, 255, 136, 0.03) 3px
+                );
+            pointer-events: none;
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100%); }
+        }
+
+        .container {
+            background: rgba(10, 14, 39, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 0 50px rgba(0, 255, 136, 0.3), inset 0 0 20px rgba(0, 255, 136, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ff88, #00ccff, #ff00ff, #00ff88);
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0.5;
+            filter: blur(10px);
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88; }
+            50% { text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88, 0 0 60px #00ff88; }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #00ccff;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .main-button {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%);
+            color: #0a0e27;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+            font-family: 'Courier New', monospace;
+        }
+
+        .main-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 255, 136, 0.6);
+        }
+
+        .main-button:active {
+            transform: translateY(0);
+        }
+
+        .checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: rgba(0, 255, 136, 0.5);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #00ff88;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            font-size: 1em;
+            user-select: none;
+        }
+
+        .prompt-section {
+            margin-top: 30px;
+        }
+
+        .prompt-label {
+            color: #00ccff;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .prompt-box {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            background: rgba(0, 20, 40, 0.6);
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            resize: vertical;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .prompt-box:hover {
+            background: rgba(0, 20, 40, 0.8);
+            border-color: #00ccff;
+        }
+
+        .prompt-box:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 20px;
+            background: rgba(0, 204, 255, 0.2);
+            border: 2px solid #00ccff;
+            border-radius: 8px;
+            color: #00ccff;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .action-button:hover {
+            background: rgba(0, 204, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 204, 255, 0.3);
+        }
+
+        .saved-prompts {
+            margin-top: 20px;
+        }
+
+        .saved-prompt-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 0.85em;
+        }
+
+        .saved-prompt-item:hover {
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .saved-prompt-name {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .delete-button {
+            background: rgba(255, 0, 100, 0.3);
+            border: 1px solid #ff0066;
+            color: #ff0066;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.3s ease;
+        }
+
+        .delete-button:hover {
+            background: rgba(255, 0, 100, 0.5);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: rgba(0, 255, 136, 0.9);
+            color: #0a0e27;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.5);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .save-prompt-input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: rgba(0, 20, 40, 0.6);
+            border: 2px solid #00ff88;
+            border-radius: 5px;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+        }
+
+        .save-prompt-input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ AGI Command Panel ⚡</h1>
+        <div class="subtitle">Multi-Model Intelligence Deployment System</div>
+        
+        <button class="main-button" onclick="openAGIPanel()">🚀 OPEN AGI PANEL 🚀</button>
+        
+        <div class="checkboxes">
+            <div class="checkbox-item">
+                <input type="checkbox" id="claude" checked>
+                <label for="claude">Claude</label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="kimi" checked>
+                <label for="kimi">Kimi</label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="chatgpt" checked>
+                <label for="chatgpt">ChatGPT</label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="grok" checked>
+                <label for="grok">Grok</label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="gemini" checked>
+                <label for="gemini">Gemini</label>
+            </div>
+        </div>
+
+        <div class="prompt-section">
+            <div class="prompt-label">📋 Query Template</div>
+            <textarea 
+                class="prompt-box" 
+                id="promptBox"
+                onclick="copyPromptToClipboard()"
+                placeholder="Click to copy prompt...">Think about what sources will give you maximum insight on this topic and output as a CSV with no other explanations or content outside of this CSV table. The CSV must only have the following columns. Column 1: XXXXXXXX</textarea>
+            
+            <div class="button-group">
+                <button class="action-button" onclick="copyPromptToClipboard()">📋 Copy Prompt</button>
+                <button class="action-button" onclick="showSavePrompt()">💾 Save Prompt</button>
+            </div>
+
+            <div id="savePromptSection" style="display: none;">
+                <input 
+                    type="text" 
+                    class="save-prompt-input" 
+                    id="promptName" 
+                    placeholder="Enter prompt name..."
+                    onkeypress="if(event.key === 'Enter') savePrompt()">
+                <div class="button-group" style="margin-top: 10px;">
+                    <button class="action-button" onclick="savePrompt()">✓ Save</button>
+                    <button class="action-button" onclick="cancelSave()">✗ Cancel</button>
+                </div>
+            </div>
+
+            <div class="saved-prompts" id="savedPrompts">
+                <div class="prompt-label" style="margin-top: 20px;">💾 Saved Prompts</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const AI_URLS = {
+            claude: 'https://claude.ai',
+            kimi: 'https://kimi.moonshot.cn',
+            chatgpt: 'https://chat.openai.com',
+            grok: 'https://x.com/i/grok',
+            gemini: 'https://gemini.google.com'
+        };
+
+        function openAGIPanel() {
+            const order = ['claude', 'kimi', 'chatgpt', 'grok', 'gemini'];
+            let openedCount = 0;
+            let delay = 0;
+
+            order.forEach(ai => {
+                const checkbox = document.getElementById(ai);
+                if (checkbox && checkbox.checked) {
+                    setTimeout(() => {
+                        window.open(AI_URLS[ai], '_blank');
+                    }, delay);
+                    delay += 300; // 300ms delay between each tab
+                    openedCount++;
+                }
+            });
+
+            if (openedCount > 0) {
+                showNotification(`🚀 Launching ${openedCount} AGI interface(s)!`);
+            } else {
+                showNotification('⚠️ Please select at least one AGI to deploy!');
+            }
+        }
+
+        function copyPromptToClipboard() {
+            const promptBox = document.getElementById('promptBox');
+            promptBox.select();
+            navigator.clipboard.writeText(promptBox.value).then(() => {
+                showNotification('✓ Prompt copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                showNotification('✗ Failed to copy prompt');
+            });
+        }
+
+        function showNotification(message) {
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function showSavePrompt() {
+            document.getElementById('savePromptSection').style.display = 'block';
+            document.getElementById('promptName').focus();
+        }
+
+        function cancelSave() {
+            document.getElementById('savePromptSection').style.display = 'none';
+            document.getElementById('promptName').value = '';
+        }
+
+        function savePrompt() {
+            const promptName = document.getElementById('promptName').value.trim();
+            const promptText = document.getElementById('promptBox').value;
+
+            if (!promptName) {
+                showNotification('⚠️ Please enter a prompt name');
+                return;
+            }
+
+            // Get existing prompts from localStorage
+            let savedPrompts = JSON.parse(localStorage.getItem('agiPrompts') || '{}');
+            
+            // Save the new prompt
+            savedPrompts[promptName] = promptText;
+            localStorage.setItem('agiPrompts', JSON.stringify(savedPrompts));
+
+            showNotification(`✓ Prompt "${promptName}" saved!`);
+            cancelSave();
+            loadSavedPrompts();
+        }
+
+        function loadSavedPrompts() {
+            const savedPrompts = JSON.parse(localStorage.getItem('agiPrompts') || '{}');
+            const container = document.getElementById('savedPrompts');
+            
+            // Clear existing prompts (except the label)
+            const label = container.querySelector('.prompt-label');
+            container.innerHTML = '';
+            if (label) {
+                container.appendChild(label);
+            } else {
+                const newLabel = document.createElement('div');
+                newLabel.className = 'prompt-label';
+                newLabel.style.marginTop = '20px';
+                newLabel.textContent = '💾 Saved Prompts';
+                container.appendChild(newLabel);
+            }
+
+            // Add saved prompts
+            Object.keys(savedPrompts).forEach(name => {
+                const item = document.createElement('div');
+                item.className = 'saved-prompt-item';
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'saved-prompt-name';
+                nameSpan.textContent = name;
+                nameSpan.onclick = () => loadPrompt(name);
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-button';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deletePrompt(name);
+                };
+                
+                item.appendChild(nameSpan);
+                item.appendChild(deleteBtn);
+                container.appendChild(item);
+            });
+
+            if (Object.keys(savedPrompts).length === 0) {
+                const empty = document.createElement('div');
+                empty.style.color = 'rgba(0, 255, 136, 0.5)';
+                empty.style.fontSize = '0.85em';
+                empty.style.fontStyle = 'italic';
+                empty.style.marginTop = '10px';
+                empty.textContent = 'No saved prompts yet';
+                container.appendChild(empty);
+            }
+        }
+
+        function loadPrompt(name) {
+            const savedPrompts = JSON.parse(localStorage.getItem('agiPrompts') || '{}');
+            const promptBox = document.getElementById('promptBox');
+            promptBox.value = savedPrompts[name] || '';
+            showNotification(`✓ Loaded prompt: "${name}"`);
+        }
+
+        function deletePrompt(name) {
+            if (confirm(`Delete prompt "${name}"?`)) {
+                let savedPrompts = JSON.parse(localStorage.getItem('agiPrompts') || '{}');
+                delete savedPrompts[name];
+                localStorage.setItem('agiPrompts', JSON.stringify(savedPrompts));
+                showNotification(`✓ Deleted prompt: "${name}"`);
+                loadSavedPrompts();
+            }
+        }
+
+        // Load saved prompts on page load
+        window.onload = () => {
+            loadSavedPrompts();
+        };
+    </script>
+</body>
+</html>
