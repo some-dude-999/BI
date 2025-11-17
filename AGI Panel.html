@@ -492,7 +492,24 @@
         <div class="subtitle">Multi-Model Intelligence Deployment System</div>
         
         <button class="main-button" onclick="openAGIPanel()">🚀 OPEN AGI PANEL 🚀</button>
-        
+
+        <div style="margin-bottom: 20px; padding: 15px; background: rgba(0, 255, 136, 0.1); border: 2px solid #00ff88; border-radius: 10px;">
+            <label style="color: #00ff88; font-weight: bold; margin-right: 10px;">Master Control - Set all LLMs to:</label>
+            <select id="masterControl" onchange="setAllLLMs(this.value)" style="padding: 8px 20px; background: rgba(0, 20, 40, 0.8); border: 2px solid #00ff88; border-radius: 5px; color: #00ff88; font-family: 'Courier New', monospace; font-size: 1em; cursor: pointer;">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+        </div>
+
         <div class="checkboxes">
             <div class="checkbox-item">
                 <label for="claude">Claude</label>
@@ -605,6 +622,17 @@
             grok: 'https://grok.com/',
             gemini: 'https://gemini.google.com/'
         };
+
+        function setAllLLMs(value) {
+            const llms = ['claude', 'kimi', 'chatgpt', 'grok', 'gemini'];
+            llms.forEach(llm => {
+                const select = document.getElementById(llm);
+                if (select) {
+                    select.value = value;
+                }
+            });
+            showNotification(`✓ All LLMs set to ${value}`);
+        }
 
         function openAGIPanel() {
             const order = ['claude', 'kimi', 'chatgpt', 'grok', 'gemini'];
