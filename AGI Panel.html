@@ -355,27 +355,27 @@
             font-weight: bold;
         }
 
-        #savedPromptsContainer {
+        .prompt-section {
             max-height: 600px;
             overflow-y: auto;
             padding-right: 10px;
         }
 
-        #savedPromptsContainer::-webkit-scrollbar {
+        .prompt-section::-webkit-scrollbar {
             width: 10px;
         }
 
-        #savedPromptsContainer::-webkit-scrollbar-track {
+        .prompt-section::-webkit-scrollbar-track {
             background: rgba(0, 20, 40, 0.6);
             border-radius: 5px;
         }
 
-        #savedPromptsContainer::-webkit-scrollbar-thumb {
+        .prompt-section::-webkit-scrollbar-thumb {
             background: rgba(0, 255, 136, 0.5);
             border-radius: 5px;
         }
 
-        #savedPromptsContainer::-webkit-scrollbar-thumb:hover {
+        .prompt-section::-webkit-scrollbar-thumb:hover {
             background: rgba(0, 255, 136, 0.7);
         }
     </style>
@@ -423,20 +423,7 @@
                 </div>
                 <div class="button-group">
                     <button class="action-button" onclick="copyPromptToClipboard('promptBox')">📋 Copy Prompt</button>
-                    <button class="action-button" onclick="showSavePrompt()">💾 Save Prompt</button>
-                </div>
-            </div>
-
-            <div id="savePromptSection" style="display: none;">
-                <input
-                    type="text"
-                    class="save-prompt-input"
-                    id="promptName"
-                    placeholder="Enter prompt name..."
-                    onkeypress="if(event.key === 'Enter') savePrompt()">
-                <div class="button-group" style="margin-top: 10px;">
-                    <button class="action-button" onclick="savePrompt()">✓ Save</button>
-                    <button class="action-button" onclick="cancelSave()">✗ Cancel</button>
+                    <button class="action-button" onclick="savePrompt()">💾 Save Prompt</button>
                 </div>
             </div>
 
@@ -503,29 +490,26 @@
             }, 3000);
         }
 
-        function showSavePrompt() {
-            document.getElementById('savePromptSection').style.display = 'block';
-            document.getElementById('promptName').focus();
-        }
-
-        function cancelSave() {
-            document.getElementById('savePromptSection').style.display = 'none';
-            document.getElementById('promptName').value = '';
-        }
-
         let promptCounter = 0;
 
         function savePrompt() {
-            const promptName = document.getElementById('promptName').value.trim();
             const promptText = document.getElementById('promptBox').value;
 
-            if (!promptName) {
-                showNotification('⚠️ Please enter a prompt name');
+            if (!promptText.trim()) {
+                showNotification('⚠️ Prompt is empty');
                 return;
             }
 
             // Get existing prompts from localStorage
             let savedPrompts = JSON.parse(localStorage.getItem('agiPrompts') || '{}');
+
+            // Auto-generate prompt name
+            let promptNumber = 1;
+            let promptName = `Prompt ${promptNumber}`;
+            while (savedPrompts[promptName]) {
+                promptNumber++;
+                promptName = `Prompt ${promptNumber}`;
+            }
 
             // Save the new prompt
             savedPrompts[promptName] = promptText;
@@ -534,8 +518,7 @@
             // Create a new prompt box
             createPromptBox(promptName, promptText);
 
-            showNotification(`✓ Prompt "${promptName}" saved!`);
-            cancelSave();
+            showNotification(`✓ Saved as "${promptName}"`);
         }
 
         function createPromptBox(name, text) {
