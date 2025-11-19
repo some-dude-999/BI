@@ -1,0 +1,85 @@
+=== MarketTop2025.txt ===
+PROJECT: BI (Business Intelligence)
+COMPONENT: Market Top 2025 Price Prediction Analysis Dashboard
+CREATED: 2025-11-19
+LAST UPDATED: 2025-11-19 - Initial creation
+
+DATA SOURCES:
+- CSV Files: MarketTop2025/*.csv (10 files total)
+  * ChatGPT 1.csv - ChatGPT first prediction run
+  * ChatGPT 2.csv - ChatGPT second prediction run
+  * Claude 1.csv - Claude first prediction run
+  * Claude 2.csv - Claude second prediction run
+  * Gemini 1.csv - Gemini first prediction run
+  * Gemini 2.csv - Gemini second prediction run
+  * Grok 1.csv - Grok first prediction run
+  * Grok 2.csv - Grok second prediction run
+  * Kimi 1.csv - Kimi first prediction run
+  * Kimi 2.csv - Kimi second prediction run
+
+CSV STRUCTURE:
+- Column 1: Asset Name (e.g., "Bitcoin", "S&P 500", "Gold")
+- Column 2: Predicted Top Price (numeric value)
+- Column 3: Predicted Date (date string)
+- Column 4: Reasoning (text explanation for the prediction)
+
+FUNCTIONALITY:
+- Main Purpose: Display and analyze market top price predictions from multiple LLMs for 2025
+- Key Functions:
+  * parseCSV() - Parses CSV files with asset predictions
+  * formatPrice() - Formats prices with $ and commas (e.g., $185,000.00)
+  * formatDate() - Formats dates nicely (e.g., "Jan 2026", "Apr 2026")
+  * calculateAverage() - Calculates average price across LLMs with optional outlier removal
+  * getCombinedData() - Combines all LLM predictions for each asset
+  * createCombinedTable() - Creates combined view with average prices
+  * createLLMTable() - Creates individual LLM prediction tables
+  * showPriceCalculation() - Shows popup with price calculation breakdown
+  * showIndividualPrediction() - Shows individual LLM prediction details
+  * showReasoning() - Shows reasoning in modal popup
+
+- Event Handlers:
+  * LLM checkbox toggles - Filter which LLMs to include in analysis
+  * "Remove Outliers" checkbox - Toggle outlier removal (removes highest and lowest when 3+ predictions)
+  * Tab switching - Switch between Combined view and individual LLM views
+  * Column sorting - Sort by predicted price (ascending/descending)
+  * "Show Reasoning" buttons - Display reasoning popups
+  * Price click in Combined view - Show calculation breakdown
+
+DEPENDENCIES:
+- External Libraries: None (vanilla JavaScript)
+- Project Files:
+  * MarketTop2025/*.csv files (10 CSV files)
+- APIs Required: None (all data from local CSV files)
+
+INTEGRATION:
+- Standalone dashboard
+- Based on structure from "AGI IDEA GEN.html"
+- Receives data from: CSV files in MarketTop2025/ folder
+- Sends data to: None (display only)
+- Triggers: Loads automatically on page load via loadAllCSVs()
+
+KEY DIFFERENCES FROM AGI IDEA GEN.html:
+1. Theme: Financial colors (green to red gradient) instead of purple
+2. Removed: "🚀 Our Ideas Only" filter (not relevant for market data)
+3. Data structure: asset name, price, date, reasoning (vs idea name, score, reasoning)
+4. No color gradient on prices - displayed as regular formatted numbers
+5. Price formatting: $ sign with commas (e.g., $185,000.00)
+6. Date formatting: Human-readable format (e.g., "Jan 2026")
+7. Column headers: "Asset Name", "Predicted Top Price", "Predicted Date", "Show Reasoning"
+8. Button text: "Show Reasoning" instead of "Show Comment"
+9. Calculation shows price averaging instead of score averaging
+
+DESIGN CHOICES:
+- Financial theme with green/red colors (bull/bear market colors)
+- Prices displayed without color gradient for clarity and readability
+- Outlier removal option maintained for better consensus analysis
+- Interactive features: sortable columns, tabbed interface, modal popups
+- Responsive design with hover effects and smooth animations
+
+NOTES:
+- Ensure all 10 CSV files exist in MarketTop2025/ folder before using
+- CSV files must have correct format: name, price, date, reasoning
+- Outlier removal only applies when 3+ LLMs have predictions for an asset
+- Prices are sorted from highest to lowest by default
+- All monetary values formatted with 2 decimal places
+===
