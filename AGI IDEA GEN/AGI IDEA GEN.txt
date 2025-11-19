@@ -1,0 +1,167 @@
+# AGI IDEA GEN System Documentation
+
+## Overview
+The AGI IDEA GEN system is an interactive dashboard for analyzing and comparing business idea scores across multiple AI language models (LLMs). It provides a visual, comparative analysis of ideas with color-coded scoring, filtering, and detailed reasoning.
+
+## File Structure
+
+### HTML File
+- **Location**: `/AGI IDEA GEN.html` (in the root directory)
+- **Purpose**: Main dashboard interface that displays and analyzes all CSV data
+- **Features**:
+  - Tab-based navigation (Combined view + individual LLM views)
+  - Color-coded rows (green = high score, red = low score)
+  - Interactive score calculations with outlier removal
+  - Clickable scores and comments with popup modals
+  - Filtering options (Remove Outliers, 🚀 Our Ideas Only)
+  - Sortable columns
+
+### CSV Files
+- **Location**: `/AGI IDEA GEN/` folder
+- **Naming Convention**: `[LLM Name] [Number].csv`
+  - Example: `Gemini 1.csv`, `Claude 2.csv`, `ChatGPT 1.csv`
+- **Structure**: 3 columns (comma-separated)
+  ```
+  idea name,score,reasoning
+  ```
+  - **idea name**: Name of the business idea (include 🚀 emoji for "our ideas")
+  - **score**: Numerical score from 0-10 (can have decimals like 9.92)
+  - **reasoning**: Detailed explanation of the score (can be long text with quotes)
+
+### Supported LLMs
+The system expects CSV files for the following LLMs:
+1. ChatGPT 1 & ChatGPT 2
+2. Claude 1 & Claude 2
+3. Gemini 1 & Gemini 2
+4. Grok 1 & Grok 2
+5. Kimi 1 & Kimi 2
+
+## How It Works
+
+### Data Loading
+1. When you open `AGI IDEA GEN.html` in a browser, it automatically loads all CSV files from the `AGI IDEA GEN/` folder
+2. Each CSV is parsed and stored in memory
+3. The JavaScript processes the data and creates interactive tables
+
+### Scoring System
+- **Individual LLM View**: Shows raw scores from that specific LLM
+- **Combined View**: Aggregates scores across selected LLMs
+  - Default: Average of all scores with outliers removed
+  - Outlier Removal: Drops the highest and lowest scores before averaging (requires 3+ scores)
+  - Formula: `(sum of middle scores) / (count of middle scores)`
+
+### Color Coding
+Rows are colored using a continuous gradient:
+- **Score 10.0**: Light green (rgb(144, 238, 144))
+- **Score 7.5**: White (neutral)
+- **Score 0.0**: Light pink/red (rgb(255, 182, 193))
+
+### Rocket Ship Icons (🚀)
+- Ideas marked with 🚀 are "our ideas" (user-submitted/original ideas)
+- The "🚀 Our Ideas Only" filter shows only these ideas
+- Common "our ideas" include:
+  - Custom automation & internal tools 🚀
+  - STEM/Math/Language/General learning games 🚀
+  - 3D printing files 🚀
+  - Print-on-demand graphics 🚀
+  - Printable activities 🚀
+  - Ambient music for sleep & relaxation 🚀
+  - Children's books for language learning 🚀
+
+### Interactive Features
+1. **Checkboxes**: Select/deselect LLMs to include in Combined view
+2. **Remove Outliers**: Toggle outlier removal in score calculations
+3. **Sortable Columns**: Click column headers to sort by score
+4. **Score Popups**: Click scores to see calculation breakdowns
+5. **Comment Popups**: Click "📝 Show Comment" to read full reasoning
+
+## CSV Data Format Rules
+
+### Important Formatting Notes
+1. **Commas in Text**: Wrap reasoning in quotes if it contains commas
+   ```
+   "Example Idea",9.5,"This is reasoning, with commas, in it."
+   ```
+
+2. **Quotes in Text**: Use proper CSV escaping (double quotes)
+   ```
+   "Example",8.0,"They said ""Hello"" to me."
+   ```
+
+3. **Rocket Icons**: Add 🚀 emoji at the END of idea names for user ideas
+   ```
+   "Custom Automation & Internal Tools 🚀",9.9,"Reasoning here"
+   ```
+
+4. **Score Format**: Use decimals (e.g., 9.92, 8.5, 7.0)
+
+5. **Headers**: First row must be:
+   ```
+   idea name,score,reasoning
+   ```
+   (or variations like "1 to 10 score", "a brief explainer of your reasoning")
+
+## Updating Data
+
+### To Add New Gemini Data:
+1. Create/update `Gemini 1.csv` and `Gemini 2.csv` in the `AGI IDEA GEN/` folder
+2. Ensure CSV follows the 3-column format
+3. Match idea names across LLMs (use same capitalization and rocket icons)
+4. Refresh the HTML page in your browser
+
+### To Add New LLM:
+1. Add CSV files: `[NewLLM] 1.csv` and `[NewLLM] 2.csv`
+2. Update the HTML file's JavaScript (lines 468-492):
+   - Add to `csvData` object
+   - Add to `llmFiles` object with file path
+
+## Best Practices
+
+1. **Consistent Naming**: Use identical idea names across all LLMs for proper aggregation
+2. **Rocket Icons**: Always add 🚀 to user-submitted ideas for filtering
+3. **Backup Old Data**: Move old CSV versions to subfolders (e.g., `ZZZ OLD DATA/`)
+4. **Score Range**: Keep scores between 0-10 for proper color coding
+5. **Reasoning Quality**: Provide detailed, specific reasoning (2-3 sentences minimum)
+
+## Common Issues
+
+### Ideas Not Appearing in Combined View
+- Check that idea names match exactly across CSV files
+- Verify CSV formatting (commas, quotes)
+- Ensure file is in correct folder and named correctly
+
+### Scores Look Wrong
+- Verify "Remove Outliers" setting matches expectations
+- Check that selected LLMs include the ones you want
+- Click the score to see calculation breakdown
+
+### Colors Not Showing
+- Ensure scores are valid numbers (not text)
+- Check score range (should be 0-10)
+
+## Technical Details
+
+### File Paths
+The HTML expects files at:
+```
+AGI IDEA GEN/[ChatGPT 1] AGI IDEA GEN.csv
+AGI IDEA GEN/[ChatGPT 2] AGI IDEA GEN.csv
+AGI IDEA GEN/Claude 1.csv
+AGI IDEA GEN/Claude 2.csv
+AGI IDEA GEN/Gemini 1.csv
+AGI IDEA GEN/Gemini 2.csv
+AGI IDEA GEN/Grok 1.csv
+AGI IDEA GEN/Grok 2.csv
+AGI IDEA GEN/Kimi 1.csv
+AGI IDEA GEN/Kimi 2.csv
+```
+
+### Browser Compatibility
+- Tested on modern browsers (Chrome, Firefox, Safari, Edge)
+- Requires JavaScript enabled
+- Local file access may require running a local server
+
+### Performance
+- Can handle hundreds of ideas across all LLMs
+- All processing done client-side (no server required)
+- Data cached in memory for fast switching between tabs
