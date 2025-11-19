@@ -1,26 +1,14 @@
-GitHub Pages Links for HTML Files
-=====================================
+# GitHub Pages Links for HTML Files
+==================================================
 
 Repository: some-dude-999/BI
 Base URL: https://some-dude-999.github.io/BI/
 
 HTML Files:
------------
+--------------------------------------------------
 
-1. AGI Panel.html
-   https://some-dude-999.github.io/BI/AGI%20Panel.html
+1. AGI IDEA GEN.html
+   https://some-dude-999.github.io/BI/AGI%20IDEA%20GEN.html - Interactive dashboard for analyzing and comparing business idea scores across multiple AI language models
 
-2. AGI IDEA GEN.html
-   https://some-dude-999.github.io/BI/AGI%20IDEA%20GEN.html
-
-Pull Requests:
---------------
-
-1. Delete Gen Era Business contents and Python files:
-   https://github.com/some-dude-999/BI/pull/new/claude/delete-gen-era-python-files-01SuQfY859cxqvHBsAvtAr3R
-
-2. Consolidate and standardize AGI idea generation data:
-   https://github.com/some-dude-999/BI/pull/new/claude/consolidate-agi-ideas-01YSar5mVZedfUZYTyZHa74M
-
-Note: Make sure GitHub Pages is enabled in your repository settings.
-To enable: Settings > Pages > Source > Select branch (usually 'main' or 'gh-pages')
+2. AGI Panel.html
+   https://some-dude-999.github.io/BI/AGI%20Panel.html - Multi-LLM query launcher for opening multiple AI chatbot tabs simultaneously with prompt management

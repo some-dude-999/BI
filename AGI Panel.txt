@@ -1,0 +1,88 @@
+=== AGI Panel.txt ===
+PROJECT: BI - Business Idea Analysis System
+COMPONENT: AGI Command Panel - Multi-LLM Query Launcher
+CREATED: 2025-11-19
+LAST UPDATED: 2025-11-19 - Initial documentation created
+
+DATA SOURCES:
+- User Input: Prompt text areas - queries to send to multiple AI models
+- LocalStorage: agiPrompts - saved prompt templates stored in browser
+- Static Data: AI_URLS object - URLs for Claude, Kimi, ChatGPT, Grok, Gemini
+
+FUNCTIONALITY:
+- Main Purpose: Streamline the process of querying multiple AI language models simultaneously with the same prompt
+- Key Functions:
+  * openAGIPanel() - Opens multiple browser tabs based on selected LLM quantities (with 500ms delays between tabs)
+  * setAllLLMs(value) - Master control to set all LLM selectors to the same value (0-10)
+  * copyPromptToClipboard(textareaId) - Copies prompt text to clipboard using Navigator API
+  * savePrompt() - Saves current prompt to localStorage with auto-generated name ("Prompt 1", "Prompt 2", etc.)
+  * createPromptBox(name, text) - Dynamically creates colored prompt containers with copy/save functionality
+  * removePromptBox(name, promptId) - Removes prompt from DOM and localStorage
+  * saveCopyOfPrompt(promptId, originalName) - Creates a duplicate of existing prompt with incremented name
+  * loadSavedPrompts() - Loads all saved prompts from localStorage on page load
+  * showNotification(message) - Displays temporary success/error notifications (3-second duration)
+
+- Event Handlers:
+  * Master Control dropdown - Sets all LLM selectors to same value
+  * Individual LLM selectors - Choose 0-10 tabs to open per model
+  * "OPEN AGI PANEL" button - Triggers multi-tab opening sequence
+  * Copy Prompt buttons - Copy text to clipboard
+  * Save Prompt buttons - Store prompts in localStorage
+  * Remove prompt (X) buttons - Delete saved prompts
+
+DEPENDENCIES:
+- External Libraries: None (vanilla JavaScript)
+- Browser APIs:
+  * localStorage - For persistent prompt storage
+  * Navigator Clipboard API - For copy-to-clipboard functionality
+  * window.open() - For opening multiple browser tabs
+- Project Files:
+  * Standalone HTML file (no dependencies on other project files)
+  * Works with AGI IDEA GEN.html in workflow (but not programmatically connected)
+
+INTEGRATION:
+- Receives data from: User manual input (prompts, LLM selection)
+- Sends data to: Opens external URLs (claude.ai, chatgpt.com, etc.) in new tabs
+- Triggers: User clicks "OPEN AGI PANEL" button
+- Workflow Integration:
+  1. User crafts prompt in AGI Panel
+  2. Opens multiple AI model tabs simultaneously
+  3. User manually pastes prompt into each tab
+  4. User manually exports responses to CSV files
+  5. CSV files loaded into AGI IDEA GEN.html for analysis
+
+STYLING & UI:
+- Theme: Cyberpunk/terminal aesthetic with neon green (#00ff88) primary color
+- Animations: Scanning lines, pulsing glow effects, gradient borders
+- Color Coding: 8 different colors for saved prompts (rotating color assignment)
+- Responsive: Grid layout for LLM checkboxes, flexible button groups
+
+TECHNICAL DETAILS:
+- AI Model URLs:
+  * Claude: https://claude.ai/
+  * Kimi: https://www.kimi.com/
+  * ChatGPT: https://chatgpt.com/
+  * Grok: https://grok.com/
+  * Gemini: https://gemini.google.com/
+- Tab Opening Sequence: Claude → Kimi → ChatGPT → Grok → Gemini (500ms delays)
+- LocalStorage Key: "agiPrompts" (JSON object with prompt names as keys)
+- Prompt Box Color Classes: color-1 through color-8 (rotating)
+- Default Master Control Value: 2 tabs per LLM
+
+CORRECTIONS & CLARIFICATIONS:
+[None yet - initial documentation]
+
+NOTES:
+- Browser pop-up blocker must be disabled for multi-tab opening to work
+- Maximum 10 tabs per LLM (configurable via dropdown)
+- Saved prompts persist across browser sessions (localStorage)
+- Default prompt template suggests CSV output format for idea analysis
+- Prompt counter increments globally (not reset on page reload)
+- Color assignment cycles through 8 colors using modulo operation
+
+FUTURE IMPROVEMENTS:
+- Could add direct CSV export functionality
+- Could integrate API calls to AI models (if available)
+- Could add prompt versioning/history
+- Could add sharing functionality for prompt templates
+===
