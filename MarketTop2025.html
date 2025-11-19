@@ -457,34 +457,44 @@
 
         // Convert numeric value back to YYYY-MM (2025.833... -> 2025-10)
         function numericToDate(numericDate) {
+            if (isNaN(numericDate) || !isFinite(numericDate)) return '';
             const year = Math.floor(numericDate);
             const monthFraction = numericDate - year;
             const month = Math.round(monthFraction * 12) + 1;
-            return `${year}-${String(month).padStart(2, '0')}`;
+            // Ensure month is in valid range
+            const validMonth = Math.max(1, Math.min(12, month));
+            return `${year}-${String(validMonth).padStart(2, '0')}`;
         }
 
         // Format date nicely (e.g., "2025-10" -> "Oct 2025")
         function formatDate(dateStr) {
-            if (!dateStr || dateStr.trim() === '') return 'N/A';
+            // Handle null, undefined, NaN, empty string
+            if (!dateStr || (typeof dateStr === 'string' && dateStr.trim() === '')) return 'N/A';
+            if (typeof dateStr === 'number' && isNaN(dateStr)) return 'N/A';
+
+            // Convert to string if it's a number
+            const dateString = String(dateStr).trim();
 
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
             // Check if it's in YYYY-MM format
-            const parts = dateStr.split('-');
+            const parts = dateString.split('-');
             if (parts.length === 2) {
                 const year = parts[0];
-                const month = parseInt(parts[1]) - 1;
-                if (month >= 0 && month < 12) {
+                const monthNum = parseInt(parts[1]);
+                const month = monthNum - 1;
+                // Validate year and month
+                if (!isNaN(monthNum) && !isNaN(parseInt(year)) && month >= 0 && month < 12) {
                     return `${months[month]} ${year}`;
                 }
             }
 
             // Try to parse as a date
-            const date = new Date(dateStr);
+            const date = new Date(dateString);
             if (isNaN(date.getTime())) {
-                // If parsing fails, return original string
-                return dateStr;
+                // If parsing fails, return N/A instead of original string
+                return 'N/A';
             }
 
             return `${months[date.getMonth()]} ${date.getFullYear()}`;
@@ -615,11 +625,16 @@
 
         // Calculate average date (convert to numeric, average, convert back)
         function calculateAverageDate(dates) {
-            if (dates.length === 0) return 'N/A';
-            if (dates.length === 1) return dates[0];
+            if (!dates || dates.length === 0) return 'N/A';
+            if (dates.length === 1) return dates[0] || 'N/A';
 
-            const numericDates = dates.map(dateToNumeric).filter(d => d > 0);
+            // Convert to numeric and filter out invalid values (NaN, 0, negative)
+            const numericDates = dates.map(dateToNumeric).filter(d => !isNaN(d) && isFinite(d) && d > 0);
             if (numericDates.length === 0) return 'N/A';
+            if (numericDates.length === 1) {
+                const result = numericToDate(numericDates[0]);
+                return result || 'N/A';
+            }
 
             let datesToAverage = numericDates;
 
@@ -630,8 +645,16 @@
                 datesToAverage = sorted;
             }
 
+            // Extra safety check
+            if (datesToAverage.length === 0) return 'N/A';
+
             const avgNumeric = datesToAverage.reduce((a, b) => a + b, 0) / datesToAverage.length;
-            return numericToDate(avgNumeric);
+
+            // Validate the average
+            if (isNaN(avgNumeric) || !isFinite(avgNumeric)) return 'N/A';
+
+            const result = numericToDate(avgNumeric);
+            return result || 'N/A';
         }
 
         // Get combined data
@@ -826,16 +849,23 @@
             let breakdown = '<div class="calculation-breakdown">';
 
             dates.forEach((date, i) => {
-                const llmName = Object.keys(llmFiles)[i % Object.keys(llmFiles).length];
-                breakdown += `<div class="calculation-item">${formatDate(date)} (${dateToNumeric(date).toFixed(4)})</div>`;
+                const numeric = dateToNumeric(date);
+                const numericStr = (isNaN(numeric) || !isFinite(numeric)) ? 'Invalid' : numeric.toFixed(4);
+                breakdown += `<div class="calculation-item">${formatDate(date)} (${numericStr})</div>`;
             });
 
             breakdown += '</div>';
 
             let calculation = '';
-            const numericDates = dates.map(dateToNumeric).filter(d => d > 0);
+            const numericDates = dates.map(dateToNumeric).filter(d => !isNaN(d) && isFinite(d) && d > 0);
 
-            if (removeOutliers && numericDates.length >= 3) {
+            if (numericDates.length === 0) {
+                calculation = `
+                    <div class="calculation-summary">
+                        No valid dates to calculate average
+                    </div>
+                `;
+            } else if (removeOutliers && numericDates.length >= 3) {
                 const sorted = [...numericDates].sort((a, b) => a - b);
                 const lowest = sorted[0];
                 const highest = sorted[sorted.length - 1];
@@ -844,7 +874,7 @@
                 calculation = `
                     <div class="calculation-summary">
                         Formula: (${used.map(d => d.toFixed(4)).join(' + ')}) / ${used.length}<br>
-                        <small style="opacity: 0.8;">Removed outliers: Earliest (${numericToDate(lowest)} = ${lowest.toFixed(4)}) and Latest (${numericToDate(highest)} = ${highest.toFixed(4)})</small><br>
+                        <small style="opacity: 0.8;">Removed outliers: Earliest (${formatDate(numericToDate(lowest))} = ${lowest.toFixed(4)}) and Latest (${formatDate(numericToDate(highest))} = ${highest.toFixed(4)})</small><br>
                         = <strong>${formatDate(avgDate)}</strong>
                     </div>
                 `;
