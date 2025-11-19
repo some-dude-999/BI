@@ -165,3 +165,28 @@ AGI IDEA GEN/Kimi 2.csv
 - Can handle hundreds of ideas across all LLMs
 - All processing done client-side (no server required)
 - Data cached in memory for fast switching between tabs
+
+## Update History
+
+### 2025-11-19: Gemini CSV Data Update
+**Changes Made:**
+- Updated both Gemini 1.csv and Gemini 2.csv with new comprehensive analysis data
+- Cleaned up data structure to maintain consistency with original naming conventions
+- Replaced 👤 icons with 🚀 rocket icons for "our ideas"
+- Combined reasoning, free value props, and paid value props into single reasoning field
+- Added 3 new ideas:
+  - "Language learning RPGs 🚀" (score: 8.88)
+  - "Personal Digital Cloaking & Anti-AI Privacy" (score: 8.52)
+  - "High-Fidelity ""Truth"" Datasets" (score: 6.85)
+- Updated "Local Government AI Manager" to "Local Government & Civic AI Management" for consistency
+- Old Gemini data preserved in ZZZ OLD DATA/ subfolder
+
+**Our Ideas (🚀) in Updated Data:**
+1. Custom automation & internal tools for companies (9.91)
+2. Language learning RPGs (8.88)
+3. STEM learning games (8.76)
+4. 3D printing files across niches (7.95)
+5. Printable activities (coloring pages, mazes, sudoku) (6.25)
+6. Children's books for language learning (5.12)
+7. Print-on-demand graphics (t-shirts, stickers, etc.) (4.55)
+8. Ambient music for sleep & relaxation (2.15)
