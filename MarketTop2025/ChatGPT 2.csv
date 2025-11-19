@@ -1,0 +1,8 @@
+asset name,top tick price,top tick date,reasoning
+SPY,800,Apr 2026,"Assuming S&P500 equivalent hits ~800 (SPY approx) just before recession; driven by peak liquidity, broad complacency, valuations stretched."
+QQQ,700,Apr 2026,"Technology/large cap heavy QQQ peaks slightly later or same time as SPY; narrow leadership peaks while breadth is weak."
+Bitcoin,180000,Oct 2025,"BTC peaks late 2025 around $180K, supported by halving effects, ETF flows, crypto mania – then crash begins when macro risk surfaces."
+Ethereum,8500,Oct 2025,"ETH rides the crypto cycle, alt season peak near same time; ~5x from current ~1700-2000 (if we assume) – then correction."
+BNB,950,Oct 2025,"BNB as major exchange-token/tight supply benefits; peak around ~$950 then sharp unwind."
+Dogecoin,1.20,Oct 2025,"Dogecoin peaks ~$1.20 in speculative mania (FOMO + memes) before big drop."
+Worldcoin,7.50,Oct 2025,"Worldcoin (WLD) – smaller cap, sharp upside during hype; peak ~ $7.50 then large risk of crash."
