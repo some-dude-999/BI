@@ -1,111 +1,103 @@
 # Project Development & Documentation Rules
 
-## 🚨 FIRST PRIORITY: DOCUMENTATION CHECK
-**BEFORE doing ANYTHING else:**
-1. Check if documentation exists for the project/files you're working with
-2. **IF NO DOCUMENTATION EXISTS → CREATE IT IMMEDIATELY**
-3. Analyze the existing code to understand:
-   - Data structures and flow
-   - Program objectives and functionality
-   - API endpoints and data sources
-   - User interactions and outputs
-4. Create comprehensive documentation BEFORE making any changes
+## 🚨 FIRST PRIORITY: DOCUMENTATION
+**No docs? CREATE THEM FIRST.** Understand the system before coding. Update when understanding changes.
 
-### For New LLMs Joining a Project
-**Your first task is ALWAYS:**
-1. Read all existing documentation files
-2. Quickly analyze the codebase to understand the system architecture
-3. Map out the data flow and program objectives
-4. If documentation is missing or incomplete, create/update it first
-5. Only then proceed with requested tasks
+## 🔗 AUTOMATED LINK MANAGEMENT
+**Check for `PythonHelpers/link_manager.py` first**
+- If it exists → Use it
+- If not → Create a Python script that:
+  - Gets repo owner/name from git remote
+  - Finds all .html files
+  - Generates GitHub Pages URLs: `https://[owner].github.io/[repo]/[path]`
+  - Updates LINK.txt with proper URL encoding
+  - Preserves existing descriptions
 
-## 📝 MANDATORY DOCUMENTATION SYSTEM
-**Every HTML file MUST have a corresponding .txt documentation file**
+Run after every HTML change: `python PythonHelpers/link_manager.py`
 
-### Documentation Naming Convention
-- HTML file: `Some Program.html` → Documentation: `Some Program.txt`
-- HTML file: `dashboard.html` → Documentation: `dashboard.txt`
-- Documentation must be in the same directory as its HTML file
+---
 
-### Documentation Contents (Required)
-Each .txt file MUST include:
-1. **PROJECT OVERVIEW** - What this component does and its purpose
-2. **DATA SOURCES** - Where all data comes from (APIs, files, databases, user input)
-3. **SCRIPT FUNCTIONALITY** - How the HTML/JavaScript works, key functions explained
-4. **DEPENDENCIES** - External libraries, APIs, or other files this depends on
-5. **LAST UPDATED** - Date and what changed
-6. **INTEGRATION NOTES** - How this connects with other project components
+## 📝 DOCUMENTATION FILES
+Every `.html` needs a `.txt`: `dashboard.html` → `dashboard.txt`
 
-### Update Protocol
-**CRITICAL: Update documentation EVERY time you:**
-- Create a new HTML file
-- Modify existing functionality
-- Add new data sources
-- Change API endpoints
-- Integrate new features
-- Fix bugs or issues
-- **DISCOVER YOUR INITIAL UNDERSTANDING WAS INCORRECT**
+**Required in each .txt:**
+- What it does & data sources
+- How it works (key functions)  
+- Dependencies & integrations
+- Corrections when initial understanding was wrong
 
-### Documentation Accuracy Rule
-**If your understanding of the project turns out to be incorrect:**
-1. IMMEDIATELY update the documentation with the correct information
-2. Note what was misunderstood and why (helps future LLMs avoid same mistake)
-3. Ensure documentation is maximally accurate and helpful for future versions
-4. Think of documentation as a message to your future self - be thorough!
-
-**Remember: Bad documentation = confused future LLMs = broken projects**
-
-**This documentation is essential for future LLMs to understand and continue the project as it grows in complexity.**
+Update docs with EVERY change. If wrong, fix immediately.
 
 ---
 
 ## 🔄 Git Rules
-**If it's not on main branch, it FAILED.**
-
-### Commit Requirements
-- Always commit and push immediately after any code change
-- Always work directly on main branch
-- Only branch if GitHub technically requires it, then immediately merge to main
-- Verify changes are on main before considering task complete
-
-### Verification Steps
-1. Make changes
-2. Update corresponding .txt documentation
-3. Git add, commit, push
-4. Verify on GitHub that changes appear on main
-5. Update LINK.txt if HTML files were created/modified
-
-**MANDATORY: End every response with a link to create the pull request for the changes just made. No link = task not done.**
+**Not on main = didn't happen.** Always work on main. Commit & push immediately after changes. End every response with PR link.
 
 ---
 
-## 🔗 HTML File Tracking (LINK.txt)
-**After each run, check LINK.txt:**
-- If any .html file was created/modified and not in LINK.txt, add it
-- If the path changed, update it
-- If already listed, leave it alone
-- Applies to ALL .html files in any folder
-
-### LINK.txt Format
+## 🔗 HTML File Tracking (LINK.txt) - NOW AUTOMATED!
+**Use the Python Link Manager for automatic tracking:**
+```bash
+python PythonHelpers/link_manager.py
 ```
-path/to/file.html - Brief description
-another/path/page.html - What this page does
+
+### What Gets Tracked Automatically
+- All .html files in the repository
+- Proper GitHub Pages URLs (https://username.github.io/repo/path/file.html)
+- Handles special characters and spaces in filenames
+- Preserves existing descriptions when updating
+
+### Manual Review After Running Script
+- Check LINK.txt for new entries marked with `[Add description for...]`
+- Update these placeholders with meaningful descriptions
+- Commit the updated LINK.txt with your code changes
+
+### LINK.txt Format (Auto-generated)
+```
+# GitHub Pages Links for some-dude-999/YTC
+# Auto-generated by PythonHelpers/link_manager.py
+
+https://some-dude-999.github.io/YTC/index.html - Main landing page
+https://some-dude-999.github.io/YTC/MUSIC%20THUMBNAIL%20GEN.html - Music thumbnail generator tool
+https://some-dude-999.github.io/YTC/dashboard.html - Analytics dashboard
 ```
 
 ---
 
 ## ⚠️ Remember
 1. **NO DOCUMENTATION = STOP! Create it first before ANY other work**
-2. **Not on main = useless code**
-3. **Incorrect understanding = update documentation immediately**
-4. **Every change needs:**
-   - Documentation check/update FIRST
-   - Code update
-   - Documentation update (if understanding changed)
-   - Git push to main
-   - LINK.txt update (if HTML)
-   - Pull request link in response
-5. **Documentation is a message to your future self - make it count!**
+2. **Check for PythonHelpers/link_manager.py first - use it if it exists!**
+3. **Not on main = useless code**
+4. **Incorrect understanding = update documentation immediately**
+5. **Every change needs this exact sequence:**
+   - Check/create documentation FIRST
+   - Make code changes
+   - Update documentation if understanding changed
+   - **Run `python PythonHelpers/link_manager.py`** (auto-updates LINK.txt)
+   - Review and update descriptions in LINK.txt
+   - Git add, commit, push to main
+   - Provide pull request link in response
+6. **Documentation is a message to your future self - make it count!**
+
+## 🎯 Quick Start Checklist for New Sessions
+```bash
+# 1. Check if link manager exists
+ls PythonHelpers/link_manager.py
+
+# 2. If not found, create it (use the script above)
+mkdir -p PythonHelpers
+# [create link_manager.py with the provided code]
+
+# 3. After any HTML changes, run:
+python PythonHelpers/link_manager.py
+
+# 4. Review and update LINK.txt descriptions
+
+# 5. Commit everything
+git add .
+git commit -m "Updated HTML files and documentation"
+git push origin main
+```
 
 ## Documentation Template Example
 ```text
