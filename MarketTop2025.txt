@@ -2,7 +2,7 @@
 PROJECT: BI (Business Intelligence)
 COMPONENT: Market Top 2025 Price Prediction Analysis Dashboard
 CREATED: 2025-11-19
-LAST UPDATED: 2025-11-19 - Initial creation
+LAST UPDATED: 2025-11-19 - Added date averaging functionality and YYYY-MM date format
 
 DATA SOURCES:
 - CSV Files: MarketTop2025/*.csv (10 files total)
@@ -18,22 +18,34 @@ DATA SOURCES:
   * Kimi 2.csv - Kimi second prediction run
 
 CSV STRUCTURE:
-- Column 1: Asset Name (e.g., "Bitcoin", "S&P 500", "Gold")
-- Column 2: Predicted Top Price (numeric value)
-- Column 3: Predicted Date (date string)
+- Column 1: Asset Name (e.g., "SPY", "BTC", "ETH")
+- Column 2: Predicted Top Price (numeric value without $ sign for JavaScript parsing)
+- Column 3: Predicted Date (YYYY-MM format, e.g., "2025-10" for Oct 2025)
 - Column 4: Reasoning (text explanation for the prediction)
+
+DATE FORMAT:
+- CSVs use YYYY-MM format (e.g., "2025-10", "2025-11", "2026-01")
+- JavaScript converts to numeric for averaging: year + (month - 1) / 12
+- Example: "2025-10" = 2025.75 (October is 10th month)
+- Dates are averaged numerically, then converted back to YYYY-MM format
+- Display format: "MMM YYYY" (e.g., "Oct 2025", "Jan 2026")
 
 FUNCTIONALITY:
 - Main Purpose: Display and analyze market top price predictions from multiple LLMs for 2025
 - Key Functions:
   * parseCSV() - Parses CSV files with asset predictions
   * formatPrice() - Formats prices with $ and commas (e.g., $185,000.00)
-  * formatDate() - Formats dates nicely (e.g., "Jan 2026", "Apr 2026")
+  * formatDate() - Formats dates from YYYY-MM to display format (e.g., "2025-10" -> "Oct 2025")
+  * dateToNumeric() - Converts YYYY-MM to numeric for averaging (e.g., "2025-10" -> 2025.75)
+  * numericToDate() - Converts numeric back to YYYY-MM (e.g., 2025.75 -> "2025-10")
   * calculateAverage() - Calculates average price across LLMs with optional outlier removal
-  * getCombinedData() - Combines all LLM predictions for each asset
-  * createCombinedTable() - Creates combined view with average prices
+  * calculateAverageDate() - Calculates average date across LLMs with optional outlier removal
+  * getCombinedData() - Combines all LLM predictions for each asset (includes avgPrice and avgDate)
+  * createCombinedTable() - Creates combined view with average prices and dates
   * createLLMTable() - Creates individual LLM prediction tables
   * showPriceCalculation() - Shows popup with price calculation breakdown
+  * showDateCalculation() - Shows popup with date calculation breakdown
+  * showCombinedDate() - Triggers date calculation popup for combined view
   * showIndividualPrediction() - Shows individual LLM prediction details
   * showReasoning() - Shows reasoning in modal popup
 
@@ -43,7 +55,8 @@ FUNCTIONALITY:
   * Tab switching - Switch between Combined view and individual LLM views
   * Column sorting - Sort by predicted price (ascending/descending)
   * "Show Reasoning" buttons - Display reasoning popups
-  * Price click in Combined view - Show calculation breakdown
+  * Price click in Combined view - Show price calculation breakdown
+  * Date click in Combined view - Show date calculation breakdown
 
 DEPENDENCIES:
 - External Libraries: None (vanilla JavaScript)
@@ -79,7 +92,11 @@ DESIGN CHOICES:
 NOTES:
 - Ensure all 10 CSV files exist in MarketTop2025/ folder before using
 - CSV files must have correct format: name, price, date, reasoning
+- Dates must be in YYYY-MM format (e.g., "2025-10", "2026-01") for proper averaging
+- Prices must NOT include $ signs in CSV (added by JavaScript formatting)
 - Outlier removal only applies when 3+ LLMs have predictions for an asset
 - Prices are sorted from highest to lowest by default
 - All monetary values formatted with 2 decimal places
+- Combined view shows average predicted price AND average predicted date
+- Click on avg price or avg date to see calculation breakdown with outlier details
 ===
