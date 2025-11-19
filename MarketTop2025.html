@@ -445,19 +445,48 @@
             });
         }
 
-        // Format date nicely (e.g., "Jan 2026", "Apr 2026")
+        // Convert YYYY-MM to numeric value for averaging (2025-10 -> 2025.833...)
+        function dateToNumeric(dateStr) {
+            if (!dateStr || dateStr.trim() === '') return 0;
+            const parts = dateStr.split('-');
+            if (parts.length !== 2) return 0;
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]);
+            return year + (month - 1) / 12;
+        }
+
+        // Convert numeric value back to YYYY-MM (2025.833... -> 2025-10)
+        function numericToDate(numericDate) {
+            const year = Math.floor(numericDate);
+            const monthFraction = numericDate - year;
+            const month = Math.round(monthFraction * 12) + 1;
+            return `${year}-${String(month).padStart(2, '0')}`;
+        }
+
+        // Format date nicely (e.g., "2025-10" -> "Oct 2025")
         function formatDate(dateStr) {
             if (!dateStr || dateStr.trim() === '') return 'N/A';
 
-            // Try to parse the date
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            // Check if it's in YYYY-MM format
+            const parts = dateStr.split('-');
+            if (parts.length === 2) {
+                const year = parts[0];
+                const month = parseInt(parts[1]) - 1;
+                if (month >= 0 && month < 12) {
+                    return `${months[month]} ${year}`;
+                }
+            }
+
+            // Try to parse as a date
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) {
                 // If parsing fails, return original string
                 return dateStr;
             }
 
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             return `${months[date.getMonth()]} ${date.getFullYear()}`;
         }
 
@@ -584,6 +613,27 @@
             return prices.reduce((a, b) => a + b, 0) / prices.length;
         }
 
+        // Calculate average date (convert to numeric, average, convert back)
+        function calculateAverageDate(dates) {
+            if (dates.length === 0) return 'N/A';
+            if (dates.length === 1) return dates[0];
+
+            const numericDates = dates.map(dateToNumeric).filter(d => d > 0);
+            if (numericDates.length === 0) return 'N/A';
+
+            let datesToAverage = numericDates;
+
+            if (removeOutliers && numericDates.length >= 3) {
+                const sorted = [...numericDates].sort((a, b) => a - b);
+                sorted.shift();
+                sorted.pop();
+                datesToAverage = sorted;
+            }
+
+            const avgNumeric = datesToAverage.reduce((a, b) => a + b, 0) / datesToAverage.length;
+            return numericToDate(avgNumeric);
+        }
+
         // Get combined data
         function getCombinedData() {
             const assetsMap = new Map();
@@ -615,6 +665,7 @@
                 combined.push({
                     name,
                     avgPrice: calculateAverage(data.prices),
+                    avgDate: calculateAverageDate(data.dates),
                     llmCount: data.prices.length,
                     reasonings: data.reasonings.join('<br><br>'),
                     pricesWithLLM: data.pricesWithLLM,
@@ -708,10 +759,11 @@
                 <table>
                     <thead>
                         <tr>
-                            <th width="25%">Asset Name</th>
-                            <th width="20%" class="sortable ${sortClass}" onclick="toggleSort('Combined')">Avg Predicted Price</th>
+                            <th width="20%">Asset Name</th>
+                            <th width="18%" class="sortable ${sortClass}" onclick="toggleSort('Combined')">Avg Predicted Price</th>
+                            <th width="15%">Avg Predicted Date</th>
                             <th width="10%">LLM Count</th>
-                            <th width="20%">Actions</th>
+                            <th width="18%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -724,6 +776,11 @@
                         <td class="price-value">
                             <span style="cursor: pointer;" onclick="showCombinedPrice(${index})">
                                 ${formatPrice(asset.avgPrice)}
+                            </span>
+                        </td>
+                        <td class="date-value">
+                            <span style="cursor: pointer;" onclick="showCombinedDate(${index})">
+                                ${formatDate(asset.avgDate)}
                             </span>
                         </td>
                         <td><span class="llm-count">${asset.llmCount} LLMs</span></td>
@@ -754,6 +811,56 @@
             if (asset) {
                 showPriceCalculation(asset.name, asset.pricesWithLLM, asset.rawPrices, asset.avgPrice);
             }
+        }
+
+        // Show combined table date by index
+        function showCombinedDate(index) {
+            const asset = currentCombinedData[index];
+            if (asset) {
+                showDateCalculation(asset.name, asset.dates, asset.avgDate);
+            }
+        }
+
+        // Show date calculation popup
+        function showDateCalculation(assetName, dates, avgDate) {
+            let breakdown = '<div class="calculation-breakdown">';
+
+            dates.forEach((date, i) => {
+                const llmName = Object.keys(llmFiles)[i % Object.keys(llmFiles).length];
+                breakdown += `<div class="calculation-item">${formatDate(date)} (${dateToNumeric(date).toFixed(4)})</div>`;
+            });
+
+            breakdown += '</div>';
+
+            let calculation = '';
+            const numericDates = dates.map(dateToNumeric).filter(d => d > 0);
+
+            if (removeOutliers && numericDates.length >= 3) {
+                const sorted = [...numericDates].sort((a, b) => a - b);
+                const lowest = sorted[0];
+                const highest = sorted[sorted.length - 1];
+                const used = sorted.slice(1, -1);
+
+                calculation = `
+                    <div class="calculation-summary">
+                        Formula: (${used.map(d => d.toFixed(4)).join(' + ')}) / ${used.length}<br>
+                        <small style="opacity: 0.8;">Removed outliers: Earliest (${numericToDate(lowest)} = ${lowest.toFixed(4)}) and Latest (${numericToDate(highest)} = ${highest.toFixed(4)})</small><br>
+                        = <strong>${formatDate(avgDate)}</strong>
+                    </div>
+                `;
+            } else {
+                calculation = `
+                    <div class="calculation-summary">
+                        Formula: (${numericDates.map(d => d.toFixed(4)).join(' + ')}) / ${numericDates.length}<br>
+                        = <strong>${formatDate(avgDate)}</strong>
+                    </div>
+                `;
+            }
+
+            showModal(
+                `Date Calculation for: ${assetName}`,
+                breakdown + calculation
+            );
         }
 
         // Switch tab
