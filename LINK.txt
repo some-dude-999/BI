@@ -13,5 +13,8 @@ HTML Files:
 2. AGI Panel.html
    https://some-dude-999.github.io/BI/AGI%20Panel.html - Multi-LLM query launcher for opening multiple AI chatbot tabs simultaneously with prompt management
 
-3. MarketTop2025.html
+3. HighestProbIdeas.html
+   https://some-dude-999.github.io/BI/HighestProbIdeas.html - [Add description for HighestProbIdeas.html]
+
+4. MarketTop2025.html
    https://some-dude-999.github.io/BI/MarketTop2025.html - Interactive dashboard analyzing market top price predictions for 2025 across multiple AI models
