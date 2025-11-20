@@ -13,71 +13,27 @@
 
         body {
             font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1729 100%);
+            background: #000000;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            color: #00ff88;
+            color: #ffffff;
             padding: 20px;
             position: relative;
             overflow-y: auto;
         }
 
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                repeating-linear-gradient(
-                    0deg,
-                    rgba(0, 255, 136, 0.03) 0px,
-                    transparent 1px,
-                    transparent 2px,
-                    rgba(0, 255, 136, 0.03) 3px
-                );
-            pointer-events: none;
-            animation: scan 8s linear infinite;
-        }
-
-        @keyframes scan {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(100%); }
-        }
-
         .container {
-            background: rgba(10, 14, 39, 0.8);
-            border: 2px solid #00ff88;
-            border-radius: 20px;
+            background: #0a0a0a;
+            border: 1px solid #333333;
+            border-radius: 8px;
             padding: 40px;
             max-width: 95%;
             width: 100%;
-            box-shadow: 0 0 50px rgba(0, 255, 136, 0.3), inset 0 0 20px rgba(0, 255, 136, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             position: relative;
             z-index: 1;
-        }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #00ff88, #00ccff, #ff00ff, #00ff88);
-            border-radius: 20px;
-            z-index: -1;
-            opacity: 0.5;
-            filter: blur(10px);
-            animation: glow 3s ease-in-out infinite;
-        }
-
-        @keyframes glow {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 0.8; }
         }
 
         h1 {
@@ -86,21 +42,14 @@
             font-size: 2em;
             text-transform: uppercase;
             letter-spacing: 4px;
-            text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88; }
-            50% { text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88, 0 0 60px #00ff88; }
+            color: #ffffff;
         }
 
         .subtitle {
             text-align: center;
-            color: #00ccff;
+            color: #cccccc;
             margin-bottom: 30px;
             font-size: 0.9em;
-            opacity: 0.8;
         }
 
         .main-button {
@@ -109,26 +58,25 @@
             padding: 20px;
             font-size: 1.5em;
             font-weight: bold;
-            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%);
-            color: #0a0e27;
-            border: none;
-            border-radius: 10px;
+            background: #1a1a1a;
+            color: #ffffff;
+            border: 1px solid #444444;
+            border-radius: 4px;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 30px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+            transition: all 0.2s ease;
             font-family: 'Courier New', monospace;
         }
 
         .main-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0, 255, 136, 0.6);
+            background: #222222;
+            border-color: #666666;
         }
 
         .main-button:active {
-            transform: translateY(0);
+            background: #0a0a0a;
         }
 
         .checkboxes {
@@ -144,44 +92,45 @@
             justify-content: space-between;
             gap: 10px;
             padding: 10px;
-            background: rgba(0, 255, 136, 0.05);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            border-radius: 5px;
-            transition: all 0.3s ease;
+            background: #1a1a1a;
+            border: 1px solid #333333;
+            border-radius: 4px;
+            transition: all 0.2s ease;
         }
 
         .checkbox-item:hover {
-            background: rgba(0, 255, 136, 0.1);
-            border-color: rgba(0, 255, 136, 0.5);
+            background: #222222;
+            border-color: #444444;
         }
 
         .checkbox-item label {
             font-size: 1em;
             user-select: none;
             flex: 1;
+            color: #ffffff;
         }
 
         .checkbox-item select {
             width: 60px;
             padding: 5px;
-            background: rgba(0, 20, 40, 0.8);
-            border: 2px solid #00ff88;
-            border-radius: 5px;
-            color: #00ff88;
+            background: #0a0a0a;
+            border: 1px solid #444444;
+            border-radius: 4px;
+            color: #ffffff;
             font-family: 'Courier New', monospace;
             font-size: 0.9em;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .checkbox-item select:hover {
-            border-color: #00ccff;
-            background: rgba(0, 20, 40, 1);
+            border-color: #666666;
+            background: #1a1a1a;
         }
 
         .checkbox-item select:focus {
             outline: none;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+            border-color: #888888;
         }
 
         .prompt-section {
@@ -189,7 +138,7 @@
         }
 
         .prompt-label {
-            color: #00ccff;
+            color: #cccccc;
             margin-bottom: 10px;
             font-size: 0.9em;
             text-transform: uppercase;
@@ -200,25 +149,25 @@
             width: 100%;
             min-height: 120px;
             padding: 15px;
-            background: rgba(0, 20, 40, 0.6);
-            border: 2px solid #00ff88;
-            border-radius: 8px;
-            color: #00ff88;
+            background: #0a0a0a;
+            border: 1px solid #444444;
+            border-radius: 4px;
+            color: #ffffff;
             font-family: 'Courier New', monospace;
             font-size: 0.9em;
             resize: vertical;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            cursor: text;
+            transition: all 0.2s ease;
         }
 
         .prompt-box:hover {
-            background: rgba(0, 20, 40, 0.8);
-            border-color: #00ccff;
+            background: #1a1a1a;
+            border-color: #555555;
         }
 
         .prompt-box:focus {
             outline: none;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+            border-color: #888888;
         }
 
         .button-group {
@@ -232,22 +181,21 @@
             flex: 1;
             min-width: 150px;
             padding: 12px 20px;
-            background: rgba(0, 204, 255, 0.2);
-            border: 2px solid #00ccff;
-            border-radius: 8px;
-            color: #00ccff;
+            background: #1a1a1a;
+            border: 1px solid #444444;
+            border-radius: 4px;
+            color: #ffffff;
             cursor: pointer;
             font-family: 'Courier New', monospace;
             font-size: 0.9em;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         .action-button:hover {
-            background: rgba(0, 204, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 204, 255, 0.3);
+            background: #222222;
+            border-color: #666666;
         }
 
         .saved-prompts {
@@ -259,35 +207,37 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px;
-            background: rgba(0, 255, 136, 0.05);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            border-radius: 5px;
+            background: #1a1a1a;
+            border: 1px solid #333333;
+            border-radius: 4px;
             margin-bottom: 10px;
             font-size: 0.85em;
         }
 
         .saved-prompt-item:hover {
-            background: rgba(0, 255, 136, 0.1);
+            background: #222222;
         }
 
         .saved-prompt-name {
             cursor: pointer;
             flex: 1;
+            color: #ffffff;
         }
 
         .delete-button {
-            background: rgba(255, 0, 100, 0.3);
-            border: 1px solid #ff0066;
-            color: #ff0066;
+            background: #2a2a2a;
+            border: 1px solid #555555;
+            color: #ffffff;
             padding: 5px 10px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.8em;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .delete-button:hover {
-            background: rgba(255, 0, 100, 0.5);
+            background: #333333;
+            border-color: #777777;
         }
 
         .notification {
@@ -295,40 +245,29 @@
             top: 20px;
             right: 20px;
             padding: 15px 25px;
-            background: rgba(0, 255, 136, 0.9);
-            color: #0a0e27;
-            border-radius: 8px;
+            background: #1a1a1a;
+            color: #ffffff;
+            border: 1px solid #444444;
+            border-radius: 4px;
             font-weight: bold;
-            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.5);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             z-index: 1000;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
         }
 
         .save-prompt-input {
             width: 100%;
             padding: 10px;
             margin-top: 10px;
-            background: rgba(0, 20, 40, 0.6);
-            border: 2px solid #00ff88;
-            border-radius: 5px;
-            color: #00ff88;
+            background: #0a0a0a;
+            border: 1px solid #444444;
+            border-radius: 4px;
+            color: #ffffff;
             font-family: 'Courier New', monospace;
         }
 
         .save-prompt-input:focus {
             outline: none;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+            border-color: #888888;
         }
 
         .prompt-box-container {
@@ -336,99 +275,26 @@
             margin-bottom: 20px;
         }
 
-        .prompt-box-container.color-1 {
-            background: rgba(0, 255, 136, 0.05);
-            border-left: 4px solid #00ff88;
-            padding-left: 15px;
-        }
-
-        .prompt-box-container.color-1 .prompt-box-wrapper textarea,
-        .prompt-box-container.color-1 .prompt-name-label {
-            border-color: #00ff88;
-        }
-
-        .prompt-box-container.color-2 {
-            background: rgba(0, 204, 255, 0.05);
-            border-left: 4px solid #00ccff;
-            padding-left: 15px;
-        }
-
-        .prompt-box-container.color-2 .prompt-box-wrapper textarea,
-        .prompt-box-container.color-2 .prompt-name-label {
-            border-color: #00ccff;
-            color: #00ccff;
-        }
-
-        .prompt-box-container.color-3 {
-            background: rgba(255, 0, 255, 0.05);
-            border-left: 4px solid #ff00ff;
-            padding-left: 15px;
-        }
-
-        .prompt-box-container.color-3 .prompt-box-wrapper textarea,
-        .prompt-box-container.color-3 .prompt-name-label {
-            border-color: #ff00ff;
-            color: #ff00ff;
-        }
-
-        .prompt-box-container.color-4 {
-            background: rgba(255, 170, 0, 0.05);
-            border-left: 4px solid #ffaa00;
-            padding-left: 15px;
-        }
-
-        .prompt-box-container.color-4 .prompt-box-wrapper textarea,
-        .prompt-box-container.color-4 .prompt-name-label {
-            border-color: #ffaa00;
-            color: #ffaa00;
-        }
-
-        .prompt-box-container.color-5 {
-            background: rgba(255, 0, 102, 0.05);
-            border-left: 4px solid #ff0066;
-            padding-left: 15px;
-        }
-
-        .prompt-box-container.color-5 .prompt-box-wrapper textarea,
-        .prompt-box-container.color-5 .prompt-name-label {
-            border-color: #ff0066;
-            color: #ff0066;
-        }
-
-        .prompt-box-container.color-6 {
-            background: rgba(0, 255, 255, 0.05);
-            border-left: 4px solid #00ffff;
-            padding-left: 15px;
-        }
-
-        .prompt-box-container.color-6 .prompt-box-wrapper textarea,
-        .prompt-box-container.color-6 .prompt-name-label {
-            border-color: #00ffff;
-            color: #00ffff;
-        }
-
-        .prompt-box-container.color-7 {
-            background: rgba(136, 255, 0, 0.05);
-            border-left: 4px solid #88ff00;
-            padding-left: 15px;
-        }
-
-        .prompt-box-container.color-7 .prompt-box-wrapper textarea,
-        .prompt-box-container.color-7 .prompt-name-label {
-            border-color: #88ff00;
-            color: #88ff00;
-        }
-
+        .prompt-box-container.color-1,
+        .prompt-box-container.color-2,
+        .prompt-box-container.color-3,
+        .prompt-box-container.color-4,
+        .prompt-box-container.color-5,
+        .prompt-box-container.color-6,
+        .prompt-box-container.color-7,
         .prompt-box-container.color-8 {
-            background: rgba(255, 102, 0, 0.05);
-            border-left: 4px solid #ff6600;
+            background: #0a0a0a;
+            border-left: 2px solid #444444;
             padding-left: 15px;
         }
 
-        .prompt-box-container.color-8 .prompt-box-wrapper textarea,
-        .prompt-box-container.color-8 .prompt-name-label {
-            border-color: #ff6600;
-            color: #ff6600;
+        .prompt-box-container .prompt-box-wrapper textarea {
+            border-color: #444444;
+            color: #ffffff;
+        }
+
+        .prompt-box-container .prompt-name-label {
+            color: #cccccc;
         }
 
         .prompt-box-wrapper {
@@ -439,9 +305,9 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background: rgba(255, 0, 100, 0.3);
-            border: 1px solid #ff0066;
-            color: #ff0066;
+            background: #2a2a2a;
+            border: 1px solid #555555;
+            color: #ffffff;
             width: 30px;
             height: 30px;
             border-radius: 50%;
@@ -451,17 +317,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             z-index: 10;
         }
 
         .remove-prompt-btn:hover {
-            background: rgba(255, 0, 100, 0.6);
-            transform: scale(1.1);
+            background: #333333;
+            border-color: #777777;
         }
 
         .prompt-name-label {
-            color: #00ccff;
+            color: #cccccc;
             margin-bottom: 5px;
             font-size: 0.85em;
             font-weight: bold;
@@ -472,17 +338,17 @@
         }
 
         body::-webkit-scrollbar-track {
-            background: rgba(0, 20, 40, 0.6);
-            border-radius: 5px;
+            background: #0a0a0a;
+            border-radius: 4px;
         }
 
         body::-webkit-scrollbar-thumb {
-            background: rgba(0, 255, 136, 0.5);
-            border-radius: 5px;
+            background: #333333;
+            border-radius: 4px;
         }
 
         body::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 255, 136, 0.7);
+            background: #444444;
         }
     </style>
 </head>
@@ -493,9 +359,9 @@
         
         <button class="main-button" onclick="openAGIPanel()">🚀 OPEN AGI PANEL 🚀</button>
 
-        <div style="margin-bottom: 20px; padding: 15px; background: rgba(0, 255, 136, 0.1); border: 2px solid #00ff88; border-radius: 10px;">
-            <label style="color: #00ff88; font-weight: bold; margin-right: 10px;">Master Control - Set all LLMs to:</label>
-            <select id="masterControl" onchange="setAllLLMs(this.value)" style="padding: 8px 20px; background: rgba(0, 20, 40, 0.8); border: 2px solid #00ff88; border-radius: 5px; color: #00ff88; font-family: 'Courier New', monospace; font-size: 1em; cursor: pointer;">
+        <div style="margin-bottom: 20px; padding: 15px; background: #1a1a1a; border: 1px solid #444444; border-radius: 4px;">
+            <label style="color: #ffffff; font-weight: bold; margin-right: 10px;">Master Control - Set all LLMs to:</label>
+            <select id="masterControl" onchange="setAllLLMs(this.value)" style="padding: 8px 20px; background: #0a0a0a; border: 1px solid #444444; border-radius: 4px; color: #ffffff; font-family: 'Courier New', monospace; font-size: 1em; cursor: pointer;">
                 <option value="0">0</option>
                 <option value="1">1</option>
                 <option value="2" selected>2</option>
