@@ -603,7 +603,8 @@
             border: 6px solid #8b6914;
             border-radius: 8px;
             padding: 25px 30px;
-            margin-bottom: 30px;
+            margin: 0 auto 30px auto;
+            max-width: 800px;
             box-shadow:
                 0 10px 25px rgba(0, 0, 0, 0.5),
                 inset 0 0 30px rgba(139, 105, 20, 0.1);
@@ -1081,120 +1082,28 @@
     <div class="quest-board">
         <h1>⚔️ Quest Board ⚔️</h1>
         <div class="subtitle">Forge what the realm needeth, then spread word of thy creations</div>
-        
-        <div class="tabs">
-            <div class="tab active" data-project="overview">🗝️ Overview</div>
-            <div class="tab blue" data-project="tavern">0. Tavern Upkeep 🍖</div>
-            <div class="tab green" data-project="productivity">1. Blue Anvil Labs</div>
-            <div class="tab green" data-project="language">2. Lingo Playground</div>
-            <div class="tab yellow" data-project="finance">3. RICH & LEGIT</div>
-            <div class="tab yellow" data-project="stl">4. StarForge Kits</div>
-            <div class="tab red" data-project="pod">5. Starship Drip</div>
-            <div class="tab red" data-project="music">6. Rockets & Rainbows</div>
-        </div>
-        
-        <div class="quest-content">
-            <!-- Overview -->
-            <div class="project-panel active" id="overview">
-                <h2 style="text-align: center; color: #d4af37; font-family: 'MedievalSharp', cursive; font-size: 2em; margin-bottom: 30px;">Quest Overview</h2>
 
-                <!-- Adventures of the Day -->
-                <div class="adventures-of-day">
-                    <h3>⚔️ Adventures of the Day ⚔️</h3>
-                    <div id="dailyTasksList">
-                        <!-- Daily tasks will be dynamically inserted here -->
-                    </div>
-                </div>
-
-                <div class="overview-grid">
-                    <div class="overview-project blue">
-                        <h3><span class="icon">🍖</span> 0. Tavern Upkeep <span class="icon">🍖</span></h3>
-                        <p class="energy-strategy" data-icon="🪚🪵">Daily Tavern Upkeep</p>
-                        <div class="overview-progress">
-                            <div class="overview-progress-bar">
-                                <div class="overview-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <span class="overview-percentage">0%</span>
-                        </div>
-                        <p class="overview-status">0/4 quests completed</p>
-                    </div>
-                    
-                    <div class="overview-project green">
-                        <h3><span class="icon">💰</span> 1. Blue Anvil Labs <span class="icon">💰</span></h3>
-                        <p class="energy-strategy" data-icon="💪🤖">Spend Full Time & Energy</p>
-                        <div class="overview-progress">
-                            <div class="overview-progress-bar">
-                                <div class="overview-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <span class="overview-percentage">0%</span>
-                        </div>
-                        <p class="overview-status">0/6 quests completed</p>
-                    </div>
-
-                    <div class="overview-project green">
-                        <h3><span class="icon">💰</span> 2. Lingo Playground <span class="icon">💰</span></h3>
-                        <p class="energy-strategy" data-icon="💪🤖">Spend Full Time & Energy</p>
-                        <div class="overview-progress">
-                            <div class="overview-progress-bar">
-                                <div class="overview-progress-fill" style="width: 17%;"></div>
-                            </div>
-                            <span class="overview-percentage">17%</span>
-                        </div>
-                        <p class="overview-status">1/6 quests completed</p>
-                    </div>
-
-                    <div class="overview-project yellow">
-                        <h3><span class="icon">🪙</span> 3. RICH & LEGIT <span class="icon">🪙</span></h3>
-                        <p class="energy-strategy" data-icon="🤖🤖">Automate, No Attention</p>
-                        <div class="overview-progress">
-                            <div class="overview-progress-bar">
-                                <div class="overview-progress-fill" style="width: 75%;"></div>
-                            </div>
-                            <span class="overview-percentage">75%</span>
-                        </div>
-                        <p class="overview-status">3/4 quests completed</p>
-                    </div>
-
-                    <div class="overview-project yellow">
-                        <h3><span class="icon">🪙</span> 4. StarForge Kits <span class="icon">🪙</span></h3>
-                        <p class="energy-strategy" data-icon="🤖🤖">Automate, No Attention</p>
-                        <div class="overview-progress">
-                            <div class="overview-progress-bar">
-                                <div class="overview-progress-fill" style="width: 60%;"></div>
-                            </div>
-                            <span class="overview-percentage">60%</span>
-                        </div>
-                        <p class="overview-status">3/5 quests completed</p>
-                    </div>
-
-                    <div class="overview-project red">
-                        <h3><span class="icon">✨</span> 5. Starship Drip <span class="icon">✨</span></h3>
-                        <p class="energy-strategy" data-icon="⏸️🤖">Paused Until Saturation</p>
-                        <div class="overview-progress">
-                            <div class="overview-progress-bar">
-                                <div class="overview-progress-fill" style="width: 50%;"></div>
-                            </div>
-                            <span class="overview-percentage">50%</span>
-                        </div>
-                        <p class="overview-status">2/4 quests completed</p>
-                    </div>
-
-                    <div class="overview-project red">
-                        <h3><span class="icon">✨</span> 6. Rockets & Rainbows <span class="icon">✨</span></h3>
-                        <p class="energy-strategy" data-icon="⏸️🤖">Paused Until Saturation</p>
-                        <div class="overview-progress">
-                            <div class="overview-progress-bar">
-                                <div class="overview-progress-fill" style="width: 33%;"></div>
-                            </div>
-                            <span class="overview-percentage">33%</span>
-                        </div>
-                        <p class="overview-status">1/3 quests completed</p>
-                    </div>
-                </div>
+        <!-- Adventures of the Day - Always Visible -->
+        <div class="adventures-of-day">
+            <h3>⚔️ Adventures of the Day ⚔️</h3>
+            <div id="dailyTasksList">
+                <!-- Daily tasks will be dynamically inserted here -->
             </div>
-            
+        </div>
+
+        <div class="tabs">
+            <div class="tab blue active" data-project="tavern">0 🍖</div>
+            <div class="tab green" data-project="productivity">1 💰</div>
+            <div class="tab green" data-project="language">2 💰</div>
+            <div class="tab yellow" data-project="finance">3 🪙</div>
+            <div class="tab yellow" data-project="stl">4 🪙</div>
+            <div class="tab red" data-project="pod">5 ✨</div>
+            <div class="tab red" data-project="music">6 ✨</div>
+        </div>
+
+        <div class="quest-content">
             <!-- Tavern Upkeep -->
-            <div class="project-panel" id="tavern">
+            <div class="project-panel active" id="tavern">
                 <div class="coin-rain"></div>
                 <div class="project-header blue-border">
                     <h2 class="project-title">🍖 Tavern Upkeep - 4 Steps</h2>
@@ -2517,12 +2426,7 @@
                 const projectId = tab.getAttribute('data-project');
                 const activePanel = document.getElementById(projectId);
                 activePanel.classList.add('active');
-                
-                // Don't initialize coin rain for overview tab
-                if (projectId === 'overview') {
-                    return;
-                }
-                
+
                 // Get the tab color class
                 const tabColor = tab.classList.contains('green') ? 'green' : 
                                 tab.classList.contains('yellow') ? 'yellow' : 
