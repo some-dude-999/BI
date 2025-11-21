@@ -234,35 +234,50 @@
         
         .coin-rain {
             position: absolute;
-            top: -150px;
+            top: 0;
             left: 0;
             width: 100%;
-            height: calc(100% + 150px);
+            height: 100%;
             pointer-events: none;
             z-index: 0;
+            overflow: hidden;
         }
-        
+
         .coin {
             position: absolute;
-            top: 0;
-            font-size: 72px;
-            animation: fall linear infinite;
-            opacity: 0.7;
+            font-size: 24px;
+            animation: float-sparkle ease-in-out infinite;
+            opacity: 0;
+            filter: drop-shadow(0 0 8px currentColor);
         }
-        
-        @keyframes fall {
+
+        @keyframes float-sparkle {
             0% {
-                transform: translateY(0) rotate(0deg);
+                transform: translate(0, 0) scale(0.5);
                 opacity: 0;
             }
-            5% {
-                opacity: 0.7;
+            10% {
+                opacity: 0.9;
+                transform: translate(10px, -20px) scale(1);
             }
-            95% {
+            25% {
+                opacity: 0.8;
+                transform: translate(-15px, -50px) scale(0.8);
+            }
+            50% {
+                opacity: 0.9;
+                transform: translate(20px, -100px) scale(1.1);
+            }
+            75% {
                 opacity: 0.7;
+                transform: translate(-10px, -150px) scale(0.9);
+            }
+            90% {
+                opacity: 0.5;
+                transform: translate(5px, -200px) scale(0.6);
             }
             100% {
-                transform: translateY(850px) rotate(360deg);
+                transform: translate(0, -250px) scale(0.3);
                 opacity: 0;
             }
         }
@@ -374,7 +389,23 @@
         }
         
         .checkpoint.completed {
-            opacity: 0.7;
+            background:
+                /* Paper texture */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    rgba(0, 0, 0, 0.02) 1px,
+                    transparent 2px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0px,
+                    rgba(0, 0, 0, 0.02) 1px,
+                    transparent 2px
+                ),
+                /* Faded yellow paper - matches brown background */
+                linear-gradient(135deg, #d4c4a8 0%, #c4b498 50%, #d4c4a8 100%);
+            opacity: 1;
         }
 
         .checkpoint.active {
@@ -2400,32 +2431,33 @@
         }
         
         function createCoin(container, emoji) {
-            const coin = document.createElement('div');
-            coin.className = 'coin';
-            coin.textContent = emoji;
-            
-            // Get next position (cycle through 5 positions, never repeat the last one)
-            let positionIndex;
-            do {
-                positionIndex = Math.floor(Math.random() * SPAWN_POSITIONS.length);
-            } while (positionIndex === lastPosition && SPAWN_POSITIONS.length > 1);
-            
-            lastPosition = positionIndex;
-            coin.style.left = SPAWN_POSITIONS[positionIndex] + '%';
-            
-            // Random animation duration
-            const duration = DROP_CONFIG.fallDuration.min + 
-                           Math.random() * (DROP_CONFIG.fallDuration.max - DROP_CONFIG.fallDuration.min);
-            coin.style.animationDuration = duration + 's';
-            
-            container.appendChild(coin);
-            
-            // Remove coin after animation completes
+            const sparkle = document.createElement('div');
+            sparkle.className = 'coin';
+            sparkle.textContent = emoji;
+
+            // Random horizontal position (anywhere on screen)
+            const randomLeft = Math.random() * 90 + 5; // 5% to 95%
+            sparkle.style.left = randomLeft + '%';
+
+            // Start from bottom
+            sparkle.style.bottom = '0px';
+
+            // Random animation duration (slower floating)
+            const duration = 4 + Math.random() * 3; // 4-7 seconds
+            sparkle.style.animationDuration = duration + 's';
+
+            // Random delay for staggered effect
+            const delay = Math.random() * 2;
+            sparkle.style.animationDelay = delay + 's';
+
+            container.appendChild(sparkle);
+
+            // Remove sparkle after animation completes
             setTimeout(() => {
-                if (coin.parentElement) {
-                    coin.remove();
+                if (sparkle.parentElement) {
+                    sparkle.remove();
                 }
-            }, duration * 1000);
+            }, (duration + delay) * 1000);
         }
         
         // Initialize coin rain for the first active panel on page load (skip if overview)
