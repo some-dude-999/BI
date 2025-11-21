@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Checkpoints - Quest Board</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(135deg, #2c1810 0%, #1a0f0a 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #f4e4c1;
+        }
+        
+        .debug-panel {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            background: linear-gradient(145deg, #1a3d1a 0%, #0f2a0f 100%);
+            border: 4px solid #4a7c2f;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(74, 124, 47, 0.4);
+        }
+        
+        .debug-panel h3 {
+            color: #6ba83e;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+        
+        .debug-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .debug-slider {
+            flex: 1;
+            min-width: 200px;
+            max-width: 400px;
+        }
+        
+        .debug-slider input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #3d2817 0%, #d4af37 100%);
+            border-radius: 5px;
+            outline: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+        
+        .debug-slider input[type="range"]:hover {
+            opacity: 1;
+        }
+        
+        .debug-slider input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            background: #d4af37;
+            border: 2px solid #8b6914;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+        }
+        
+        .debug-slider input[type="range"]::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            background: #d4af37;
+            border: 2px solid #8b6914;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+        }
+        
+        .debug-value {
+            font-size: 2em;
+            color: #d4af37;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .debug-label {
+            color: #c4a45e;
+            font-size: 1.1em;
+        }
+        
+        .quest-board {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(61, 40, 23, 0.3) 0px,
+                    rgba(74, 52, 32, 0.3) 2px,
+                    rgba(61, 40, 23, 0.3) 4px,
+                    transparent 4px,
+                    transparent 40px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    #3d2817 0px,
+                    #4a3420 3px,
+                    #3d2817 6px,
+                    #352110 9px,
+                    #3d2817 12px
+                ),
+                linear-gradient(145deg, #3d2817 0%, #2a1810 100%);
+            border: 8px solid #8b6914;
+            border-radius: 20px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.8), 
+                inset 0 2px 10px rgba(139, 105, 20, 0.3),
+                inset 0 0 100px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            position: relative;
+        }
+        
+        .quest-board::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: linear-gradient(45deg, #d4af37, #8b6914, #d4af37);
+            border-radius: 24px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        h1 {
+            font-family: 'MedievalSharp', cursive;
+            text-align: center;
+            font-size: 3em;
+            color: #d4af37;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.5);
+            margin-bottom: 30px;
+            letter-spacing: 3px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #c4a45e;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .tab {
+            background: linear-gradient(145deg, #5a3d2b 0%, #3d2817 100%);
+            border: 3px solid #8b6914;
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 10px 10px 0 0;
+            font-family: 'Cinzel', serif;
+            font-size: 1em;
+            color: #c4a45e;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        
+        .tab:hover {
+            background: linear-gradient(145deg, #6a4d3b 0%, #4d3827 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
+        }
+        
+        .tab.active {
+            background: linear-gradient(145deg, #d4af37 0%, #8b6914 100%);
+            color: #2a1810;
+            border-color: #d4af37;
+            box-shadow: 0 6px 16px rgba(212, 175, 55, 0.6), inset 0 2px 8px rgba(255, 255, 255, 0.3);
+            font-weight: 700;
+        }
+        
+        .tab.green {
+            border-color: #4a7c2f;
+        }
+        
+        .tab.green.active {
+            background: linear-gradient(145deg, #6ba83e 0%, #4a7c2f 100%);
+            border-color: #6ba83e;
+            box-shadow: 0 6px 16px rgba(107, 168, 62, 0.6), inset 0 2px 8px rgba(255, 255, 255, 0.3);
+        }
+        
+        .tab.yellow {
+            border-color: #b8860b;
+        }
+        
+        .tab.yellow.active {
+            background: linear-gradient(145deg, #ffd700 0%, #b8860b 100%);
+            border-color: #ffd700;
+            box-shadow: 0 6px 16px rgba(255, 215, 0, 0.6), inset 0 2px 8px rgba(255, 255, 255, 0.3);
+        }
+        
+        .tab.red {
+            border-color: #8b1a1a;
+        }
+        
+        .tab.red.active {
+            background: linear-gradient(145deg, #c92a2a 0%, #8b1a1a 100%);
+            border-color: #c92a2a;
+            box-shadow: 0 6px 16px rgba(201, 42, 42, 0.6), inset 0 2px 8px rgba(255, 255, 255, 0.3);
+        }
+        
+        .tab.blue {
+            border-color: #1a5a8b;
+        }
+        
+        .tab.blue.active {
+            background: linear-gradient(145deg, #2a8bc9 0%, #1a5a8b 100%);
+            border-color: #2a8bc9;
+            box-shadow: 0 6px 16px rgba(42, 139, 201, 0.6), inset 0 2px 8px rgba(255, 255, 255, 0.3);
+        }
+        
+        .quest-content {
+            background: rgba(26, 15, 10, 0.6);
+            border: 4px solid #5a3d2b;
+            border-radius: 15px;
+            padding: 40px;
+            min-height: 500px;
+            box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .coin-rain {
+            position: absolute;
+            top: -150px;
+            left: 0;
+            width: 100%;
+            height: calc(100% + 150px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .coin {
+            position: absolute;
+            top: 0;
+            font-size: 72px;
+            animation: fall linear infinite;
+            opacity: 0.7;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            5% {
+                opacity: 0.7;
+            }
+            95% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(850px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .project-panel {
+            display: none;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .project-panel.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .checkpoint {
+            background: linear-gradient(135deg, #2a1810 0%, #1a0f0a 100%);
+            border: 3px solid #5a3d2b;
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .checkpoint:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.8);
+        }
+        
+        .checkpoint::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .checkpoint:hover::before {
+            left: 100%;
+        }
+        
+        .checkpoint.completed {
+            border-color: #2d5016;
+            background: linear-gradient(135deg, #1a3010 0%, #0f1f08 100%);
+            box-shadow: 0 8px 16px rgba(45, 80, 22, 0.4), inset 0 2px 8px rgba(82, 163, 42, 0.2);
+        }
+        
+        .checkpoint.completed::after {
+            content: '🏰';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2em;
+            opacity: 0.8;
+        }
+        
+        .checkpoint.active {
+            border-color: #d4af37;
+            background: linear-gradient(135deg, #3d2817 0%, #2a1810 100%);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), 0 8px 16px rgba(212, 175, 55, 0.3);
+            animation: pulse 2s infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .checkpoint.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.1) 25%,
+                rgba(255, 255, 255, 0.4) 50%,
+                rgba(255, 255, 255, 0.1) 75%,
+                transparent 100%);
+            animation: sheen 3s infinite;
+            z-index: 1;
+        }
+        
+        @keyframes sheen {
+            0% {
+                left: -100%;
+            }
+            20% {
+                left: 100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), 0 8px 16px rgba(212, 175, 55, 0.3); }
+            50% { box-shadow: 0 0 50px rgba(212, 175, 55, 0.8), 0 8px 20px rgba(212, 175, 55, 0.5); }
+        }
+        
+        .checkpoint.active::after {
+            content: '⚔️';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2em;
+            animation: flicker 1.5s infinite;
+            z-index: 2;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .checkpoint.inactive {
+            opacity: 0.5;
+            border-color: #3d2817;
+        }
+        
+        .checkpoint.inactive::after {
+            content: '🔒';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2em;
+            opacity: 0.6;
+        }
+        
+        .checkpoint-text {
+            font-size: 1.2em;
+            color: #f4e4c1;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .checkpoint.completed .checkpoint-text {
+            color: #a8d88c;
+        }
+        
+        .checkpoint.active .checkpoint-text {
+            color: #f4e4c1;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        
+        .no-checkpoints {
+            text-align: center;
+            color: #8b6914;
+            font-size: 1.5em;
+            font-style: italic;
+            margin-top: 100px;
+        }
+        
+        .progress-bar {
+            background: rgba(26, 15, 10, 1);
+            height: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid #5a3d2b;
+            overflow: hidden;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b6914 0%, #d4af37 50%, #8b6914 100%);
+            background-size: 200% 100%;
+            transition: width 0.8s ease;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            animation: shimmer 2s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeInModal 0.3s ease;
+        }
+        
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: linear-gradient(145deg, #3d2817 0%, #2a1810 100%);
+            border: 6px solid #d4af37;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(212, 175, 55, 0.5);
+            text-align: center;
+            animation: scaleIn 0.3s ease;
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .modal-content h2 {
+            font-family: 'MedievalSharp', cursive;
+            color: #d4af37;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        .modal-content p {
+            color: #f4e4c1;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .modal-button {
+            font-family: 'Cinzel', serif;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: 3px solid;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            background: none;
+        }
+        
+        .modal-button.confirm {
+            background: linear-gradient(145deg, #d4af37 0%, #8b6914 100%);
+            border-color: #d4af37;
+            color: #2a1810;
+            font-weight: bold;
+        }
+        
+        .modal-button.confirm:hover {
+            background: linear-gradient(145deg, #ffd700 0%, #d4af37 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(212, 175, 55, 0.6);
+        }
+        
+        .modal-button.cancel {
+            background: linear-gradient(145deg, #5a3d2b 0%, #3d2817 100%);
+            border-color: #8b6914;
+            color: #c4a45e;
+        }
+        
+        .modal-button.cancel:hover {
+            background: linear-gradient(145deg, #6a4d3b 0%, #4d3827 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
+        }
+        
+        /* Overview Styles */
+        .overview-grid {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .overview-project {
+            background: linear-gradient(135deg, #2a1810 0%, #1a0f0a 100%);
+            border: 4px solid;
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin: 20px 0;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .overview-project:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
+        }
+        
+        .overview-project.green {
+            border-color: #4a7c2f;
+        }
+        
+        .overview-project.green:hover {
+            box-shadow: 0 12px 30px rgba(74, 124, 47, 0.5);
+        }
+        
+        .overview-project.yellow {
+            border-color: #b8860b;
+        }
+        
+        .overview-project.yellow:hover {
+            box-shadow: 0 12px 30px rgba(184, 134, 11, 0.5);
+        }
+        
+        .overview-project.red {
+            border-color: #8b1a1a;
+        }
+        
+        .overview-project.red:hover {
+            box-shadow: 0 12px 30px rgba(139, 26, 26, 0.5);
+        }
+        
+        .overview-project.blue {
+            border-color: #1a5a8b;
+        }
+        
+        .overview-project.blue:hover {
+            box-shadow: 0 12px 30px rgba(26, 90, 139, 0.5);
+        }
+        
+        .overview-project h3 {
+            color: #d4af37;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            font-family: 'MedievalSharp', cursive;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .overview-project h3 .icon {
+            font-size: 1.2em;
+        }
+        
+        .overview-progress {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .overview-progress-bar {
+            flex: 1;
+            background: rgba(26, 15, 10, 1);
+            height: 25px;
+            border-radius: 12px;
+            border: 2px solid #5a3d2b;
+            overflow: hidden;
+        }
+        
+        .overview-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b6914 0%, #d4af37 50%, #8b6914 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s ease-in-out infinite;
+            transition: width 0.8s ease;
+        }
+        
+        .overview-percentage {
+            color: #d4af37;
+            font-size: 1.3em;
+            font-weight: bold;
+            min-width: 55px;
+            text-align: right;
+        }
+        
+        .overview-status {
+            color: #c4a45e;
+            text-align: center;
+            font-size: 1em;
+        }
+        
+        /* Project Header Styles */
+        .project-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(61, 40, 23, 0.5) 0%, rgba(26, 15, 10, 0.5) 100%);
+            border: 4px solid;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        }
+        
+        .project-header.green-border {
+            border-color: #4a7c2f;
+        }
+        
+        .project-header.yellow-border {
+            border-color: #b8860b;
+        }
+        
+        .project-header.red-border {
+            border-color: #8b1a1a;
+        }
+        
+        .project-header.blue-border {
+            border-color: #1a5a8b;
+        }
+        
+        .project-title {
+            color: #d4af37;
+            font-family: 'MedievalSharp', cursive;
+            font-size: 2em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        .project-strategy {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 10px auto;
+            padding: 15px 40px;
+            display: inline-block;
+            position: relative;
+            background: linear-gradient(135deg, #8b6914 0%, #d4af37 50%, #8b6914 100%);
+            color: #2a1810;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+            clip-path: polygon(
+                8% 0%, 92% 0%, 
+                100% 50%, 
+                92% 100%, 8% 100%, 
+                0% 50%
+            );
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+        
+        .project-strategy::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            background: inherit;
+            opacity: 0.3;
+            clip-path: inherit;
+            z-index: -1;
+        }
+        
+        .green-strategy {
+            background: linear-gradient(135deg, #4a7c2f 0%, #6ba83e 50%, #4a7c2f 100%);
+            color: #f4e4c1;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+        
+        .yellow-strategy {
+            background: linear-gradient(135deg, #b8860b 0%, #ffd700 50%, #b8860b 100%);
+            color: #2a1810;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+        }
+        
+        .red-strategy {
+            background: linear-gradient(135deg, #8b1a1a 0%, #c92a2a 50%, #8b1a1a 100%);
+            color: #f4e4c1;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+        
+        .blue-strategy {
+            background: linear-gradient(135deg, #1a5a8b 0%, #2a8bc9 50%, #1a5a8b 100%);
+            color: #f4e4c1;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+        
+        .energy-strategy {
+            color: #f4e4c1;
+            font-size: 1em;
+            margin: 12px auto;
+            padding: 10px 20px;
+            font-weight: 600;
+            display: block;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(135deg, #5a3d2b 0%, #8b6914 50%, #5a3d2b 100%);
+            width: fit-content;
+            clip-path: polygon(
+                10% 0%, 90% 0%, 
+                100% 50%, 
+                90% 100%, 10% 100%, 
+                0% 50%
+            );
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+        
+        .energy-strategy::before {
+            content: attr(data-icon);
+            margin-right: 8px;
+        }
+        
+        .energy-strategy::after {
+            content: attr(data-icon);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Debug Panel -->
+    <div class="debug-panel" id="debugPanel">
+        <h3>🐛 Debug Mode - Completion Percentage Simulator</h3>
+        <div class="debug-controls">
+            <span class="debug-label">Completion:</span>
+            <div class="debug-slider">
+                <input type="range" id="debugSlider" min="0" max="100" value="0" step="1">
+            </div>
+            <span class="debug-value" id="debugValue">0%</span>
+        </div>
+    </div>
+
+    <div class="quest-board">
+        <h1>⚔️ Quest Board ⚔️</h1>
+        <div class="subtitle">Track thy noble ventures and conquests</div>
+        
+        <div class="tabs">
+            <div class="tab active" data-project="overview">🗝️ Overview</div>
+            <div class="tab blue" data-project="tavern">0. Tavern Upkeep 🍖</div>
+            <div class="tab green" data-project="productivity">1. Custom Tools</div>
+            <div class="tab green" data-project="language">2. Learn Language Game</div>
+            <div class="tab yellow" data-project="finance">3. Finance Education Vids</div>
+            <div class="tab yellow" data-project="stl">4. STL Files</div>
+            <div class="tab red" data-project="pod">5. POD</div>
+            <div class="tab red" data-project="music">6. Ambient Music</div>
+        </div>
+        
+        <div class="quest-content">
+            <!-- Overview -->
+            <div class="project-panel active" id="overview">
+                <h2 style="text-align: center; color: #d4af37; font-family: 'MedievalSharp', cursive; font-size: 2em; margin-bottom: 30px;">Quest Overview</h2>
+                
+                <div class="overview-grid">
+                    <div class="overview-project blue">
+                        <h3><span class="icon">🍖</span> 0. Tavern Upkeep <span class="icon">🍖</span></h3>
+                        <p class="energy-strategy" data-icon="🪚🪵">Daily Tavern Upkeep</p>
+                        <div class="overview-progress">
+                            <div class="overview-progress-bar">
+                                <div class="overview-progress-fill" style="width: 0%;"></div>
+                            </div>
+                            <span class="overview-percentage">0%</span>
+                        </div>
+                        <p class="overview-status">0/4 quests completed</p>
+                    </div>
+                    
+                    <div class="overview-project green">
+                        <h3><span class="icon">💰</span> 1. Custom Tools <span class="icon">💰</span></h3>
+                        <p class="energy-strategy" data-icon="💪🤖">Spend Full Time & Energy</p>
+                        <div class="overview-progress">
+                            <div class="overview-progress-bar">
+                                <div class="overview-progress-fill" style="width: 0%;"></div>
+                            </div>
+                            <span class="overview-percentage">0%</span>
+                        </div>
+                        <p class="overview-status">0/6 quests completed</p>
+                    </div>
+                    
+                    <div class="overview-project green">
+                        <h3><span class="icon">💰</span> 2. Learn Language Game <span class="icon">💰</span></h3>
+                        <p class="energy-strategy" data-icon="💪🤖">Spend Full Time & Energy</p>
+                        <div class="overview-progress">
+                            <div class="overview-progress-bar">
+                                <div class="overview-progress-fill" style="width: 20%;"></div>
+                            </div>
+                            <span class="overview-percentage">20%</span>
+                        </div>
+                        <p class="overview-status">1/5 quests completed</p>
+                    </div>
+                    
+                    <div class="overview-project yellow">
+                        <h3><span class="icon">🪙</span> 3. Finance Education Vids <span class="icon">🪙</span></h3>
+                        <p class="energy-strategy" data-icon="🤖🤖">Automate, No Attention</p>
+                        <div class="overview-progress">
+                            <div class="overview-progress-bar">
+                                <div class="overview-progress-fill" style="width: 75%;"></div>
+                            </div>
+                            <span class="overview-percentage">75%</span>
+                        </div>
+                        <p class="overview-status">3/4 quests completed</p>
+                    </div>
+                    
+                    <div class="overview-project yellow">
+                        <h3><span class="icon">🪙</span> 4. STL Files <span class="icon">🪙</span></h3>
+                        <p class="energy-strategy" data-icon="🤖🤖">Automate, No Attention</p>
+                        <div class="overview-progress">
+                            <div class="overview-progress-bar">
+                                <div class="overview-progress-fill" style="width: 60%;"></div>
+                            </div>
+                            <span class="overview-percentage">60%</span>
+                        </div>
+                        <p class="overview-status">3/5 quests completed</p>
+                    </div>
+                    
+                    <div class="overview-project red">
+                        <h3><span class="icon">✨</span> 5. POD <span class="icon">✨</span></h3>
+                        <p class="energy-strategy" data-icon="⏸️🤖">Paused Until Saturation</p>
+                        <div class="overview-progress">
+                            <div class="overview-progress-bar">
+                                <div class="overview-progress-fill" style="width: 50%;"></div>
+                            </div>
+                            <span class="overview-percentage">50%</span>
+                        </div>
+                        <p class="overview-status">2/4 quests completed</p>
+                    </div>
+                    
+                    <div class="overview-project red">
+                        <h3><span class="icon">✨</span> 6. Ambient Music <span class="icon">✨</span></h3>
+                        <p class="energy-strategy" data-icon="⏸️🤖">Paused Until Saturation</p>
+                        <div class="overview-progress">
+                            <div class="overview-progress-bar">
+                                <div class="overview-progress-fill" style="width: 33%;"></div>
+                            </div>
+                            <span class="overview-percentage">33%</span>
+                        </div>
+                        <p class="overview-status">1/3 quests completed</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tavern Upkeep -->
+            <div class="project-panel" id="tavern">
+                <div class="coin-rain"></div>
+                <div class="project-header blue-border">
+                    <h2 class="project-title">🍖 Tavern Upkeep - 4 Steps</h2>
+                    <div class="project-strategy blue-strategy">🪚🪵 Daily Tavern Upkeep 🪚🪵</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%;"></div>
+                </div>
+                <div class="checkpoint active">
+                    <div class="checkpoint-text">1. Daily squat and deadlift</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">2. Clean zen pest free house</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">3. Fix water leak</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">4. Collect refunds & payments</div>
+                </div>
+            </div>
+            
+            <!-- Custom Productivity Tools -->
+            <div class="project-panel" id="productivity">
+                <div class="coin-rain"></div>
+                <div class="project-header green-border">
+                    <h2 class="project-title">💰 Custom Productivity Tools - 6 Steps</h2>
+                    <div class="project-strategy green-strategy">💪🤖 Spend Full Time & Energy 💪🤖</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%;"></div>
+                </div>
+                <div class="checkpoint active">
+                    <div class="checkpoint-text">1. Get domain name</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">2. Set up site</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">3. Upload sample tools</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">4. Make tutorials and funnel</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">5. Call businesses to get clients</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">6. Hire People to Make Future Tools</div>
+                </div>
+            </div>
+            
+            <!-- Learn Language Game -->
+            <div class="project-panel" id="language">
+                <div class="coin-rain"></div>
+                <div class="project-header green-border">
+                    <h2 class="project-title">💰 Learn Language Game - 5 Steps</h2>
+                    <div class="project-strategy green-strategy">💪🤖 Spend Full Time & Energy 💪🤖</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 20%;"></div>
+                </div>
+                <div class="checkpoint completed">
+                    <div class="checkpoint-text">1. Get domain name</div>
+                </div>
+                <div class="checkpoint active">
+                    <div class="checkpoint-text">2. Set up site</div>
+                </div>
+                <div class="checkpoint active">
+                    <div class="checkpoint-text">3. Build wordpacks</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">4. Build games</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">5. Make gameplay videos</div>
+                </div>
+            </div>
+            
+            <!-- Finance Education Vids -->
+            <div class="project-panel" id="finance">
+                <div class="coin-rain"></div>
+                <div class="project-header yellow-border">
+                    <h2 class="project-title">🪙 Finance Education Vids - 4 Steps</h2>
+                    <div class="project-strategy yellow-strategy">🤖🤖 Automate, No Attention 🤖🤖</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 75%;"></div>
+                </div>
+                <div class="checkpoint completed">
+                    <div class="checkpoint-text">1. Make youtube channel</div>
+                </div>
+                <div class="checkpoint completed">
+                    <div class="checkpoint-text">2. Connect opus clips</div>
+                </div>
+                <div class="checkpoint completed">
+                    <div class="checkpoint-text">3. Make custom thumbnail internal tools</div>
+                </div>
+                <div class="checkpoint active">
+                    <div class="checkpoint-text">4. Scale to 4 videos a day</div>
+                </div>
+            </div>
+            
+            <!-- POD -->
+            <div class="project-panel" id="pod">
+                <div class="coin-rain"></div>
+                <div class="project-header red-border">
+                    <h2 class="project-title">✨ POD - 4 Steps</h2>
+                    <div class="project-strategy red-strategy">⏸️🤖 Paused Until Saturation ⏸️🤖</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 50%;"></div>
+                </div>
+                <div class="checkpoint completed">
+                    <div class="checkpoint-text">1. Set up printify</div>
+                </div>
+                <div class="checkpoint completed">
+                    <div class="checkpoint-text">2. Connect etsy and publish stickers on etsy</div>
+                </div>
+                <div class="checkpoint active">
+                    <div class="checkpoint-text">3. Set up shopify</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">4. Scale out to 5k designs each product category via API</div>
+                </div>
+            </div>
+            
+            <!-- STL Files -->
+            <div class="project-panel" id="stl">
+                <div class="coin-rain"></div>
+                <div class="project-header yellow-border">
+                    <h2 class="project-title">🪙 STL Files - 5 Steps</h2>
+                    <div class="project-strategy yellow-strategy">🤖🤖 Automate, No Attention 🤖🤖</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 60%;"></div>
+                </div>
+                <div class="checkpoint completed">
+                    <div class="checkpoint-text">1. Set up website</div>
+                </div>
+                <div class="checkpoint completed">
+                    <div class="checkpoint-text">2. Automate production</div>
+                </div>
+                <div class="checkpoint completed">
+                    <div class="checkpoint-text">3. Automate upload to site and cults3d and pinterest</div>
+                </div>
+                <div class="checkpoint active">
+                    <div class="checkpoint-text">4. Scale out to 5k designs</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">5. Scale out to 10k designs</div>
+                </div>
+            </div>
+            
+            <!-- Ambient Music -->
+            <div class="project-panel" id="music">
+                <div class="coin-rain"></div>
+                <div class="project-header red-border">
+                    <h2 class="project-title">✨ Ambient Music - 3 Steps</h2>
+                    <div class="project-strategy red-strategy">⏸️🤖 Paused Until Saturation ⏸️🤖</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 33%;"></div>
+                </div>
+                <div class="checkpoint completed">
+                    <div class="checkpoint-text">1. Create channel</div>
+                </div>
+                <div class="checkpoint active">
+                    <div class="checkpoint-text">2. Create automation tools to quickly upload a rack of 10 vids for each test niche</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">3. Hire and automate for near daily upload</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for task state changes -->
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Quest Update</h2>
+            <p id="modalMessage">Would you like to proceed?</p>
+            <div class="modal-buttons">
+                <button class="modal-button confirm" id="modalConfirm">Confirm</button>
+                <button class="modal-button cancel" id="modalCancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ========================================
+        // CONFIGURATION - Easy to modify
+        // ========================================
+        const DEBUG_MODE = false;
+        const DROP_CONFIG = {
+            itemsPerSecond: 2,             // Items per second at 100% completion
+            baseInterval: 500,              // Base interval in ms (500ms = 2 items/sec at 100%)
+            intervalIncrement: 500,         // Additional ms per 10% not complete
+            fallDuration: { min: 3, max: 7 } // Random fall duration range in seconds
+        };
+        
+        // ========================================
+        // GLOBAL STATE
+        // ========================================
+        let currentDropInterval = null;
+        let lastPosition = -1; // Track last used position
+        const SPAWN_POSITIONS = [10, 30, 50, 70, 90]; // 5 different horizontal positions (in %)
+        
+        // ========================================
+        // LOCAL STORAGE - Save/Load State
+        // ========================================
+        const STORAGE_KEY = 'questBoardState';
+        
+        function saveState() {
+            const state = {};
+            const panels = document.querySelectorAll('.project-panel');
+            
+            panels.forEach(panel => {
+                const panelId = panel.id;
+                if (panelId === 'overview') return;
+                
+                const checkpoints = panel.querySelectorAll('.checkpoint');
+                state[panelId] = [];
+                
+                checkpoints.forEach(checkpoint => {
+                    let status = 'inactive';
+                    if (checkpoint.classList.contains('completed')) status = 'completed';
+                    else if (checkpoint.classList.contains('active')) status = 'active';
+                    state[panelId].push(status);
+                });
+            });
+            
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+        
+        function loadState() {
+            const savedState = localStorage.getItem(STORAGE_KEY);
+            if (!savedState) {
+                return;
+            }
+            
+            const state = JSON.parse(savedState);
+            
+            Object.keys(state).forEach(panelId => {
+                const panel = document.getElementById(panelId);
+                if (!panel) return;
+                
+                const checkpoints = panel.querySelectorAll('.checkpoint');
+                state[panelId].forEach((status, index) => {
+                    if (checkpoints[index]) {
+                        checkpoints[index].classList.remove('active', 'inactive', 'completed');
+                        checkpoints[index].classList.add(status);
+                    }
+                });
+                
+                // Update progress bar
+                const allCheckpoints = panel.querySelectorAll('.checkpoint');
+                const completedCheckpoints = panel.querySelectorAll('.checkpoint.completed');
+                const completionPercent = (completedCheckpoints.length / allCheckpoints.length) * 100;
+                const progressFill = panel.querySelector('.progress-fill');
+                if (progressFill) {
+                    progressFill.style.width = completionPercent + '%';
+                }
+            });
+            
+            // Update overview after loading
+            updateOverview();
+        }
+        
+        // ========================================
+        // SOUND EFFECTS
+        // ========================================
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playPageTurnSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+        
+        function playTaskClickSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.05);
+            
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+        
+        function playConfirmSound() {
+            // Pleasant ASMR-like confirmation sound
+            const oscillator1 = audioContext.createOscillator();
+            const oscillator2 = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator1.connect(gainNode);
+            oscillator2.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator1.type = 'sine';
+            oscillator2.type = 'sine';
+            
+            // Pleasant chord
+            oscillator1.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+            oscillator2.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
+            
+            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator1.start(audioContext.currentTime);
+            oscillator2.start(audioContext.currentTime);
+            oscillator1.stop(audioContext.currentTime + 0.3);
+            oscillator2.stop(audioContext.currentTime + 0.3);
+        }
+        
+        // ========================================
+        // MODAL FUNCTIONALITY
+        // ========================================
+        const modal = document.getElementById('taskModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalConfirm = document.getElementById('modalConfirm');
+        const modalCancel = document.getElementById('modalCancel');
+        
+        let currentCheckpoint = null;
+        let currentAction = null;
+        
+        function showModal(checkpoint, action, title, message) {
+            currentCheckpoint = checkpoint;
+            currentAction = action;
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modal.classList.add('active');
+            playTaskClickSound();
+        }
+        
+        function hideModal() {
+            modal.classList.remove('active');
+            currentCheckpoint = null;
+            currentAction = null;
+        }
+        
+        modalCancel.addEventListener('click', hideModal);
+        
+        modalConfirm.addEventListener('click', () => {
+            if (currentCheckpoint && currentAction) {
+                playConfirmSound();
+                executeTaskAction(currentCheckpoint, currentAction);
+                hideModal();
+            }
+        });
+        
+        // Close modal on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideModal();
+            }
+        });
+        
+        function executeTaskAction(checkpoint, action) {
+            if (action === 'mark-done') {
+                // Change from active to completed
+                checkpoint.classList.remove('active');
+                checkpoint.classList.add('completed');
+                
+                // Auto-activate next task
+                const nextCheckpoint = checkpoint.nextElementSibling;
+                if (nextCheckpoint && nextCheckpoint.classList.contains('checkpoint') && nextCheckpoint.classList.contains('inactive')) {
+                    nextCheckpoint.classList.remove('inactive');
+                    nextCheckpoint.classList.add('active');
+                }
+            } else if (action === 'mark-active') {
+                // Change from inactive to active OR from completed to active
+                checkpoint.classList.remove('inactive', 'completed');
+                checkpoint.classList.add('active');
+            }
+            
+            // Update progress bar
+            const activePanel = document.querySelector('.project-panel.active');
+            const allCheckpoints = activePanel.querySelectorAll('.checkpoint');
+            const completedCheckpoints = activePanel.querySelectorAll('.checkpoint.completed');
+            const completionPercent = (completedCheckpoints.length / allCheckpoints.length) * 100;
+            const progressFill = activePanel.querySelector('.progress-fill');
+            progressFill.style.width = completionPercent + '%';
+            
+            // Update the coin rain with new completion percentage
+            const activeTab = document.querySelector('.tab.active');
+            if (activePanel && activeTab) {
+                const tabColor = activeTab.classList.contains('green') ? 'green' : 
+                                activeTab.classList.contains('yellow') ? 'yellow' : 
+                                activeTab.classList.contains('blue') ? 'blue' : 'red';
+                initCoinRain(activePanel, tabColor);
+            }
+            
+            // Update overview panel
+            updateOverview();
+            
+            // Save state to localStorage
+            saveState();
+        }
+        
+        function updateOverview() {
+            const projects = [
+                { id: 'tavern', index: 0 },
+                { id: 'productivity', index: 1 },
+                { id: 'language', index: 2 },
+                { id: 'finance', index: 3 },
+                { id: 'stl', index: 4 },
+                { id: 'pod', index: 5 },
+                { id: 'music', index: 6 }
+            ];
+            
+            const overviewCards = document.querySelectorAll('.overview-project');
+            
+            projects.forEach(project => {
+                const panel = document.getElementById(project.id);
+                const card = overviewCards[project.index];
+                
+                if (!panel || !card) return;
+                
+                const allCheckpoints = panel.querySelectorAll('.checkpoint');
+                const completedCheckpoints = panel.querySelectorAll('.checkpoint.completed');
+                const completionPercent = Math.round((completedCheckpoints.length / allCheckpoints.length) * 100);
+                
+                // Update progress bar
+                const progressFill = card.querySelector('.overview-progress-fill');
+                progressFill.style.width = completionPercent + '%';
+                
+                // Update percentage text
+                const percentageText = card.querySelector('.overview-percentage');
+                percentageText.textContent = completionPercent + '%';
+                
+                // Update status text
+                const statusText = card.querySelector('.overview-status');
+                statusText.textContent = `${completedCheckpoints.length}/${allCheckpoints.length} quests completed`;
+            });
+        }
+        
+        // Add click handlers to all checkpoints
+        function initCheckpointClickHandlers() {
+            document.querySelectorAll('.checkpoint').forEach(checkpoint => {
+                checkpoint.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    if (checkpoint.classList.contains('active')) {
+                        showModal(
+                            checkpoint,
+                            'mark-done',
+                            '⚔️ Complete Quest?',
+                            'Mark this quest as completed?'
+                        );
+                    } else if (checkpoint.classList.contains('inactive')) {
+                        showModal(
+                            checkpoint,
+                            'mark-active',
+                            '🔓 Unlock Quest?',
+                            'Begin working on this quest?'
+                        );
+                    } else if (checkpoint.classList.contains('completed')) {
+                        showModal(
+                            checkpoint,
+                            'mark-active',
+                            '🔄 Reopen Quest?',
+                            'Mark this quest as active again?'
+                        );
+                    }
+                });
+            });
+        }
+        
+        // Show/hide debug panel based on mode
+        if (!DEBUG_MODE) {
+            document.getElementById('debugPanel').style.display = 'none';
+        }
+        
+        // Debug slider controls
+        const debugSlider = document.getElementById('debugSlider');
+        const debugValue = document.getElementById('debugValue');
+        
+        debugSlider.addEventListener('input', (e) => {
+            const percentage = e.target.value;
+            debugValue.textContent = percentage + '%';
+            
+            // Update the active panel's coin rain
+            const activePanel = document.querySelector('.project-panel.active');
+            const activeTab = document.querySelector('.tab.active');
+            if (activePanel && activeTab) {
+                const tabColor = activeTab.classList.contains('green') ? 'green' : 
+                                activeTab.classList.contains('yellow') ? 'yellow' : 
+                                activeTab.classList.contains('blue') ? 'blue' : 'red';
+                initCoinRain(activePanel, tabColor);
+            }
+        });
+        
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.tab');
+        const panels = document.querySelectorAll('.project-panel');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Play page turn sound
+                playPageTurnSound();
+                
+                // Remove active class from all tabs and panels
+                tabs.forEach(t => t.classList.remove('active'));
+                panels.forEach(p => p.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Show corresponding panel
+                const projectId = tab.getAttribute('data-project');
+                const activePanel = document.getElementById(projectId);
+                activePanel.classList.add('active');
+                
+                // Don't initialize coin rain for overview tab
+                if (projectId === 'overview') {
+                    return;
+                }
+                
+                // Get the tab color class
+                const tabColor = tab.classList.contains('green') ? 'green' : 
+                                tab.classList.contains('yellow') ? 'yellow' : 
+                                tab.classList.contains('blue') ? 'blue' : 'red';
+                
+                // Initialize coin rain for the active panel
+                initCoinRain(activePanel, tabColor);
+            });
+        });
+        
+        // Coin rain functionality
+        function initCoinRain(panel, tabColor) {
+            const coinRainContainer = panel.querySelector('.coin-rain');
+            
+            // Clear existing coins and stop any existing intervals
+            coinRainContainer.innerHTML = '';
+            if (currentDropInterval) {
+                clearInterval(currentDropInterval);
+                currentDropInterval = null;
+            }
+            
+            // Reset position tracking
+            lastPosition = -1;
+            
+            let completionPercent;
+            
+            if (DEBUG_MODE) {
+                // Use debug slider value
+                completionPercent = parseInt(debugSlider.value);
+            } else {
+                // Count completed and total checkpoints
+                // IMPORTANT: Only completed tasks count toward completion percentage
+                // Active tasks are NOT counted as complete
+                const allCheckpoints = panel.querySelectorAll('.checkpoint');
+                const completedCheckpoints = panel.querySelectorAll('.checkpoint.completed');
+                const totalCheckpoints = allCheckpoints.length;
+                const completedCount = completedCheckpoints.length;
+                
+                // Calculate completion percentage based on completed tasks only
+                completionPercent = totalCheckpoints > 0 ? (completedCount / totalCheckpoints) * 100 : 0;
+            }
+            
+            // If 0% complete, don't drop anything
+            if (completionPercent === 0) {
+                return;
+            }
+            
+            // Calculate drop interval based on completion percentage
+            // At 100%: baseInterval (500ms = 2 items/sec)
+            // At 90%: baseInterval + 1 * intervalIncrement (1000ms = 1 item/sec)
+            // At 80%: baseInterval + 2 * intervalIncrement (1500ms = 0.67 items/sec)
+            const percentNotComplete = 100 - completionPercent;
+            const dropInterval = DROP_CONFIG.baseInterval + (percentNotComplete / 10) * DROP_CONFIG.intervalIncrement;
+            
+            // Determine which emoji to use based on tab color
+            let emoji = '🪙'; // default yellow
+            if (tabColor === 'green') {
+                emoji = '💰';
+            } else if (tabColor === 'red') {
+                emoji = '✨';
+            } else if (tabColor === 'blue') {
+                emoji = '🍖';
+            }
+            
+            // Drop first item immediately
+            createCoin(coinRainContainer, emoji);
+            
+            // Set up interval for subsequent drops (one item per interval)
+            currentDropInterval = setInterval(() => {
+                createCoin(coinRainContainer, emoji);
+            }, dropInterval);
+        }
+        
+        function createCoin(container, emoji) {
+            const coin = document.createElement('div');
+            coin.className = 'coin';
+            coin.textContent = emoji;
+            
+            // Get next position (cycle through 5 positions, never repeat the last one)
+            let positionIndex;
+            do {
+                positionIndex = Math.floor(Math.random() * SPAWN_POSITIONS.length);
+            } while (positionIndex === lastPosition && SPAWN_POSITIONS.length > 1);
+            
+            lastPosition = positionIndex;
+            coin.style.left = SPAWN_POSITIONS[positionIndex] + '%';
+            
+            // Random animation duration
+            const duration = DROP_CONFIG.fallDuration.min + 
+                           Math.random() * (DROP_CONFIG.fallDuration.max - DROP_CONFIG.fallDuration.min);
+            coin.style.animationDuration = duration + 's';
+            
+            container.appendChild(coin);
+            
+            // Remove coin after animation completes
+            setTimeout(() => {
+                if (coin.parentElement) {
+                    coin.remove();
+                }
+            }, duration * 1000);
+        }
+        
+        // Initialize coin rain for the first active panel on page load (skip if overview)
+        const initialPanel = document.querySelector('.project-panel.active');
+        const initialTab = document.querySelector('.tab.active');
+        if (initialPanel && initialTab && initialTab.getAttribute('data-project') !== 'overview') {
+            const tabColor = initialTab.classList.contains('green') ? 'green' : 
+                            initialTab.classList.contains('yellow') ? 'yellow' : 
+                            initialTab.classList.contains('blue') ? 'blue' : 'red';
+            initCoinRain(initialPanel, tabColor);
+        }
+        
+        // Initialize checkpoint click handlers
+        initCheckpointClickHandlers();
+        
+        // Load saved state from localStorage
+        loadState();
+        
+        // Make overview project cards clickable
+        document.querySelectorAll('.overview-project').forEach(card => {
+            card.addEventListener('click', () => {
+                const projectName = card.querySelector('h3').textContent;
+                let projectId = '';
+                
+                if (projectName.includes('Tavern Upkeep')) projectId = 'tavern';
+                else if (projectName.includes('Custom Tools')) projectId = 'productivity';
+                else if (projectName.includes('Learn Language')) projectId = 'language';
+                else if (projectName.includes('Finance')) projectId = 'finance';
+                else if (projectName.includes('STL')) projectId = 'stl';
+                else if (projectName.includes('POD')) projectId = 'pod';
+                else if (projectName.includes('Ambient Music')) projectId = 'music';
+                
+                if (projectId) {
+                    const targetTab = document.querySelector(`[data-project="${projectId}"]`);
+                    if (targetTab) {
+                        targetTab.click();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
