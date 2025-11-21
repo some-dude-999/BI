@@ -1683,7 +1683,6 @@
 
         function initializeDurationInputs() {
             const savedDurations = loadDurations();
-            const savedExpanded = loadDurationExpanded();
             const panels = document.querySelectorAll('.project-panel');
 
             panels.forEach(panel => {
@@ -1695,8 +1694,8 @@
                     const savedData = savedDurations[panelId] && savedDurations[panelId][index]
                         ? savedDurations[panelId][index]
                         : null;
-                    const isExpanded = savedExpanded[panelId] && savedExpanded[panelId][index];
-                    createDurationInputs(checkpoint, savedData, isExpanded);
+                    // Always start collapsed on fresh load
+                    createDurationInputs(checkpoint, savedData, false);
                 });
             });
 
