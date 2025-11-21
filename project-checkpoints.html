@@ -440,16 +440,50 @@
             z-index: 2;
         }
 
+        .duration-expander {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #5a3d2b 0%, #4d3322 100%);
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+            color: #c4a45e;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .duration-expander:hover {
+            background: linear-gradient(135deg, #6b4a35 0%, #5a3d2b 100%);
+            border-color: #d4af37;
+        }
+
+        .duration-expander-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .duration-expander-icon.expanded {
+            transform: rotate(180deg);
+        }
+
         .duration-inputs {
             margin-top: 15px;
             padding-top: 15px;
             border-top: 2px solid #5a3d2b;
-            display: flex;
+            display: none;
             gap: 15px;
             align-items: center;
             flex-wrap: wrap;
             position: relative;
             z-index: 2;
+        }
+
+        .duration-inputs.expanded {
+            display: flex;
         }
 
         .duration-input-group {
@@ -510,7 +544,87 @@
             color: #d4af37;
             font-size: 1.2em;
         }
-        
+
+        .star-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 3;
+            transition: all 0.3s ease;
+            opacity: 0.3;
+        }
+
+        .star-icon:hover {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.2);
+        }
+
+        .star-icon.starred {
+            opacity: 1;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+        }
+
+        .checkpoint-text {
+            padding-left: 30px;
+        }
+
+        .adventures-of-day {
+            background: linear-gradient(135deg, #2a1810 0%, #1a0f0a 100%);
+            border: 4px solid #d4af37;
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .adventures-of-day h3 {
+            color: #d4af37;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            font-family: 'MedievalSharp', cursive;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .daily-task {
+            background: linear-gradient(135deg, #1a3d1a 0%, #0f2a0f 100%);
+            border: 3px solid #4a7c2f;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            box-shadow: 0 6px 12px rgba(74, 124, 47, 0.3);
+            position: relative;
+        }
+
+        .daily-task .task-title {
+            font-size: 1.1em;
+            color: #a8d88c;
+            font-weight: 600;
+        }
+
+        .daily-task .task-project {
+            font-size: 0.9em;
+            color: #6ba83e;
+            margin-top: 5px;
+        }
+
+        .daily-task.passive {
+            border-color: #2a8bc9;
+            background: linear-gradient(135deg, #1a3a5a 0%, #0f2540 100%);
+        }
+
+        .daily-task.passive .task-title {
+            color: #87ceeb;
+        }
+
+        .daily-task.passive .task-project {
+            color: #5fa8d3;
+        }
+
         .checkpoint.completed .checkpoint-text {
             color: #a8d88c;
         }
@@ -919,7 +1033,15 @@
             <!-- Overview -->
             <div class="project-panel active" id="overview">
                 <h2 style="text-align: center; color: #d4af37; font-family: 'MedievalSharp', cursive; font-size: 2em; margin-bottom: 30px;">Quest Overview</h2>
-                
+
+                <!-- Adventures of the Day -->
+                <div class="adventures-of-day">
+                    <h3>⚔️ Adventures of the Day ⚔️</h3>
+                    <div id="dailyTasksList">
+                        <!-- Daily tasks will be dynamically inserted here -->
+                    </div>
+                </div>
+
                 <div class="overview-grid">
                     <div class="overview-project blue">
                         <h3><span class="icon">🍖</span> 0. Tavern Upkeep <span class="icon">🍖</span></h3>
@@ -1225,6 +1347,8 @@
         // ========================================
         const STORAGE_KEY = 'questBoardState';
         const DURATION_STORAGE_KEY = 'questBoardDurations';
+        const STARRED_STORAGE_KEY = 'questBoardStarred';
+        const DURATION_EXPANDED_KEY = 'questBoardDurationExpanded';
 
         function saveState() {
             const state = {};
@@ -1345,19 +1469,64 @@
             updateEffortRemaining();
         }
 
-        function createDurationInputs(checkpoint, savedData = null) {
+        function createDurationInputs(checkpoint, savedData = null, isExpanded = false) {
             // Only add duration inputs if checkpoint is active or inactive (not completed)
             if (checkpoint.classList.contains('completed')) return;
 
             // Check if duration inputs already exist
             if (checkpoint.querySelector('.duration-inputs')) return;
 
-            const durationDiv = document.createElement('div');
-            durationDiv.className = 'duration-inputs';
-
             const days = savedData ? savedData.days : 0;
             const weeks = savedData ? savedData.weeks : 0;
             const months = savedData ? savedData.months : 0;
+
+            // Check if this is the squat task (passive task - no star icon)
+            const checkpointText = checkpoint.querySelector('.checkpoint-text');
+            const isSquatTask = checkpointText && checkpointText.textContent.includes('Daily squat and deadlift');
+
+            // Add star icon (except for squat task)
+            if (!isSquatTask && !checkpoint.querySelector('.star-icon')) {
+                const starIcon = document.createElement('div');
+                starIcon.className = 'star-icon';
+                starIcon.textContent = '⭐';
+                starIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const activePanel = checkpoint.closest('.project-panel');
+                    const panelId = activePanel ? activePanel.id : null;
+                    const checkpoints = activePanel ? activePanel.querySelectorAll('.checkpoint') : [];
+                    const checkpointIndex = Array.from(checkpoints).indexOf(checkpoint);
+                    toggleStar(starIcon, checkpoint, panelId, checkpointIndex);
+                });
+                checkpoint.appendChild(starIcon);
+            }
+
+            // Add duration expander button
+            const expanderButton = document.createElement('div');
+            expanderButton.className = 'duration-expander';
+            expanderButton.innerHTML = `
+                <span class="duration-expander-icon ${isExpanded ? 'expanded' : ''}">▼</span>
+                <span>Estimate Duration</span>
+            `;
+            expanderButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const durationInputs = checkpoint.querySelector('.duration-inputs');
+                const icon = expanderButton.querySelector('.duration-expander-icon');
+
+                if (durationInputs.classList.contains('expanded')) {
+                    durationInputs.classList.remove('expanded');
+                    icon.classList.remove('expanded');
+                } else {
+                    durationInputs.classList.add('expanded');
+                    icon.classList.add('expanded');
+                }
+
+                saveDurationExpanded();
+            });
+            checkpoint.appendChild(expanderButton);
+
+            // Add duration inputs container
+            const durationDiv = document.createElement('div');
+            durationDiv.className = `duration-inputs ${isExpanded ? 'expanded' : ''}`;
 
             durationDiv.innerHTML = `
                 <div class="duration-input-group">
@@ -1456,6 +1625,7 @@
 
         function initializeDurationInputs() {
             const savedDurations = loadDurations();
+            const savedExpanded = loadDurationExpanded();
             const panels = document.querySelectorAll('.project-panel');
 
             panels.forEach(panel => {
@@ -1467,11 +1637,260 @@
                     const savedData = savedDurations[panelId] && savedDurations[panelId][index]
                         ? savedDurations[panelId][index]
                         : null;
-                    createDurationInputs(checkpoint, savedData);
+                    const isExpanded = savedExpanded[panelId] && savedExpanded[panelId][index];
+                    createDurationInputs(checkpoint, savedData, isExpanded);
                 });
             });
 
             updateEffortRemaining();
+        }
+
+        function saveDurationExpanded() {
+            const expanded = {};
+            const panels = document.querySelectorAll('.project-panel');
+
+            panels.forEach(panel => {
+                const panelId = panel.id;
+                if (panelId === 'overview') return;
+
+                const checkpoints = panel.querySelectorAll('.checkpoint');
+                expanded[panelId] = [];
+
+                checkpoints.forEach((checkpoint, index) => {
+                    const durationInputs = checkpoint.querySelector('.duration-inputs');
+                    expanded[panelId].push(durationInputs && durationInputs.classList.contains('expanded'));
+                });
+            });
+
+            localStorage.setItem(DURATION_EXPANDED_KEY, JSON.stringify(expanded));
+        }
+
+        function loadDurationExpanded() {
+            const savedExpanded = localStorage.getItem(DURATION_EXPANDED_KEY);
+            if (!savedExpanded) return {};
+            return JSON.parse(savedExpanded);
+        }
+
+        // ========================================
+        // STARRING FUNCTIONALITY
+        // ========================================
+        function saveStarred() {
+            const starred = {};
+            const panels = document.querySelectorAll('.project-panel');
+
+            panels.forEach(panel => {
+                const panelId = panel.id;
+                if (panelId === 'overview') return;
+
+                const checkpoints = panel.querySelectorAll('.checkpoint');
+                starred[panelId] = [];
+
+                checkpoints.forEach((checkpoint, index) => {
+                    const starIcon = checkpoint.querySelector('.star-icon');
+                    starred[panelId].push(starIcon && starIcon.classList.contains('starred'));
+                });
+            });
+
+            localStorage.setItem(STARRED_STORAGE_KEY, JSON.stringify(starred));
+        }
+
+        function loadStarred() {
+            const savedStarred = localStorage.getItem(STARRED_STORAGE_KEY);
+            if (!savedStarred) return {};
+            return JSON.parse(savedStarred);
+        }
+
+        function getStarredCount() {
+            let count = 0;
+            const panels = document.querySelectorAll('.project-panel');
+
+            panels.forEach(panel => {
+                if (panel.id === 'overview') return;
+
+                const starredIcons = panel.querySelectorAll('.star-icon.starred');
+                count += starredIcons.length;
+            });
+
+            return count;
+        }
+
+        function toggleStar(starIcon, checkpoint, panelId, checkpointIndex) {
+            const isStarred = starIcon.classList.contains('starred');
+
+            if (isStarred) {
+                // Unstar
+                starIcon.classList.remove('starred');
+            } else {
+                // Check if we can star (max 3)
+                const starredCount = getStarredCount();
+                if (starredCount >= 3) {
+                    // Show a brief warning
+                    starIcon.style.color = '#c92a2a';
+                    setTimeout(() => {
+                        starIcon.style.color = '';
+                    }, 500);
+                    return;
+                }
+
+                // Star it
+                starIcon.classList.add('starred');
+            }
+
+            saveStarred();
+            updateAdventuresOfDay();
+        }
+
+        function autoStarNextTask() {
+            // Find the next active task based on priority (tab order, then step order)
+            const projectPriority = ['tavern', 'productivity', 'language', 'finance', 'stl', 'pod', 'music'];
+
+            for (const projectId of projectPriority) {
+                const panel = document.getElementById(projectId);
+                if (!panel) continue;
+
+                const checkpoints = panel.querySelectorAll('.checkpoint');
+                for (let i = 0; i < checkpoints.length; i++) {
+                    const checkpoint = checkpoints[i];
+                    const checkpointText = checkpoint.querySelector('.checkpoint-text');
+
+                    // Skip the daily squat task
+                    if (checkpointText && checkpointText.textContent.includes('Daily squat and deadlift')) {
+                        continue;
+                    }
+
+                    const starIcon = checkpoint.querySelector('.star-icon');
+
+                    // If this is an active task and not starred, star it
+                    if (checkpoint.classList.contains('active') && starIcon && !starIcon.classList.contains('starred')) {
+                        starIcon.classList.add('starred');
+                        saveStarred();
+                        updateAdventuresOfDay();
+                        return;
+                    }
+                }
+            }
+        }
+
+        function initializeStarredState() {
+            const savedStarred = loadStarred();
+            const panels = document.querySelectorAll('.project-panel');
+
+            panels.forEach(panel => {
+                const panelId = panel.id;
+                if (panelId === 'overview') return;
+
+                const checkpoints = panel.querySelectorAll('.checkpoint');
+                checkpoints.forEach((checkpoint, index) => {
+                    const starIcon = checkpoint.querySelector('.star-icon');
+                    const isStarred = savedStarred[panelId] && savedStarred[panelId][index];
+
+                    if (starIcon && isStarred) {
+                        starIcon.classList.add('starred');
+                    }
+                });
+            });
+        }
+
+        function updateAdventuresOfDay() {
+            const dailyTasksList = document.getElementById('dailyTasksList');
+            if (!dailyTasksList) return;
+
+            dailyTasksList.innerHTML = '';
+
+            // Always add the daily squat task first (passive task)
+            const tavernPanel = document.getElementById('tavern');
+            if (tavernPanel) {
+                const squatCheckpoint = tavernPanel.querySelectorAll('.checkpoint')[0]; // First task
+                if (squatCheckpoint) {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.className = 'daily-task passive';
+                    taskDiv.innerHTML = `
+                        <div class="task-title">🍖 Daily squat and deadlift</div>
+                        <div class="task-project">Tavern Upkeep - Passive Task</div>
+                    `;
+                    dailyTasksList.appendChild(taskDiv);
+                }
+            }
+
+            // Get all starred tasks
+            const starredTasks = [];
+            const projectPriority = ['tavern', 'productivity', 'language', 'finance', 'stl', 'pod', 'music'];
+            const projectNames = {
+                'tavern': 'Tavern Upkeep',
+                'productivity': 'Blue Anvil Labs',
+                'language': 'Lingo Playground',
+                'finance': 'RICH & LEGIT',
+                'stl': 'StarForge Kits',
+                'pod': 'Starship Drip',
+                'music': 'Rockets & Rainbows'
+            };
+
+            for (const projectId of projectPriority) {
+                const panel = document.getElementById(projectId);
+                if (!panel) continue;
+
+                const checkpoints = panel.querySelectorAll('.checkpoint');
+                checkpoints.forEach((checkpoint, index) => {
+                    const starIcon = checkpoint.querySelector('.star-icon');
+                    const checkpointText = checkpoint.querySelector('.checkpoint-text');
+
+                    // Skip the squat task
+                    if (checkpointText && checkpointText.textContent.includes('Daily squat and deadlift')) {
+                        return;
+                    }
+
+                    if (starIcon && starIcon.classList.contains('starred') &&
+                        (checkpoint.classList.contains('active') || checkpoint.classList.contains('inactive'))) {
+                        starredTasks.push({
+                            text: checkpointText ? checkpointText.textContent : '',
+                            project: projectNames[projectId] || projectId,
+                            isActive: checkpoint.classList.contains('active')
+                        });
+                    }
+                });
+            }
+
+            // If no starred tasks, get top 3 active tasks by priority
+            if (starredTasks.length === 0) {
+                for (const projectId of projectPriority) {
+                    if (starredTasks.length >= 3) break;
+
+                    const panel = document.getElementById(projectId);
+                    if (!panel) continue;
+
+                    const checkpoints = panel.querySelectorAll('.checkpoint');
+                    for (let i = 0; i < checkpoints.length; i++) {
+                        if (starredTasks.length >= 3) break;
+
+                        const checkpoint = checkpoints[i];
+                        const checkpointText = checkpoint.querySelector('.checkpoint-text');
+
+                        // Skip the squat task
+                        if (checkpointText && checkpointText.textContent.includes('Daily squat and deadlift')) {
+                            continue;
+                        }
+
+                        if (checkpoint.classList.contains('active')) {
+                            starredTasks.push({
+                                text: checkpointText ? checkpointText.textContent : '',
+                                project: projectNames[projectId] || projectId,
+                                isActive: true
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Add up to 3 starred tasks
+            starredTasks.slice(0, 3).forEach(task => {
+                const taskDiv = document.createElement('div');
+                taskDiv.className = 'daily-task';
+                taskDiv.innerHTML = `
+                    <div class="task-title">⭐ ${task.text}</div>
+                    <div class="task-project">${task.project}</div>
+                `;
+                dailyTasksList.appendChild(taskDiv);
+            });
         }
         
         // ========================================
@@ -1641,14 +2060,24 @@
         
         function executeTaskAction(checkpoint, action) {
             if (action === 'mark-done') {
+                // Check if this task was starred before completing
+                const starIcon = checkpoint.querySelector('.star-icon');
+                const wasStarred = starIcon && starIcon.classList.contains('starred');
+
                 // Change from active to completed
                 checkpoint.classList.remove('active');
                 checkpoint.classList.add('completed');
 
-                // Remove duration inputs when task is completed
+                // Remove duration inputs, expander, and star icon when task is completed
                 const durationDiv = checkpoint.querySelector('.duration-inputs');
-                if (durationDiv) {
-                    durationDiv.remove();
+                const expanderButton = checkpoint.querySelector('.duration-expander');
+                if (durationDiv) durationDiv.remove();
+                if (expanderButton) expanderButton.remove();
+                if (starIcon) starIcon.remove();
+
+                // If this was a starred task, auto-star the next task
+                if (wasStarred) {
+                    autoStarNextTask();
                 }
 
                 // Auto-activate next task
@@ -1658,13 +2087,15 @@
                     nextCheckpoint.classList.add('active');
                     // Add duration inputs to newly activated task if it doesn't have them
                     const savedDurations = loadDurations();
+                    const savedExpanded = loadDurationExpanded();
                     const activePanel = document.querySelector('.project-panel.active');
                     const checkpoints = activePanel.querySelectorAll('.checkpoint');
                     const index = Array.from(checkpoints).indexOf(nextCheckpoint);
                     const savedData = savedDurations[activePanel.id] && savedDurations[activePanel.id][index]
                         ? savedDurations[activePanel.id][index]
                         : null;
-                    createDurationInputs(nextCheckpoint, savedData);
+                    const isExpanded = savedExpanded[activePanel.id] && savedExpanded[activePanel.id][index];
+                    createDurationInputs(nextCheckpoint, savedData, isExpanded);
                 }
             } else if (action === 'mark-active') {
                 // Change from inactive to active OR from completed to active
@@ -1676,10 +2107,12 @@
                 const checkpoints = activePanel.querySelectorAll('.checkpoint');
                 const index = Array.from(checkpoints).indexOf(checkpoint);
                 const savedDurations = loadDurations();
+                const savedExpanded = loadDurationExpanded();
                 const savedData = savedDurations[activePanel.id] && savedDurations[activePanel.id][index]
                     ? savedDurations[activePanel.id][index]
                     : null;
-                createDurationInputs(checkpoint, savedData);
+                const isExpanded = savedExpanded[activePanel.id] && savedExpanded[activePanel.id][index];
+                createDurationInputs(checkpoint, savedData, isExpanded);
             }
 
             // Update progress bar
@@ -1705,9 +2138,13 @@
             // Update effort remaining display
             updateEffortRemaining();
 
+            // Update Adventures of the Day
+            updateAdventuresOfDay();
+
             // Save state to localStorage
             saveState();
             saveDurations();
+            saveStarred();
         }
         
         function updateOverview() {
@@ -1949,6 +2386,10 @@
 
         // Initialize duration inputs
         initializeDurationInputs();
+
+        // Load starred state and initialize Adventures of the Day
+        initializeStarredState();
+        updateAdventuresOfDay();
         
         // Make overview project cards clickable
         document.querySelectorAll('.overview-project').forEach(card => {
