@@ -284,13 +284,28 @@
         }
         
         .checkpoint {
-            background: linear-gradient(135deg, #2a1810 0%, #1a0f0a 100%);
+            background:
+                /* Paper texture */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    rgba(0, 0, 0, 0.02) 1px,
+                    transparent 2px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0px,
+                    rgba(0, 0, 0, 0.02) 1px,
+                    transparent 2px
+                ),
+                /* Aged paper color */
+                linear-gradient(135deg, #f4e4c1 0%, #e8d4a8 50%, #f4e4c1 100%);
             border: 3px solid #5a3d2b;
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 15px 20px;
             margin: 20px auto;
             max-width: 600px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
             position: relative;
             overflow: visible;
@@ -306,8 +321,41 @@
         }
         
         .checkpoint:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Colored borders for different project types */
+        .checkpoint.project-green {
+            border-color: #4a7c2f;
+        }
+
+        .checkpoint.project-green .checkpoint-text {
+            color: #2d5016;
+        }
+
+        .checkpoint.project-yellow {
+            border-color: #d4af37;
+        }
+
+        .checkpoint.project-yellow .checkpoint-text {
+            color: #8b6914;
+        }
+
+        .checkpoint.project-red {
+            border-color: #c92a2a;
+        }
+
+        .checkpoint.project-red .checkpoint-text {
+            color: #8b1a1a;
+        }
+
+        .checkpoint.project-blue {
+            border-color: #2a8bc9;
+        }
+
+        .checkpoint.project-blue .checkpoint-text {
+            color: #1a5a8b;
         }
         
         .checkpoint::before {
@@ -326,63 +374,15 @@
         }
         
         .checkpoint.completed {
-            border-color: #2d5016;
-            background: linear-gradient(135deg, #1a3010 0%, #0f1f08 100%);
-            box-shadow: 0 8px 16px rgba(45, 80, 22, 0.4), inset 0 2px 8px rgba(82, 163, 42, 0.2);
+            opacity: 0.7;
         }
-        
-        
+
         .checkpoint.active {
-            border-color: #d4af37;
-            background: linear-gradient(135deg, #3d2817 0%, #2a1810 100%);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), 0 8px 16px rgba(212, 175, 55, 0.3);
-            animation: pulse 2s infinite;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .checkpoint.active::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.1) 25%,
-                rgba(255, 255, 255, 0.4) 50%,
-                rgba(255, 255, 255, 0.1) 75%,
-                transparent 100%);
-            animation: sheen 3s infinite;
-            z-index: 1;
-        }
-        
-        @keyframes sheen {
-            0% {
-                left: -100%;
-            }
-            20% {
-                left: 100%;
-            }
-            100% {
-                left: 100%;
-            }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), 0 8px 16px rgba(212, 175, 55, 0.3); }
-            50% { box-shadow: 0 0 50px rgba(212, 175, 55, 0.8), 0 8px 20px rgba(212, 175, 55, 0.5); }
-        }
-        
-        @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 20px rgba(212, 175, 55, 0.3);
         }
 
         .checkpoint.inactive {
             opacity: 0.5;
-            border-color: #3d2817;
         }
         
 
@@ -510,12 +510,6 @@
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
         }
 
-        .checkpoint-text {
-            flex: 1;
-            font-size: 1.2em;
-            color: #f4e4c1;
-        }
-
         .checkpoint-status-icon {
             font-size: 2em;
             opacity: 0.8;
@@ -603,14 +597,9 @@
             color: #6b4a35;
         }
 
-        .checkpoint.completed .checkpoint-text {
-            color: #a8d88c;
-        }
-        
-        .checkpoint.active .checkpoint-text {
-            color: #f4e4c1;
-            font-weight: 600;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        .checkpoint-text {
+            flex: 1;
+            font-size: 1.1em;
         }
         
         .no-checkpoints {
@@ -994,7 +983,7 @@
 
     <div class="quest-board">
         <h1>⚔️ Quest Board ⚔️</h1>
-        <div class="subtitle">Track thy noble ventures and conquests</div>
+        <div class="subtitle">Forge what the realm needeth, then spread word of thy creations</div>
         
         <div class="tabs">
             <div class="tab active" data-project="overview">🗝️ Overview</div>
@@ -1292,10 +1281,12 @@
     <!-- Modal for task state changes -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal-content">
-            <h2 id="modalTitle">Quest Update</h2>
-            <p id="modalMessage">Would you like to proceed?</p>
+            <h2 id="modalTitle">Quest State Change</h2>
+            <p id="modalMessage">Choose the new state for this quest:</p>
             <div class="modal-buttons">
-                <button class="modal-button confirm" id="modalConfirm">Confirm</button>
+                <button class="modal-button state-active" id="modalActive">⚔️ Active</button>
+                <button class="modal-button state-locked" id="modalLocked">🔒 Locked</button>
+                <button class="modal-button state-complete" id="modalComplete">🏰 Complete</button>
                 <button class="modal-button cancel" id="modalCancel">Cancel</button>
             </div>
         </div>
@@ -1453,6 +1444,24 @@
 
             // Check if row already exists
             if (checkpoint.querySelector('.checkpoint-row')) return;
+
+            // Add project color class based on panel
+            const panel = checkpoint.closest('.project-panel');
+            const panelId = panel ? panel.id : '';
+
+            // Remove any existing project color classes
+            checkpoint.classList.remove('project-green', 'project-yellow', 'project-red', 'project-blue');
+
+            // Add appropriate color class
+            if (panelId === 'productivity' || panelId === 'language') {
+                checkpoint.classList.add('project-green');
+            } else if (panelId === 'finance' || panelId === 'stl') {
+                checkpoint.classList.add('project-yellow');
+            } else if (panelId === 'pod' || panelId === 'music') {
+                checkpoint.classList.add('project-red');
+            } else if (panelId === 'tavern') {
+                checkpoint.classList.add('project-blue');
+            }
 
             const days = savedData ? savedData.days : 0;
             const weeks = savedData ? savedData.weeks : 0;
@@ -2033,37 +2042,50 @@
         const modal = document.getElementById('taskModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalMessage = document.getElementById('modalMessage');
-        const modalConfirm = document.getElementById('modalConfirm');
+        const modalActive = document.getElementById('modalActive');
+        const modalLocked = document.getElementById('modalLocked');
+        const modalComplete = document.getElementById('modalComplete');
         const modalCancel = document.getElementById('modalCancel');
-        
+
         let currentCheckpoint = null;
-        let currentAction = null;
-        
-        function showModal(checkpoint, action, title, message) {
+
+        function showModal(checkpoint) {
             currentCheckpoint = checkpoint;
-            currentAction = action;
-            modalTitle.textContent = title;
-            modalMessage.textContent = message;
             modal.classList.add('active');
             playTaskClickSound();
         }
-        
+
         function hideModal() {
             modal.classList.remove('active');
             currentCheckpoint = null;
-            currentAction = null;
         }
-        
+
         modalCancel.addEventListener('click', hideModal);
-        
-        modalConfirm.addEventListener('click', () => {
-            if (currentCheckpoint && currentAction) {
+
+        modalActive.addEventListener('click', () => {
+            if (currentCheckpoint) {
                 playConfirmSound();
-                executeTaskAction(currentCheckpoint, currentAction);
+                executeTaskAction(currentCheckpoint, 'mark-active');
                 hideModal();
             }
         });
-        
+
+        modalLocked.addEventListener('click', () => {
+            if (currentCheckpoint) {
+                playConfirmSound();
+                executeTaskAction(currentCheckpoint, 'mark-locked');
+                hideModal();
+            }
+        });
+
+        modalComplete.addEventListener('click', () => {
+            if (currentCheckpoint) {
+                playConfirmSound();
+                executeTaskAction(currentCheckpoint, 'mark-done');
+                hideModal();
+            }
+        });
+
         // Close modal on background click
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
@@ -2129,11 +2151,36 @@
                 const checkpointTextEl = checkpoint.querySelector('.checkpoint-text');
                 const taskText = checkpointTextEl ? checkpointTextEl.textContent : '';
 
-                // Change from inactive to active OR from completed to active
+                // Change to active
                 checkpoint.classList.remove('inactive', 'completed');
                 checkpoint.classList.add('active');
 
                 // Recreate the row for active state
+                checkpoint.innerHTML = '';
+                const savedData = savedDurations[activePanel.id] && savedDurations[activePanel.id][index]
+                    ? savedDurations[activePanel.id][index]
+                    : null;
+                const isExpanded = savedExpanded[activePanel.id] && savedExpanded[activePanel.id][index];
+                createDurationInputs(checkpoint, savedData, isExpanded, taskText);
+
+                // Restore starred state
+                const isStarred = savedStarred[activePanel.id] && savedStarred[activePanel.id][index];
+                if (isStarred) {
+                    const starIcon = checkpoint.querySelector('.star-icon');
+                    if (starIcon) {
+                        starIcon.classList.add('starred');
+                    }
+                }
+            } else if (action === 'mark-locked') {
+                // Get text BEFORE clearing
+                const checkpointTextEl = checkpoint.querySelector('.checkpoint-text');
+                const taskText = checkpointTextEl ? checkpointTextEl.textContent : '';
+
+                // Change to locked/inactive
+                checkpoint.classList.remove('active', 'completed');
+                checkpoint.classList.add('inactive');
+
+                // Recreate the row for locked state
                 checkpoint.innerHTML = '';
                 const savedData = savedDurations[activePanel.id] && savedDurations[activePanel.id][index]
                     ? savedDurations[activePanel.id][index]
@@ -2224,29 +2271,7 @@
             document.querySelectorAll('.checkpoint').forEach(checkpoint => {
                 checkpoint.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    
-                    if (checkpoint.classList.contains('active')) {
-                        showModal(
-                            checkpoint,
-                            'mark-done',
-                            '⚔️ Complete Quest?',
-                            'Mark this quest as completed?'
-                        );
-                    } else if (checkpoint.classList.contains('inactive')) {
-                        showModal(
-                            checkpoint,
-                            'mark-active',
-                            '🔓 Unlock Quest?',
-                            'Begin working on this quest?'
-                        );
-                    } else if (checkpoint.classList.contains('completed')) {
-                        showModal(
-                            checkpoint,
-                            'mark-active',
-                            '🔄 Reopen Quest?',
-                            'Mark this quest as active again?'
-                        );
-                    }
+                    showModal(checkpoint);
                 });
             });
         }
