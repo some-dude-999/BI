@@ -68,7 +68,8 @@ BUG FIXES (2025-11-21):
 
 3. **Proper Data Formatting**:
    - Score datasets: Display as X.XX (e.g., "8.75")
-   - Price datasets: Display as $XXX,XXX (e.g., "$160,000")
+   - Price datasets: Display as $XXX,XXX.XX with 2 decimal precision (e.g., "$160,000.00", "$0.60")
+   - CRITICAL: Always preserves 2 decimal places to maintain CSV precision (DOGE $0.60 not rounded to $1)
    - Calculation breakdowns show properly formatted values
 
 4. **Data Integrity**: All calculations and displays now use validated, properly formatted data
