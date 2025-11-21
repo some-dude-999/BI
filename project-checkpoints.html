@@ -133,16 +133,34 @@
             font-size: 3em;
             color: #d4af37;
             text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.5);
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             letter-spacing: 3px;
         }
-        
+
         .subtitle {
             text-align: center;
-            color: #c4a45e;
+            background: linear-gradient(45deg, #d4af37, #ffd700, #d4af37, #ffd700);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             font-size: 1.1em;
             margin-bottom: 30px;
             font-style: italic;
+            animation: sparkle-shimmer 3s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6));
+        }
+
+        @keyframes sparkle-shimmer {
+            0%, 100% {
+                background-position: 0% center;
+                filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6)) brightness(1);
+            }
+            50% {
+                background-position: 100% center;
+                filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)) brightness(1.3);
+            }
         }
         
         .tabs {
@@ -1077,6 +1095,13 @@
             </div>
             <span class="debug-value" id="debugValue">0%</span>
         </div>
+        <div class="debug-controls" style="margin-top: 15px;">
+            <span class="debug-label">Icon Frequency:</span>
+            <div class="debug-slider">
+                <input type="range" id="frequencySlider" min="100" max="3000" value="500" step="100">
+            </div>
+            <span class="debug-value" id="frequencyValue">500ms</span>
+        </div>
     </div>
 
     <div class="quest-board">
@@ -1106,23 +1131,20 @@
             <div class="project-panel active" id="tavern">
                 <div class="coin-rain"></div>
                 <div class="project-header blue-border">
-                    <h2 class="project-title">🍖 Tavern Upkeep - 4 Steps</h2>
+                    <h2 class="project-title">🍖 Tavern Upkeep - 3 Steps</h2>
                     <div class="project-strategy blue-strategy">🪚🪵 Daily Tavern Upkeep 🪚🪵</div>
                 </div>
                 <div class="progress-bar">
                     <div class="progress-fill" style="width: 0%;"></div>
                 </div>
                 <div class="checkpoint active">
-                    <div class="checkpoint-text">1. Daily Squat and Deadlift</div>
+                    <div class="checkpoint-text">1. Clean Zen Pest Free House</div>
                 </div>
                 <div class="checkpoint inactive">
-                    <div class="checkpoint-text">2. Clean Zen Pest Free House</div>
+                    <div class="checkpoint-text">2. Fix Water Leak</div>
                 </div>
                 <div class="checkpoint inactive">
-                    <div class="checkpoint-text">3. Fix Water Leak</div>
-                </div>
-                <div class="checkpoint inactive">
-                    <div class="checkpoint-text">4. Collect Refunds & Payments</div>
+                    <div class="checkpoint-text">3. Collect Refunds & Payments</div>
                 </div>
             </div>
             
@@ -1480,7 +1502,6 @@
                 const checkpointText = checkpoint.querySelector('.checkpoint-text');
                 taskText = checkpointText ? checkpointText.textContent : '';
             }
-            const isSquatTask = taskText.includes('Daily Squat and Deadlift');
 
             // Determine status emoji
             let statusEmoji = '';
@@ -1496,10 +1517,10 @@
             const row = document.createElement('div');
             row.className = 'checkpoint-row';
 
-            // Create star icon (except for squat task and completed tasks)
+            // Create star icon (except for completed tasks)
             // Also hide if 3 tasks are already starred (unless this task is starred)
             let starHTML = '';
-            if (!isSquatTask && !isCompleted) {
+            if (!isCompleted) {
                 // Count currently starred tasks
                 const allStarred = document.querySelectorAll('.star-icon.starred');
                 const isThisStarred = checkpoint.querySelector('.star-icon')?.classList.contains('starred');
@@ -1793,13 +1814,11 @@
 
                 const isStarred = starIcon.classList.contains('starred');
                 const isCompleted = checkpoint.classList.contains('completed');
-                const checkpointText = checkpoint.querySelector('.checkpoint-text');
-                const isSquatTask = checkpointText && checkpointText.textContent.includes('Daily Squat and Deadlift');
 
-                // Hide star icon if: 3 stars exist AND this task is not starred AND not squat AND not completed
-                if (starredCount >= 3 && !isStarred && !isSquatTask && !isCompleted) {
+                // Hide star icon if: 3 stars exist AND this task is not starred AND not completed
+                if (starredCount >= 3 && !isStarred && !isCompleted) {
                     starIcon.style.display = 'none';
-                } else if (!isSquatTask && !isCompleted) {
+                } else if (!isCompleted) {
                     starIcon.style.display = 'flex';
                 }
             });
@@ -1816,13 +1835,6 @@
                 const checkpoints = panel.querySelectorAll('.checkpoint');
                 for (let i = 0; i < checkpoints.length; i++) {
                     const checkpoint = checkpoints[i];
-                    const checkpointText = checkpoint.querySelector('.checkpoint-text');
-
-                    // Skip the daily squat task
-                    if (checkpointText && checkpointText.textContent.includes('Daily Squat and Deadlift')) {
-                        continue;
-                    }
-
                     const starIcon = checkpoint.querySelector('.star-icon');
 
                     // If this is an active task and not starred, star it
@@ -1866,20 +1878,14 @@
 
             dailyTasksList.innerHTML = '';
 
-            // Always add the daily squat task first (passive task)
-            const tavernPanel = document.getElementById('tavern');
-            if (tavernPanel) {
-                const squatCheckpoint = tavernPanel.querySelectorAll('.checkpoint')[0]; // First task
-                if (squatCheckpoint) {
-                    const taskDiv = document.createElement('div');
-                    taskDiv.className = 'daily-task passive';
-                    taskDiv.innerHTML = `
-                        <div class="task-title">🍖 Daily Squat and Deadlift</div>
-                        <div class="task-project">Tavern Upkeep - Passive Task</div>
-                    `;
-                    dailyTasksList.appendChild(taskDiv);
-                }
-            }
+            // Always add the daily squat task first (passive task - not tied to any project checkpoint)
+            const taskDiv = document.createElement('div');
+            taskDiv.className = 'daily-task passive';
+            taskDiv.innerHTML = `
+                <div class="task-title">🍖 Daily Squat and Deadlift</div>
+                <div class="task-project">Tavern Upkeep - Daily Task</div>
+            `;
+            dailyTasksList.appendChild(taskDiv);
 
             // Get all starred tasks
             const starredTasks = [];
@@ -1903,17 +1909,25 @@
                     const starIcon = checkpoint.querySelector('.star-icon');
                     const checkpointText = checkpoint.querySelector('.checkpoint-text');
 
-                    // Skip the squat task
-                    if (checkpointText && checkpointText.textContent.includes('Daily Squat and Deadlift')) {
-                        return;
-                    }
-
                     if (starIcon && starIcon.classList.contains('starred') &&
                         (checkpoint.classList.contains('active') || checkpoint.classList.contains('inactive'))) {
+
+                        // Get duration data for this checkpoint
+                        const daysInput = checkpoint.querySelector('.duration-days');
+                        const weeksInput = checkpoint.querySelector('.duration-weeks');
+                        const monthsInput = checkpoint.querySelector('.duration-months');
+
+                        const days = daysInput ? parseInt(daysInput.value) || 0 : 0;
+                        const weeks = weeksInput ? parseInt(weeksInput.value) || 0 : 0;
+                        const months = monthsInput ? parseInt(monthsInput.value) || 0 : 0;
+
                         starredTasks.push({
                             text: checkpointText ? checkpointText.textContent : '',
                             project: projectNames[projectId] || projectId,
-                            isActive: checkpoint.classList.contains('active')
+                            isActive: checkpoint.classList.contains('active'),
+                            days: days,
+                            weeks: weeks,
+                            months: months
                         });
                     }
                 });
@@ -1934,29 +1948,50 @@
                         const checkpoint = checkpoints[i];
                         const checkpointText = checkpoint.querySelector('.checkpoint-text');
 
-                        // Skip the squat task
-                        if (checkpointText && checkpointText.textContent.includes('Daily Squat and Deadlift')) {
-                            continue;
-                        }
-
                         if (checkpoint.classList.contains('active')) {
+                            // Get duration data for this checkpoint
+                            const daysInput = checkpoint.querySelector('.duration-days');
+                            const weeksInput = checkpoint.querySelector('.duration-weeks');
+                            const monthsInput = checkpoint.querySelector('.duration-months');
+
+                            const days = daysInput ? parseInt(daysInput.value) || 0 : 0;
+                            const weeks = weeksInput ? parseInt(weeksInput.value) || 0 : 0;
+                            const months = monthsInput ? parseInt(monthsInput.value) || 0 : 0;
+
                             starredTasks.push({
                                 text: checkpointText ? checkpointText.textContent : '',
                                 project: projectNames[projectId] || projectId,
-                                isActive: true
+                                isActive: true,
+                                days: days,
+                                weeks: weeks,
+                                months: months
                             });
                         }
                     }
                 }
             }
 
+            // Helper function to format remaining effort
+            function formatRemainingEffort(days, weeks, months) {
+                const totalDays = days + (weeks * 7) + (months * 30);
+                if (totalDays === 0) return '';
+
+                const parts = [];
+                if (months > 0) parts.push(`${months} Month${months > 1 ? 's' : ''}`);
+                if (weeks > 0) parts.push(`${weeks} Week${weeks > 1 ? 's' : ''}`);
+                if (days > 0) parts.push(`${days} Day${days > 1 ? 's' : ''}`);
+
+                return parts.length > 0 ? ` - ${parts.join(', ')} Remaining` : '';
+            }
+
             // Add up to 3 starred tasks
             starredTasks.slice(0, 3).forEach(task => {
                 const taskDiv = document.createElement('div');
                 taskDiv.className = 'daily-task';
+                const effortText = formatRemainingEffort(task.days || 0, task.weeks || 0, task.months || 0);
                 taskDiv.innerHTML = `
                     <div class="task-title">⭐ ${task.text}</div>
-                    <div class="task-project">${task.project}</div>
+                    <div class="task-project">${task.project}${effortText}</div>
                 `;
                 dailyTasksList.appendChild(taskDiv);
             });
@@ -2394,13 +2429,32 @@
         debugSlider.addEventListener('input', (e) => {
             const percentage = e.target.value;
             debugValue.textContent = percentage + '%';
-            
+
             // Update the active panel's coin rain
             const activePanel = document.querySelector('.project-panel.active');
             const activeTab = document.querySelector('.tab.active');
             if (activePanel && activeTab) {
-                const tabColor = activeTab.classList.contains('green') ? 'green' : 
-                                activeTab.classList.contains('yellow') ? 'yellow' : 
+                const tabColor = activeTab.classList.contains('green') ? 'green' :
+                                activeTab.classList.contains('yellow') ? 'yellow' :
+                                activeTab.classList.contains('blue') ? 'blue' : 'red';
+                initCoinRain(activePanel, tabColor);
+            }
+        });
+
+        // Frequency slider controls
+        const frequencySlider = document.getElementById('frequencySlider');
+        const frequencyValue = document.getElementById('frequencyValue');
+
+        frequencySlider.addEventListener('input', (e) => {
+            const interval = e.target.value;
+            frequencyValue.textContent = interval + 'ms';
+
+            // Update the active panel's coin rain with new frequency
+            const activePanel = document.querySelector('.project-panel.active');
+            const activeTab = document.querySelector('.tab.active');
+            if (activePanel && activeTab) {
+                const tabColor = activeTab.classList.contains('green') ? 'green' :
+                                activeTab.classList.contains('yellow') ? 'yellow' :
                                 activeTab.classList.contains('blue') ? 'blue' : 'red';
                 initCoinRain(activePanel, tabColor);
             }
@@ -2450,36 +2504,10 @@
             
             // Reset position tracking
             lastPosition = -1;
-            
-            let completionPercent;
-            
-            if (DEBUG_MODE) {
-                // Use debug slider value
-                completionPercent = parseInt(debugSlider.value);
-            } else {
-                // Count completed and total checkpoints
-                // IMPORTANT: Only completed tasks count toward completion percentage
-                // Active tasks are NOT counted as complete
-                const allCheckpoints = panel.querySelectorAll('.checkpoint');
-                const completedCheckpoints = panel.querySelectorAll('.checkpoint.completed');
-                const totalCheckpoints = allCheckpoints.length;
-                const completedCount = completedCheckpoints.length;
-                
-                // Calculate completion percentage based on completed tasks only
-                completionPercent = totalCheckpoints > 0 ? (completedCount / totalCheckpoints) * 100 : 0;
-            }
-            
-            // If 0% complete, don't drop anything
-            if (completionPercent === 0) {
-                return;
-            }
-            
-            // Calculate drop interval based on completion percentage
-            // At 100%: baseInterval (500ms = 2 items/sec)
-            // At 90%: baseInterval + 1 * intervalIncrement (1000ms = 1 item/sec)
-            // At 80%: baseInterval + 2 * intervalIncrement (1500ms = 0.67 items/sec)
-            const percentNotComplete = 100 - completionPercent;
-            const dropInterval = DROP_CONFIG.baseInterval + (percentNotComplete / 10) * DROP_CONFIG.intervalIncrement;
+
+            // Get drop interval from frequency slider
+            const frequencySlider = document.getElementById('frequencySlider');
+            const dropInterval = frequencySlider ? parseInt(frequencySlider.value) : 500;
             
             // Determine which emoji to use based on tab color
             let emoji = '🪙'; // default yellow
