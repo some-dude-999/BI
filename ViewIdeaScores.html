@@ -810,10 +810,11 @@
 
         function formatValue(value) {
             if (isMoneyDataset()) {
-                // Format as money
+                // Format as money - preserve precision from CSV with 2 decimal places
+                // This ensures values like DOGE ($0.60) display correctly
                 return '$' + value.toLocaleString('en-US', {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
                 });
             } else {
                 // Format as score with 2 decimals
