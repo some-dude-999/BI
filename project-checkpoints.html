@@ -388,9 +388,16 @@
                     rgba(0, 0, 0, 0.02) 1px,
                     transparent 2px
                 ),
-                /* Aged/yellowed paper - closer to brown background */
-                linear-gradient(135deg, #b8a888 0%, #a89878 50%, #b8a888 100%);
+                /* Really old brown paper - much darker */
+                linear-gradient(135deg, #8b7355 0%, #6e5c42 50%, #8b7355 100%);
             opacity: 1;
+            /* Burned edges effect */
+            box-shadow:
+                inset 8px 0 15px -8px rgba(61, 40, 23, 0.8),
+                inset -8px 0 15px -8px rgba(61, 40, 23, 0.8),
+                inset 0 8px 15px -8px rgba(61, 40, 23, 0.8),
+                inset 0 -8px 15px -8px rgba(61, 40, 23, 0.8),
+                0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         .checkpoint.active {
@@ -681,76 +688,106 @@
         }
         
         .modal-content {
-            background: linear-gradient(145deg, #3d2817 0%, #2a1810 100%);
-            border: 6px solid #d4af37;
-            border-radius: 20px;
+            background:
+                /* Paper texture */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    rgba(0, 0, 0, 0.02) 1px,
+                    transparent 2px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0px,
+                    rgba(0, 0, 0, 0.02) 1px,
+                    transparent 2px
+                ),
+                /* Solid aged paper */
+                linear-gradient(135deg, #f4e4c1 0%, #e8d4a8 50%, #f4e4c1 100%);
+            border: 6px solid #8b6914;
+            border-radius: 15px;
             padding: 40px;
             max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(212, 175, 55, 0.5);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
             text-align: center;
             animation: scaleIn 0.3s ease;
         }
-        
+
         @keyframes scaleIn {
             from { transform: scale(0.8); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
-        
+
         .modal-content h2 {
             font-family: 'MedievalSharp', cursive;
-            color: #d4af37;
-            font-size: 2em;
+            color: #5a3d2b;
+            font-size: 1.5em;
             margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
-        
+
         .modal-content p {
-            color: #f4e4c1;
-            font-size: 1.2em;
-            margin-bottom: 30px;
+            color: #5a3d2b;
+            font-size: 1em;
+            margin-bottom: 25px;
         }
-        
+
         .modal-buttons {
             display: flex;
-            gap: 20px;
+            gap: 25px;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .modal-icon-row {
+            display: flex;
+            gap: 40px;
             justify-content: center;
         }
-        
+
         .modal-button {
-            font-family: 'Merriweather', serif;
-            padding: 15px 30px;
-            font-size: 1.1em;
-            border: 3px solid;
-            border-radius: 10px;
+            font-size: 4em;
+            border: none;
+            background: none;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            background: none;
+            padding: 10px;
+            border-radius: 50%;
         }
-        
-        .modal-button.confirm {
-            background: linear-gradient(145deg, #d4af37 0%, #8b6914 100%);
-            border-color: #d4af37;
-            color: #2a1810;
-            font-weight: bold;
+
+        .modal-button:hover {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 15px currentColor);
         }
-        
-        .modal-button.confirm:hover {
-            background: linear-gradient(145deg, #ffd700 0%, #d4af37 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(212, 175, 55, 0.6);
+
+        .modal-button.state-active {
+            color: #d4af37;
         }
-        
+
+        .modal-button.state-locked {
+            color: #8b6914;
+        }
+
+        .modal-button.state-complete {
+            color: #4a7c2f;
+        }
+
         .modal-button.cancel {
-            background: linear-gradient(145deg, #5a3d2b 0%, #3d2817 100%);
-            border-color: #8b6914;
-            color: #c4a45e;
+            font-size: 1.2em;
+            padding: 12px 35px;
+            background: linear-gradient(135deg, #8b6914 0%, #6b4a35 100%);
+            color: #f4e4c1;
+            border: 3px solid #5a3d2b;
+            border-radius: 10px;
+            font-family: 'Merriweather', serif;
+            font-weight: 600;
         }
-        
+
         .modal-button.cancel:hover {
-            background: linear-gradient(145deg, #6a4d3b 0%, #4d3827 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
+            background: linear-gradient(135deg, #6b4a35 0%, #5a3d2b 100%);
+            transform: scale(1.05);
+            filter: none;
         }
         
         /* Overview Styles */
@@ -1300,9 +1337,11 @@
             <h2 id="modalTitle">Quest State Change</h2>
             <p id="modalMessage">Choose the new state for this quest:</p>
             <div class="modal-buttons">
-                <button class="modal-button state-active" id="modalActive">⚔️ Active</button>
-                <button class="modal-button state-locked" id="modalLocked">🔒 Locked</button>
-                <button class="modal-button state-complete" id="modalComplete">🏰 Complete</button>
+                <div class="modal-icon-row">
+                    <button class="modal-button state-active" id="modalActive">⚔️</button>
+                    <button class="modal-button state-locked" id="modalLocked">🔒</button>
+                    <button class="modal-button state-complete" id="modalComplete">🏰</button>
+                </div>
                 <button class="modal-button cancel" id="modalCancel">Cancel</button>
             </div>
         </div>
