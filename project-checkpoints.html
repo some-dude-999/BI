@@ -105,37 +105,44 @@
             max-width: 1200px;
             margin: 0 auto;
             background:
+                /* Subtle wood knots */
+                radial-gradient(ellipse 40px 80px at 20% 30%, rgba(61, 40, 23, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse 50px 90px at 80% 60%, rgba(61, 40, 23, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse 35px 70px at 50% 80%, rgba(61, 40, 23, 0.25) 0%, transparent 50%),
+                /* Fine wood grain */
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0px,
+                    rgba(0, 0, 0, 0.03) 1px,
+                    transparent 2px,
+                    transparent 4px
+                ),
                 /* Wood grain texture */
                 repeating-linear-gradient(
                     90deg,
-                    #5a3d2b 0px,
-                    #6b4a35 2px,
-                    #5a3d2b 3px,
-                    #4d3322 8px,
-                    #5a3d2b 12px,
-                    #6b4a35 15px,
-                    #5a3d2b 20px
+                    #7a5c42 0px,
+                    #8b6a4f 8px,
+                    #6e5238 16px,
+                    #7a5c42 24px,
+                    #8b6a4f 32px,
+                    #6e5238 40px
                 ),
-                /* Horizontal wood planks */
+                /* Horizontal planks */
                 repeating-linear-gradient(
                     0deg,
                     transparent 0px,
-                    transparent 98px,
-                    rgba(0, 0, 0, 0.4) 98px,
-                    rgba(0, 0, 0, 0.4) 100px,
-                    transparent 100px,
-                    transparent 198px,
-                    rgba(0, 0, 0, 0.4) 198px,
-                    rgba(0, 0, 0, 0.4) 200px
+                    transparent 148px,
+                    rgba(0, 0, 0, 0.15) 148px,
+                    rgba(0, 0, 0, 0.15) 152px
                 ),
-                /* Base wood color with depth */
-                linear-gradient(145deg, #6b4a35 0%, #5a3d2b 50%, #4d3322 100%);
-            border: 8px solid #8b6914;
+                /* Base rich wood color */
+                linear-gradient(135deg, #8b6a4f 0%, #6e5238 50%, #7a5c42 100%);
+            border: 10px solid #5a4a35;
             border-radius: 20px;
             box-shadow:
                 0 20px 60px rgba(0, 0, 0, 0.8),
-                inset 0 2px 10px rgba(139, 105, 20, 0.3),
-                inset 0 0 100px rgba(0, 0, 0, 0.3);
+                inset 0 0 60px rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(139, 106, 79, 0.4);
             padding: 30px;
             position: relative;
         }
@@ -313,14 +320,22 @@
             background: linear-gradient(135deg, #2a1810 0%, #1a0f0a 100%);
             border: 3px solid #5a3d2b;
             border-radius: 12px;
-            padding: 20px 30px;
+            padding: 15px 20px;
             margin: 20px auto;
             max-width: 600px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
             transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
+            overflow: visible;
             cursor: pointer;
+        }
+
+        .checkpoint-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 2;
         }
         
         .checkpoint:hover {
@@ -349,15 +364,6 @@
             box-shadow: 0 8px 16px rgba(45, 80, 22, 0.4), inset 0 2px 8px rgba(82, 163, 42, 0.2);
         }
         
-        .checkpoint.completed::after {
-            content: '🏰';
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 2em;
-            opacity: 0.8;
-        }
         
         .checkpoint.active {
             border-color: #d4af37;
@@ -402,64 +408,37 @@
             50% { box-shadow: 0 0 50px rgba(212, 175, 55, 0.8), 0 8px 20px rgba(212, 175, 55, 0.5); }
         }
         
-        .checkpoint.active::after {
-            content: '⚔️';
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 2em;
-            animation: flicker 1.5s infinite;
-            z-index: 2;
-        }
-        
         @keyframes flicker {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.6; }
         }
-        
+
         .checkpoint.inactive {
             opacity: 0.5;
             border-color: #3d2817;
         }
         
-        .checkpoint.inactive::after {
-            content: '🔒';
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 2em;
-            opacity: 0.6;
-        }
-        
-        .checkpoint-text {
-            font-size: 1.2em;
-            color: #f4e4c1;
-            position: relative;
-            z-index: 2;
-        }
 
         .duration-expander {
-            margin-top: 10px;
-            padding: 8px 12px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: linear-gradient(135deg, #5a3d2b 0%, #4d3322 100%);
             border: 2px solid #8b6914;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95em;
+            font-size: 0.7em;
             color: #c4a45e;
             transition: all 0.3s ease;
-            position: relative;
-            z-index: 2;
+            flex-shrink: 0;
         }
 
         .duration-expander:hover {
             background: linear-gradient(135deg, #6b4a35 0%, #5a3d2b 100%);
             border-color: #d4af37;
+            transform: scale(1.1);
         }
 
         .duration-expander-icon {
@@ -546,20 +525,16 @@
         }
 
         .star-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.5em;
+            font-size: 1.3em;
             cursor: pointer;
-            z-index: 3;
             transition: all 0.3s ease;
             opacity: 0.3;
+            flex-shrink: 0;
         }
 
         .star-icon:hover {
             opacity: 1;
-            transform: translateY(-50%) scale(1.2);
+            transform: scale(1.2);
         }
 
         .star-icon.starred {
@@ -569,60 +544,96 @@
         }
 
         .checkpoint-text {
-            padding-left: 30px;
+            flex: 1;
+            font-size: 1.2em;
+            color: #f4e4c1;
+        }
+
+        .checkpoint-status-icon {
+            font-size: 2em;
+            opacity: 0.8;
+            flex-shrink: 0;
         }
 
         .adventures-of-day {
-            background: linear-gradient(135deg, #2a1810 0%, #1a0f0a 100%);
-            border: 4px solid #d4af37;
-            border-radius: 15px;
+            background:
+                /* Paper texture */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    rgba(0, 0, 0, 0.02) 1px,
+                    transparent 2px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0px,
+                    rgba(0, 0, 0, 0.02) 1px,
+                    transparent 2px
+                ),
+                /* Aged paper color */
+                linear-gradient(135deg, #f4e4c1 0%, #e8d4a8 50%, #f4e4c1 100%);
+            border: 6px solid #8b6914;
+            border-radius: 8px;
             padding: 25px 30px;
             margin-bottom: 30px;
-            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+            box-shadow:
+                0 10px 25px rgba(0, 0, 0, 0.5),
+                inset 0 0 30px rgba(139, 105, 20, 0.1);
+            position: relative;
+        }
+
+        .adventures-of-day::before {
+            content: '📌';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2em;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
         }
 
         .adventures-of-day h3 {
-            color: #d4af37;
+            color: #5a3d2b;
             font-size: 1.6em;
             margin-bottom: 20px;
             font-family: 'MedievalSharp', cursive;
             text-align: center;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .daily-task {
-            background: linear-gradient(135deg, #1a3d1a 0%, #0f2a0f 100%);
-            border: 3px solid #4a7c2f;
-            border-radius: 12px;
-            padding: 15px 20px;
-            margin: 15px 0;
-            box-shadow: 0 6px 12px rgba(74, 124, 47, 0.3);
+            background: rgba(74, 124, 47, 0.1);
+            border: 2px solid #4a7c2f;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 12px 0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             position: relative;
         }
 
         .daily-task .task-title {
-            font-size: 1.1em;
-            color: #a8d88c;
+            font-size: 1.05em;
+            color: #2d5016;
             font-weight: 600;
         }
 
         .daily-task .task-project {
-            font-size: 0.9em;
-            color: #6ba83e;
-            margin-top: 5px;
+            font-size: 0.85em;
+            color: #4a7c2f;
+            margin-top: 4px;
         }
 
         .daily-task.passive {
-            border-color: #2a8bc9;
-            background: linear-gradient(135deg, #1a3a5a 0%, #0f2540 100%);
+            border-color: #1a5a8b;
+            background: rgba(26, 90, 139, 0.1);
         }
 
         .daily-task.passive .task-title {
-            color: #87ceeb;
+            color: #0f2540;
         }
 
         .daily-task.passive .task-project {
-            color: #5fa8d3;
+            color: #1a5a8b;
         }
 
         .checkpoint.completed .checkpoint-text {
@@ -1471,24 +1482,64 @@
 
         function createDurationInputs(checkpoint, savedData = null, isExpanded = false) {
             // Only add duration inputs if checkpoint is active or inactive (not completed)
-            if (checkpoint.classList.contains('completed')) return;
+            const isCompleted = checkpoint.classList.contains('completed');
 
-            // Check if duration inputs already exist
-            if (checkpoint.querySelector('.duration-inputs')) return;
+            // Check if row already exists
+            if (checkpoint.querySelector('.checkpoint-row')) return;
 
             const days = savedData ? savedData.days : 0;
             const weeks = savedData ? savedData.weeks : 0;
             const months = savedData ? savedData.months : 0;
 
-            // Check if this is the squat task (passive task - no star icon)
+            // Get text content
             const checkpointText = checkpoint.querySelector('.checkpoint-text');
-            const isSquatTask = checkpointText && checkpointText.textContent.includes('Daily squat and deadlift');
+            const taskText = checkpointText ? checkpointText.textContent : '';
+            const isSquatTask = taskText.includes('Daily squat and deadlift');
 
-            // Add star icon (except for squat task)
-            if (!isSquatTask && !checkpoint.querySelector('.star-icon')) {
-                const starIcon = document.createElement('div');
-                starIcon.className = 'star-icon';
-                starIcon.textContent = '⭐';
+            // Determine status emoji
+            let statusEmoji = '';
+            if (isCompleted) {
+                statusEmoji = '🏰';
+            } else if (checkpoint.classList.contains('active')) {
+                statusEmoji = '⚔️';
+            } else if (checkpoint.classList.contains('inactive')) {
+                statusEmoji = '🔒';
+            }
+
+            // Create the single row
+            const row = document.createElement('div');
+            row.className = 'checkpoint-row';
+
+            // Create star icon (except for squat task and completed tasks)
+            let starHTML = '';
+            if (!isSquatTask && !isCompleted) {
+                starHTML = '<div class="star-icon">⭐</div>';
+            }
+
+            // Create expander button (except for completed tasks)
+            let expanderHTML = '';
+            if (!isCompleted) {
+                expanderHTML = `
+                    <div class="duration-expander">
+                        <span class="duration-expander-icon ${isExpanded ? 'expanded' : ''}">▼</span>
+                    </div>
+                `;
+            }
+
+            row.innerHTML = `
+                ${starHTML}
+                <div class="checkpoint-text">${taskText}</div>
+                ${expanderHTML}
+                <div class="checkpoint-status-icon">${statusEmoji}</div>
+            `;
+
+            // Clear checkpoint and add row
+            checkpoint.innerHTML = '';
+            checkpoint.appendChild(row);
+
+            // Add event listeners
+            const starIcon = row.querySelector('.star-icon');
+            if (starIcon) {
                 starIcon.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const activePanel = checkpoint.closest('.project-panel');
@@ -1497,64 +1548,57 @@
                     const checkpointIndex = Array.from(checkpoints).indexOf(checkpoint);
                     toggleStar(starIcon, checkpoint, panelId, checkpointIndex);
                 });
-                checkpoint.appendChild(starIcon);
             }
 
-            // Add duration expander button
-            const expanderButton = document.createElement('div');
-            expanderButton.className = 'duration-expander';
-            expanderButton.innerHTML = `
-                <span class="duration-expander-icon ${isExpanded ? 'expanded' : ''}">▼</span>
-                <span>Estimate Duration</span>
-            `;
-            expanderButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const durationInputs = checkpoint.querySelector('.duration-inputs');
-                const icon = expanderButton.querySelector('.duration-expander-icon');
+            const expanderButton = row.querySelector('.duration-expander');
+            if (expanderButton && !isCompleted) {
+                // Add duration inputs container
+                const durationDiv = document.createElement('div');
+                durationDiv.className = `duration-inputs ${isExpanded ? 'expanded' : ''}`;
 
-                if (durationInputs.classList.contains('expanded')) {
-                    durationInputs.classList.remove('expanded');
-                    icon.classList.remove('expanded');
-                } else {
-                    durationInputs.classList.add('expanded');
-                    icon.classList.add('expanded');
-                }
+                durationDiv.innerHTML = `
+                    <div class="duration-input-group">
+                        <label>Days</label>
+                        <input type="number" class="duration-days" min="0" value="${days}" placeholder="0">
+                    </div>
+                    <div class="duration-input-group">
+                        <label>Weeks</label>
+                        <input type="number" class="duration-weeks" min="0" value="${weeks}" placeholder="0">
+                    </div>
+                    <div class="duration-input-group">
+                        <label>Months</label>
+                        <input type="number" class="duration-months" min="0" value="${months}" placeholder="0">
+                    </div>
+                    <div class="duration-total">Total: ${calculateTotalDays(days, weeks, months)} days</div>
+                `;
 
-                saveDurationExpanded();
-            });
-            checkpoint.appendChild(expanderButton);
+                checkpoint.appendChild(durationDiv);
 
-            // Add duration inputs container
-            const durationDiv = document.createElement('div');
-            durationDiv.className = `duration-inputs ${isExpanded ? 'expanded' : ''}`;
+                expanderButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const icon = expanderButton.querySelector('.duration-expander-icon');
 
-            durationDiv.innerHTML = `
-                <div class="duration-input-group">
-                    <label>Days</label>
-                    <input type="number" class="duration-days" min="0" value="${days}" placeholder="0">
-                </div>
-                <div class="duration-input-group">
-                    <label>Weeks</label>
-                    <input type="number" class="duration-weeks" min="0" value="${weeks}" placeholder="0">
-                </div>
-                <div class="duration-input-group">
-                    <label>Months</label>
-                    <input type="number" class="duration-months" min="0" value="${months}" placeholder="0">
-                </div>
-                <div class="duration-total">Total: ${calculateTotalDays(days, weeks, months)} days</div>
-            `;
+                    if (durationDiv.classList.contains('expanded')) {
+                        durationDiv.classList.remove('expanded');
+                        icon.classList.remove('expanded');
+                    } else {
+                        durationDiv.classList.add('expanded');
+                        icon.classList.add('expanded');
+                    }
 
-            checkpoint.appendChild(durationDiv);
+                    saveDurationExpanded();
+                });
 
-            // Add event listeners to inputs
-            const daysInput = checkpoint.querySelector('.duration-days');
-            const weeksInput = checkpoint.querySelector('.duration-weeks');
-            const monthsInput = checkpoint.querySelector('.duration-months');
+                // Add event listeners to inputs
+                const daysInput = checkpoint.querySelector('.duration-days');
+                const weeksInput = checkpoint.querySelector('.duration-weeks');
+                const monthsInput = checkpoint.querySelector('.duration-months');
 
-            [daysInput, weeksInput, monthsInput].forEach(input => {
-                input.addEventListener('input', () => updateDurationTotal(checkpoint));
-                input.addEventListener('click', (e) => e.stopPropagation());
-            });
+                [daysInput, weeksInput, monthsInput].forEach(input => {
+                    input.addEventListener('input', () => updateDurationTotal(checkpoint));
+                    input.addEventListener('click', (e) => e.stopPropagation());
+                });
+            }
         }
 
         function updateEffortRemaining() {
@@ -2059,6 +2103,13 @@
         });
         
         function executeTaskAction(checkpoint, action) {
+            const activePanel = document.querySelector('.project-panel.active');
+            const checkpoints = activePanel.querySelectorAll('.checkpoint');
+            const index = Array.from(checkpoints).indexOf(checkpoint);
+            const savedDurations = loadDurations();
+            const savedExpanded = loadDurationExpanded();
+            const savedStarred = loadStarred();
+
             if (action === 'mark-done') {
                 // Check if this task was starred before completing
                 const starIcon = checkpoint.querySelector('.star-icon');
@@ -2068,12 +2119,13 @@
                 checkpoint.classList.remove('active');
                 checkpoint.classList.add('completed');
 
-                // Remove duration inputs, expander, and star icon when task is completed
-                const durationDiv = checkpoint.querySelector('.duration-inputs');
-                const expanderButton = checkpoint.querySelector('.duration-expander');
-                if (durationDiv) durationDiv.remove();
-                if (expanderButton) expanderButton.remove();
-                if (starIcon) starIcon.remove();
+                // Recreate the row for completed state
+                checkpoint.innerHTML = '';
+                const savedData = savedDurations[activePanel.id] && savedDurations[activePanel.id][index]
+                    ? savedDurations[activePanel.id][index]
+                    : null;
+                const isExpanded = savedExpanded[activePanel.id] && savedExpanded[activePanel.id][index];
+                createDurationInputs(checkpoint, savedData, isExpanded);
 
                 // If this was a starred task, auto-star the next task
                 if (wasStarred) {
@@ -2085,38 +2137,40 @@
                 if (nextCheckpoint && nextCheckpoint.classList.contains('checkpoint') && nextCheckpoint.classList.contains('inactive')) {
                     nextCheckpoint.classList.remove('inactive');
                     nextCheckpoint.classList.add('active');
-                    // Add duration inputs to newly activated task if it doesn't have them
-                    const savedDurations = loadDurations();
-                    const savedExpanded = loadDurationExpanded();
-                    const activePanel = document.querySelector('.project-panel.active');
-                    const checkpoints = activePanel.querySelectorAll('.checkpoint');
-                    const index = Array.from(checkpoints).indexOf(nextCheckpoint);
-                    const savedData = savedDurations[activePanel.id] && savedDurations[activePanel.id][index]
-                        ? savedDurations[activePanel.id][index]
+
+                    // Recreate next checkpoint row
+                    const nextIndex = Array.from(checkpoints).indexOf(nextCheckpoint);
+                    const nextSavedData = savedDurations[activePanel.id] && savedDurations[activePanel.id][nextIndex]
+                        ? savedDurations[activePanel.id][nextIndex]
                         : null;
-                    const isExpanded = savedExpanded[activePanel.id] && savedExpanded[activePanel.id][index];
-                    createDurationInputs(nextCheckpoint, savedData, isExpanded);
+                    const nextIsExpanded = savedExpanded[activePanel.id] && savedExpanded[activePanel.id][nextIndex];
+                    nextCheckpoint.innerHTML = '';
+                    createDurationInputs(nextCheckpoint, nextSavedData, nextIsExpanded);
                 }
             } else if (action === 'mark-active') {
                 // Change from inactive to active OR from completed to active
                 checkpoint.classList.remove('inactive', 'completed');
                 checkpoint.classList.add('active');
 
-                // Add duration inputs if they don't exist
-                const activePanel = document.querySelector('.project-panel.active');
-                const checkpoints = activePanel.querySelectorAll('.checkpoint');
-                const index = Array.from(checkpoints).indexOf(checkpoint);
-                const savedDurations = loadDurations();
-                const savedExpanded = loadDurationExpanded();
+                // Recreate the row for active state
+                checkpoint.innerHTML = '';
                 const savedData = savedDurations[activePanel.id] && savedDurations[activePanel.id][index]
                     ? savedDurations[activePanel.id][index]
                     : null;
                 const isExpanded = savedExpanded[activePanel.id] && savedExpanded[activePanel.id][index];
                 createDurationInputs(checkpoint, savedData, isExpanded);
+
+                // Restore starred state
+                const isStarred = savedStarred[activePanel.id] && savedStarred[activePanel.id][index];
+                if (isStarred) {
+                    const starIcon = checkpoint.querySelector('.star-icon');
+                    if (starIcon) {
+                        starIcon.classList.add('starred');
+                    }
+                }
             }
 
             // Update progress bar
-            const activePanel = document.querySelector('.project-panel.active');
             const allCheckpoints = activePanel.querySelectorAll('.checkpoint');
             const completedCheckpoints = activePanel.querySelectorAll('.checkpoint.completed');
             const completionPercent = (completedCheckpoints.length / allCheckpoints.length) * 100;
