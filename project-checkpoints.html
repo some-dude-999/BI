@@ -389,15 +389,15 @@
                     transparent 2px
                 ),
                 /* Really old brown paper - much darker */
-                linear-gradient(135deg, #8b7355 0%, #6e5c42 50%, #8b7355 100%);
-            opacity: 1;
+                linear-gradient(135deg, #8b7355 0%, #6e5c42 50%, #8b7355 100%) !important;
+            opacity: 1 !important;
             /* Burned edges effect */
             box-shadow:
                 inset 8px 0 15px -8px rgba(61, 40, 23, 0.8),
                 inset -8px 0 15px -8px rgba(61, 40, 23, 0.8),
                 inset 0 8px 15px -8px rgba(61, 40, 23, 0.8),
                 inset 0 -8px 15px -8px rgba(61, 40, 23, 0.8),
-                0 4px 10px rgba(0, 0, 0, 0.3);
+                0 4px 10px rgba(0, 0, 0, 0.3) !important;
         }
 
         .checkpoint.active {
@@ -1544,9 +1544,17 @@
             row.className = 'checkpoint-row';
 
             // Create star icon (except for squat task and completed tasks)
+            // Also hide if 3 tasks are already starred (unless this task is starred)
             let starHTML = '';
             if (!isSquatTask && !isCompleted) {
-                starHTML = '<div class="star-icon">⭐</div>';
+                // Count currently starred tasks
+                const allStarred = document.querySelectorAll('.star-icon.starred');
+                const isThisStarred = checkpoint.querySelector('.star-icon')?.classList.contains('starred');
+
+                // Show star icon if: fewer than 3 stars exist OR this task is already starred
+                if (allStarred.length < 3 || isThisStarred) {
+                    starHTML = '<div class="star-icon">⭐</div>';
+                }
             }
 
             // Create expander button (except for completed tasks)
@@ -1818,6 +1826,30 @@
 
             saveStarred();
             updateAdventuresOfDay();
+            refreshStarIconVisibility();
+        }
+
+        function refreshStarIconVisibility() {
+            // Show/hide star icons based on whether 3 tasks are starred
+            const starredCount = getStarredCount();
+            const allCheckpoints = document.querySelectorAll('.checkpoint');
+
+            allCheckpoints.forEach(checkpoint => {
+                const starIcon = checkpoint.querySelector('.star-icon');
+                if (!starIcon) return;
+
+                const isStarred = starIcon.classList.contains('starred');
+                const isCompleted = checkpoint.classList.contains('completed');
+                const checkpointText = checkpoint.querySelector('.checkpoint-text');
+                const isSquatTask = checkpointText && checkpointText.textContent.includes('Daily squat and deadlift');
+
+                // Hide star icon if: 3 stars exist AND this task is not starred AND not squat AND not completed
+                if (starredCount >= 3 && !isStarred && !isSquatTask && !isCompleted) {
+                    starIcon.style.display = 'none';
+                } else if (!isSquatTask && !isCompleted) {
+                    starIcon.style.display = 'flex';
+                }
+            });
         }
 
         function autoStarNextTask() {
@@ -1845,6 +1877,7 @@
                         starIcon.classList.add('starred');
                         saveStarred();
                         updateAdventuresOfDay();
+                        refreshStarIconVisibility();
                         return;
                     }
                 }
@@ -1869,6 +1902,9 @@
                     }
                 });
             });
+
+            // Refresh star icon visibility after loading starred state
+            refreshStarIconVisibility();
         }
 
         function updateAdventuresOfDay() {
