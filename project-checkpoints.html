@@ -1758,12 +1758,14 @@
             if (isStarred) {
                 // Unstar
                 starIcon.classList.remove('starred');
+                playUnstarSound();
             } else {
                 // Check if we can star (max 3)
                 const starredCount = getStarredCount();
                 if (starredCount >= 3) {
-                    // Show a brief warning
+                    // Show a brief warning - play error sound
                     starIcon.style.color = '#c92a2a';
+                    playTaskClickSound(); // Error feedback
                     setTimeout(() => {
                         starIcon.style.color = '';
                     }, 500);
@@ -1772,6 +1774,7 @@
 
                 // Star it
                 starIcon.classList.add('starred');
+                playStarSound();
             }
 
             saveStarred();
@@ -2051,7 +2054,66 @@
             shimmer.start(now + 0.15);
             shimmer.stop(now + 0.5);
         }
-        
+
+        function playStarSound() {
+            // Magical star sound - ascending twinkle
+            const now = audioContext.currentTime;
+
+            // First twinkle
+            const osc1 = audioContext.createOscillator();
+            const gain1 = audioContext.createGain();
+
+            osc1.connect(gain1);
+            gain1.connect(audioContext.destination);
+
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(1318.51, now); // E6
+
+            gain1.gain.setValueAtTime(0.15, now);
+            gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+
+            osc1.start(now);
+            osc1.stop(now + 0.2);
+
+            // Second higher twinkle
+            const osc2 = audioContext.createOscillator();
+            const gain2 = audioContext.createGain();
+
+            osc2.connect(gain2);
+            gain2.connect(audioContext.destination);
+
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(1975.53, now + 0.08); // B6
+
+            gain2.gain.setValueAtTime(0, now + 0.08);
+            gain2.gain.linearRampToValueAtTime(0.12, now + 0.1);
+            gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+            osc2.start(now + 0.08);
+            osc2.stop(now + 0.3);
+        }
+
+        function playUnstarSound() {
+            // Softer descending sound for unstarring
+            const now = audioContext.currentTime;
+
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(987.77, now); // B5
+            osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.15); // E5 - descending
+
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+
+            osc.start(now);
+            osc.stop(now + 0.2);
+        }
+
         // ========================================
         // MODAL FUNCTIONALITY
         // ========================================
