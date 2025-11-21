@@ -757,14 +757,19 @@
         }
 
         // Show individual LLM score
-        function showIndividualScore(ideaName, llmName, score, reasoning) {
+        function showIndividualScore(ideaName, llmName, score, reasoning, date = null) {
             const valueLabel = getValueLabel();
             const formattedValue = formatValue(score);
+
+            let dateInfo = '';
+            if (isMoneyDataset() && date) {
+                dateInfo = `<br><strong>PREDICTED DATE:</strong> ${formatDate(date)}`;
+            }
 
             const content = `
                 <div style="margin-bottom: 20px;">
                     <strong>ANALYST:</strong> ${llmName}<br>
-                    <strong>${valueLabel.toUpperCase()}:</strong> ${formattedValue}
+                    <strong>${valueLabel.toUpperCase()}:</strong> ${formattedValue}${dateInfo}
                 </div>
                 <div style="background: rgba(139, 69, 19, 0.1); padding: 20px; border: 2px solid #8b4513; line-height: 2;">
                     ${reasoning}
@@ -841,7 +846,36 @@
             return true;
         }
 
-        // Parse CSV with validation
+        // Format date nicely (e.g., "2025-10" -> "Oct 2025")
+        function formatDate(dateStr) {
+            if (!dateStr || (typeof dateStr === 'string' && dateStr.trim() === '')) return 'N/A';
+            if (typeof dateStr === 'number' && isNaN(dateStr)) return 'N/A';
+
+            const dateString = String(dateStr).trim();
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            // Check if it's in YYYY-MM format
+            const parts = dateString.split('-');
+            if (parts.length === 2) {
+                const year = parts[0];
+                const monthNum = parseInt(parts[1]);
+                const month = monthNum - 1;
+                if (!isNaN(monthNum) && !isNaN(parseInt(year)) && month >= 0 && month < 12) {
+                    return `${months[month]} ${year}`;
+                }
+            }
+
+            // Try to parse as a date
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) {
+                return 'N/A';
+            }
+
+            return `${months[date.getMonth()]} ${date.getFullYear()}`;
+        }
+
+        // Parse CSV with validation - handles both 3 and 4 column formats
         function parseCSV(text) {
             const lines = text.trim().split('\n');
             const result = [];
@@ -867,7 +901,26 @@
                 }
                 parts.push(current.trim());
 
-                if (parts.length >= 3) {
+                // MarketTop2025 has 4 columns: name, price, date, reasoning
+                // Other datasets have 3 columns: name, score, reasoning
+                if (isMoneyDataset() && parts.length >= 4) {
+                    const name = parts[0].replace(/^"|"$/g, '');
+                    const score = parseFloat(parts[1]);
+                    const date = parts[2].replace(/^"|"$/g, '');
+                    const reasoning = parts[3].replace(/^"|"$/g, '');
+
+                    // Validate before adding
+                    if (isValidEntry(name, score)) {
+                        result.push({
+                            name,
+                            score,
+                            date,
+                            reasoning
+                        });
+                    } else {
+                        console.warn(`Skipping invalid entry: ${name}, score: ${score}`);
+                    }
+                } else if (!isMoneyDataset() && parts.length >= 3) {
                     const name = parts[0].replace(/^"|"$/g, '');
                     const score = parseFloat(parts[1]);
                     const reasoning = parts[2].replace(/^"|"$/g, '');
@@ -877,6 +930,7 @@
                         result.push({
                             name,
                             score,
+                            date: null, // No date for score datasets
                             reasoning
                         });
                     } else {
@@ -943,6 +997,34 @@
             return scores.reduce((a, b) => a + b, 0) / scores.length;
         }
 
+        // Calculate average date from date strings
+        function calculateAverageDate(dates) {
+            if (!dates || dates.length === 0) return null;
+
+            // Convert dates to numeric values (YYYY-MM -> YYYY.fraction)
+            const numericDates = dates.map(dateStr => {
+                if (!dateStr) return null;
+                const parts = dateStr.split('-');
+                if (parts.length !== 2) return null;
+                const year = parseInt(parts[0]);
+                const month = parseInt(parts[1]);
+                if (isNaN(year) || isNaN(month)) return null;
+                return year + (month - 1) / 12;
+            }).filter(d => d !== null);
+
+            if (numericDates.length === 0) return null;
+
+            // Calculate average
+            const avg = calculateAverage(numericDates);
+
+            // Convert back to YYYY-MM
+            const year = Math.floor(avg);
+            const monthFraction = avg - year;
+            const month = Math.round(monthFraction * 12) + 1;
+            const validMonth = Math.max(1, Math.min(12, month));
+            return `${year}-${String(validMonth).padStart(2, '0')}`;
+        }
+
         // Get combined data
         function getCombinedData() {
             const ideasMap = new Map();
@@ -955,6 +1037,7 @@
                         ideasMap.set(idea.name, {
                             name: idea.name,
                             scores: [],
+                            dates: [],
                             scoresWithLLM: [],
                             comments: []
                         });
@@ -962,7 +1045,8 @@
 
                     const entry = ideasMap.get(idea.name);
                     entry.scores.push(idea.score);
-                    entry.scoresWithLLM.push({ llm, score: idea.score });
+                    if (idea.date) entry.dates.push(idea.date);
+                    entry.scoresWithLLM.push({ llm, score: idea.score, date: idea.date });
                     entry.comments.push(`<strong>${llm}:</strong> ${idea.reasoning}`);
                 }
             }
@@ -975,6 +1059,7 @@
                 combined.push({
                     name,
                     avgScore: calculateAverage(data.scores),
+                    avgDate: calculateAverageDate(data.dates),
                     llmCount: data.scores.length,
                     comments: data.comments.join('<br><br>'),
                     scoresWithLLM: data.scoresWithLLM,
@@ -1015,6 +1100,47 @@
             const itemLabel = getItemLabel();
             const valueLabel = getValueLabel();
 
+            // For money datasets, include date column
+            if (isMoneyDataset()) {
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="30%">${itemLabel} Name</th>
+                                <th width="20%" class="sortable ${sortClass}" onclick="toggleSort('${llm}')">Predicted Top Price</th>
+                                <th width="15%">Predicted Date</th>
+                                <th width="20%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                filteredData.forEach((idea, index) => {
+                    const rowColor = getRowColor(idea.score);
+
+                    html += `
+                        <tr style="background-color: ${rowColor};">
+                            <td><strong>${idea.name}</strong></td>
+                            <td>
+                                <span class="score-clickable" onclick="showLLMScore('${llm}', ${index})">
+                                    ${getScoreBadge(idea.score)}
+                                </span>
+                            </td>
+                            <td>${formatDate(idea.date)}</td>
+                            <td>
+                                <button class="show-comment-btn" onclick="showLLMComment('${llm}', ${index})">
+                                    📋 View Intel
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                return html;
+            }
+
+            // For score datasets, no date column
             let html = `
                 <table>
                     <thead>
@@ -1063,7 +1189,7 @@
         function showLLMScore(llm, index) {
             const idea = currentLLMData[llm]?.[index];
             if (idea) {
-                showIndividualScore(idea.name, llm, idea.score, idea.reasoning);
+                showIndividualScore(idea.name, llm, idea.score, idea.reasoning, idea.date);
             }
         }
 
@@ -1089,6 +1215,49 @@
             const itemLabel = getItemLabel();
             const avgValueLabel = getAvgValueLabel();
 
+            // For money datasets, include avgDate column
+            if (isMoneyDataset()) {
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="20%">${itemLabel} Name</th>
+                                <th width="18%" class="sortable ${sortClass}" onclick="toggleSort('Combined')">Avg Predicted Price</th>
+                                <th width="15%">Avg Predicted Date</th>
+                                <th width="10%">Analyst Count</th>
+                                <th width="18%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                data.forEach((idea, index) => {
+                    const rowColor = getRowColor(idea.avgScore);
+
+                    html += `
+                        <tr style="background-color: ${rowColor};">
+                            <td><strong>${idea.name}</strong></td>
+                            <td>
+                                <span class="score-clickable" onclick="showCombinedScore(${index})">
+                                    ${getScoreBadge(idea.avgScore)}
+                                </span>
+                            </td>
+                            <td>${formatDate(idea.avgDate)}</td>
+                            <td><span class="llm-count">${idea.llmCount} ANALYSTS</span></td>
+                            <td>
+                                <button class="show-comment-btn" onclick="showCombinedComment(${index})">
+                                    📋 View Intel
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                return html;
+            }
+
+            // For score datasets, no date column
             let html = `
                 <table>
                     <thead>
