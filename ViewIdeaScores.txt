@@ -1,0 +1,62 @@
+=== ViewIdeaScores.txt ===
+PROJECT: Business Intelligence / Idea Analysis System
+COMPONENT: Centralized Idea Scores Viewer with Top Secret Theme
+CREATED: 2025-11-21
+LAST UPDATED: 2025-11-21 - Initial documentation
+
+DATA SOURCES:
+- Folder: AGI IDEA GEN/*.csv - AGI-focused business ideas with LLM evaluations
+- Folder: FutureHighProbIdeas/*.csv - Future high-probability business ideas for AI age
+- Folder: HighestProbIdeas/*.csv - Highest probability business ideas
+- Folder: MarketTop2025/*.csv - Market top ideas for 2025
+- Each folder contains 10 CSV files (ChatGPT 1, ChatGPT 2, Claude 1, Claude 2, Gemini 1, Gemini 2, Grok 1, Grok 2, Kimi 1, Kimi 2)
+- CSV Format: "Idea Name", Score (0-10), "Reasoning/Comment"
+
+FUNCTIONALITY:
+- Main Purpose: Consolidated view for all idea score reports from different research runs
+- Key Functions:
+  * Dynamic dataset selector - dropdown to choose which research run to view
+  * Tab-based navigation between different data sources (AGI IDEA GEN, FutureHighProbIdeas, etc.)
+  * Combined view showing averaged scores across all LLMs
+  * Individual LLM views for detailed analysis
+  * Outlier removal toggle for more accurate averaging
+  * Rocket emoji filter (🚀) to show only user-generated ideas
+  * Sortable columns for score-based analysis
+  * Modal popups for full comments and score calculation breakdowns
+- Event Handlers:
+  * Tab switching with ASMR paper sound effects
+  * Expandable sections with paper rustling sounds
+  * Score badge clicks to show calculation details
+  * Comment button clicks to show full LLM reasoning
+- Visual Theme:
+  * Yellow legal pad aesthetic with horizontal lines
+  * "Top Secret Report" header in red
+  * Random report numbers for spy file folder feel
+  * Old-fashioned, vintage document styling
+  * Tab navigation styled like file folder tabs
+
+DEPENDENCIES:
+- External Libraries: None (vanilla JavaScript, HTML, CSS)
+- Project Files: All CSV folders in /home/user/BI/
+- APIs Required: None (client-side only, loads CSV files via fetch)
+- Sound Files: ASMR paper sounds embedded as data URIs or external audio files
+
+INTEGRATION:
+- Receives data from: CSV files in AGI IDEA GEN/, FutureHighProbIdeas/, HighestProbIdeas/, MarketTop2025/
+- Sends data to: None (read-only viewer)
+- Triggers: User interactions (tab clicks, dropdown selection, button clicks)
+- Similar Files: AGI IDEA GEN.html, FutureHighProbIdeas.html, HighestProbIdeas.html (single dataset viewers)
+
+CORRECTIONS & CLARIFICATIONS:
+- Initially thought: Each HTML would only show one dataset
+- Actually: ViewIdeaScores.html consolidates ALL datasets into one interface
+- Why this matters: Reduces clutter as research operations scale, provides centralized reporting
+
+NOTES:
+- This is a master viewer that prevents the need for 100+ separate HTML files
+- Users can switch between different research runs using tabs
+- All features from individual HTML files are preserved (outlier removal, sorting, filtering, popups)
+- Yellow legal pad theme creates engaging, spy-themed user experience
+- ASMR sounds enhance the tactile feel of browsing "secret files"
+- Random report numbers add fun element to data review process
+===

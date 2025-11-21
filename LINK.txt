@@ -22,5 +22,8 @@ HTML Files:
 5. MarketTop2025.html
    https://some-dude-999.github.io/BI/MarketTop2025.html - Interactive dashboard analyzing market top price predictions for 2025 across multiple AI models
 
-6. project-checkpoints.html
+6. ViewIdeaScores.html
+   https://some-dude-999.github.io/BI/ViewIdeaScores.html - Centralized TOP SECRET themed dashboard consolidating all idea score reports (AGI Ideas, Future High-Prob, Highest Prob, Market Top 2025) with yellow legal pad aesthetic, tab navigation, and ASMR paper sounds
+
+7. project-checkpoints.html
    https://some-dude-999.github.io/BI/project-checkpoints.html - Interactive medieval-themed quest board for tracking multiple business projects with task completion, duration estimation, and progress visualization

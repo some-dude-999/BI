@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOP SECRET - Idea Scores Report</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            background: #2c2416;
+            padding: 30px;
+            min-height: 100vh;
+            background-image:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(139, 69, 19, 0.1) 2px,
+                    rgba(139, 69, 19, 0.1) 4px
+                );
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: #fef9e7;
+            background-image:
+                repeating-linear-gradient(
+                    transparent,
+                    transparent 31px,
+                    #d4a574 31px,
+                    #d4a574 32px
+                );
+            border: 3px solid #8b4513;
+            box-shadow:
+                0 10px 30px rgba(0,0,0,0.5),
+                inset 0 0 100px rgba(139, 69, 19, 0.1);
+            position: relative;
+            padding-left: 80px;
+        }
+
+        /* Red margin line */
+        .container::before {
+            content: '';
+            position: absolute;
+            left: 60px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #dc143c;
+        }
+
+        /* Hole punches */
+        .container::after {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 100px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #2c2416;
+            box-shadow:
+                0 200px 0 #2c2416,
+                0 400px 0 #2c2416,
+                0 600px 0 #2c2416;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px 20px;
+            border-bottom: 3px double #8b4513;
+            background: rgba(220, 20, 60, 0.05);
+        }
+
+        .top-secret {
+            font-family: 'Special Elite', 'Courier New', monospace;
+            color: #dc143c;
+            font-size: 3em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            transform: rotate(-2deg);
+        }
+
+        .report-number {
+            font-family: 'Special Elite', 'Courier New', monospace;
+            color: #000;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            color: #2c2416;
+            margin-bottom: 10px;
+            text-decoration: underline;
+        }
+
+        .controls {
+            padding: 30px 20px;
+            border-bottom: 2px dashed #8b4513;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            background: rgba(139, 69, 19, 0.03);
+        }
+
+        .dataset-selector {
+            padding: 12px 20px;
+            font-family: 'Courier Prime', monospace;
+            font-size: 1.1em;
+            font-weight: bold;
+            background: #fff;
+            border: 3px solid #8b4513;
+            border-radius: 0;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        .dataset-selector:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 rgba(0,0,0,0.3);
+        }
+
+        .llm-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .llm-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid #8b4513;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .llm-checkbox:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .llm-checkbox input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .llm-checkbox label {
+            cursor: pointer;
+            font-weight: 700;
+            color: #2c2416;
+        }
+
+        .outlier-control, .rocket-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 3px solid #8b4513;
+        }
+
+        .outlier-control input[type="checkbox"],
+        .rocket-control input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .outlier-control label {
+            font-weight: 700;
+            color: #228b22;
+            cursor: pointer;
+        }
+
+        .rocket-control label {
+            font-weight: 700;
+            color: #dc143c;
+            cursor: pointer;
+        }
+
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            background: rgba(139, 69, 19, 0.1);
+            border-bottom: 3px solid #8b4513;
+            padding: 10px 10px 0 10px;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            background: rgba(210, 180, 140, 0.5);
+            border: 3px solid #8b4513;
+            border-bottom: none;
+            font-weight: 700;
+            color: #2c2416;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            margin-right: 5px;
+            position: relative;
+            clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+            padding-left: 20px;
+            font-size: 1.1em;
+        }
+
+        .tab:hover {
+            background: rgba(210, 180, 140, 0.8);
+            transform: translateY(-3px);
+        }
+
+        .tab.active {
+            background: #fef9e7;
+            color: #dc143c;
+            border-bottom: 3px solid #fef9e7;
+            margin-bottom: -3px;
+            z-index: 10;
+            font-weight: 900;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 3px solid #8b4513;
+        }
+
+        thead {
+            background: rgba(139, 69, 19, 0.3);
+            color: #2c2416;
+            border-bottom: 3px double #8b4513;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 900;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-right: 2px solid #8b4513;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(139, 69, 19, 0.3);
+            border-right: 2px solid rgba(139, 69, 19, 0.2);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            transform: scale(1.005);
+            box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 25px;
+        }
+
+        .sortable:hover {
+            background: rgba(139, 69, 19, 0.2);
+        }
+
+        .sortable::after {
+            content: '⇅';
+            position: absolute;
+            right: 8px;
+            opacity: 0.5;
+            font-size: 1.2em;
+        }
+
+        .sortable.asc::after {
+            content: '↑';
+            opacity: 1;
+            color: #dc143c;
+        }
+
+        .sortable.desc::after {
+            content: '↓';
+            opacity: 1;
+            color: #dc143c;
+        }
+
+        .score-high {
+            background: #90ee90;
+            color: #006400;
+            padding: 5px 12px;
+            border: 2px solid #006400;
+            font-weight: 900;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+        }
+
+        .score-medium {
+            background: #ffd700;
+            color: #8b4513;
+            padding: 5px 12px;
+            border: 2px solid #8b4513;
+            font-weight: 900;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+        }
+
+        .score-low {
+            background: #ffcccb;
+            color: #8b0000;
+            padding: 5px 12px;
+            border: 2px solid #8b0000;
+            font-weight: 900;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+        }
+
+        .llm-count {
+            display: inline-block;
+            background: #8b4513;
+            color: #fef9e7;
+            padding: 5px 12px;
+            border: 2px solid #2c2416;
+            font-size: 0.9em;
+            font-weight: 900;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(44, 36, 22, 0.8);
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #fef9e7;
+            background-image:
+                repeating-linear-gradient(
+                    transparent,
+                    transparent 31px,
+                    #d4a574 31px,
+                    #d4a574 32px
+                );
+            padding: 40px;
+            border: 5px solid #8b4513;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        .modal-header {
+            font-size: 1.8em;
+            font-weight: 900;
+            color: #dc143c;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px double #8b4513;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .modal-body {
+            color: #2c2416;
+            line-height: 2;
+            font-size: 1.1em;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #8b4513;
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: #dc143c;
+            transform: scale(1.3) rotate(90deg);
+        }
+
+        .show-comment-btn {
+            padding: 10px 20px;
+            background: #8b4513;
+            color: #fef9e7;
+            border: 3px solid #2c2416;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 0.9em;
+            font-family: 'Courier Prime', monospace;
+            transition: all 0.3s ease;
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+            text-transform: uppercase;
+        }
+
+        .show-comment-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 rgba(0,0,0,0.4);
+            background: #a0522d;
+        }
+
+        .score-clickable {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .score-clickable:hover {
+            transform: scale(1.15) rotate(-2deg);
+        }
+
+        .calculation-breakdown {
+            font-family: 'Courier Prime', monospace;
+            background: rgba(139, 69, 19, 0.1);
+            padding: 20px;
+            border: 2px solid #8b4513;
+            margin-top: 15px;
+        }
+
+        .calculation-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.5);
+            border-left: 5px solid #8b4513;
+        }
+
+        .calculation-summary {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(139, 69, 19, 0.3);
+            color: #2c2416;
+            border: 3px double #8b4513;
+            font-weight: 900;
+            font-size: 1.2em;
+        }
+
+        .stamp {
+            position: absolute;
+            top: 80px;
+            right: 100px;
+            width: 200px;
+            height: 200px;
+            border: 5px solid rgba(220, 20, 60, 0.3);
+            border-radius: 10px;
+            transform: rotate(15deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Special Elite', monospace;
+            font-size: 2em;
+            color: rgba(220, 20, 60, 0.3);
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.5em;
+            color: #8b4513;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(139, 69, 19, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #8b4513;
+            border: 2px solid #fef9e7;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0522d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="stamp">CLASSIFIED</div>
+
+        <div class="header">
+            <div class="top-secret">★ TOP SECRET ★</div>
+            <div class="report-number" id="reportNumber">REPORT NO: TS-AGI-2025-XXXX</div>
+            <div class="subtitle">Business Idea Intelligence Analysis</div>
+        </div>
+
+        <div class="controls">
+            <select class="dataset-selector" id="datasetSelector">
+                <option value="AGI IDEA GEN">DOSSIER: AGI Idea Generation</option>
+                <option value="FutureHighProbIdeas">DOSSIER: Future High-Prob Ideas</option>
+                <option value="HighestProbIdeas">DOSSIER: Highest Prob Ideas</option>
+                <option value="MarketTop2025">DOSSIER: Market Top 2025</option>
+            </select>
+
+            <div class="outlier-control">
+                <input type="checkbox" id="removeOutliers" checked>
+                <label for="removeOutliers">REMOVE OUTLIERS</label>
+            </div>
+
+            <div class="rocket-control">
+                <input type="checkbox" id="rocketOnly">
+                <label for="rocketOnly">🚀 OUR IDEAS ONLY</label>
+            </div>
+
+            <div class="llm-checkboxes" id="llmCheckboxes"></div>
+        </div>
+
+        <div class="tabs" id="tabs"></div>
+
+        <div id="tabContents"></div>
+    </div>
+
+    <!-- Modal for popups -->
+    <div id="popupModal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-header" id="modalHeader"></div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- ASMR Paper Sounds -->
+    <audio id="paperSound1" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2952/2952-preview.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="paperSound2" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="paperSound3" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2956/2956-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Dataset configurations
+        const DATASETS = {
+            'AGI IDEA GEN': {
+                folder: 'AGI IDEA GEN',
+                llmFiles: {
+                    'ChatGPT 1': 'AGI IDEA GEN/[ChatGPT 1] AGI IDEA GEN.csv',
+                    'ChatGPT 2': 'AGI IDEA GEN/[ChatGPT 2] AGI IDEA GEN.csv',
+                    'Claude 1': 'AGI IDEA GEN/Claude 1.csv',
+                    'Claude 2': 'AGI IDEA GEN/Claude 2.csv',
+                    'Gemini 1': 'AGI IDEA GEN/Gemini 1.csv',
+                    'Gemini 2': 'AGI IDEA GEN/Gemini 2.csv',
+                    'Grok 1': 'AGI IDEA GEN/Grok 1.csv',
+                    'Grok 2': 'AGI IDEA GEN/Grok 2.csv',
+                    'Kimi 1': 'AGI IDEA GEN/Kimi 1.csv',
+                    'Kimi 2': 'AGI IDEA GEN/Kimi 2.csv'
+                }
+            },
+            'FutureHighProbIdeas': {
+                folder: 'FutureHighProbIdeas',
+                llmFiles: {
+                    'ChatGPT 1': 'FutureHighProbIdeas/ChatGPT 1.csv',
+                    'ChatGPT 2': 'FutureHighProbIdeas/ChatGPT 2.csv',
+                    'Claude 1': 'FutureHighProbIdeas/Claude 1.csv',
+                    'Claude 2': 'FutureHighProbIdeas/Claude 2.csv',
+                    'Gemini 1': 'FutureHighProbIdeas/Gemini 1.csv',
+                    'Gemini 2': 'FutureHighProbIdeas/Gemini 2.csv',
+                    'Grok 1': 'FutureHighProbIdeas/Grok 1.csv',
+                    'Grok 2': 'FutureHighProbIdeas/Grok 2.csv',
+                    'Kimi 1': 'FutureHighProbIdeas/Kimi 1.csv',
+                    'Kimi 2': 'FutureHighProbIdeas/Kimi 2.csv'
+                }
+            },
+            'HighestProbIdeas': {
+                folder: 'HighestProbIdeas',
+                llmFiles: {
+                    'ChatGPT 1': 'HighestProbIdeas/ChatGPT 1.csv',
+                    'ChatGPT 2': 'HighestProbIdeas/ChatGPT 2.csv',
+                    'Claude 1': 'HighestProbIdeas/Claude 1.csv',
+                    'Claude 2': 'HighestProbIdeas/Claude 2.csv',
+                    'Gemini 1': 'HighestProbIdeas/Gemini 1.csv',
+                    'Gemini 2': 'HighestProbIdeas/Gemini 2.csv',
+                    'Grok 1': 'HighestProbIdeas/Grok 1.csv',
+                    'Grok 2': 'HighestProbIdeas/Grok 2.csv',
+                    'Kimi 1': 'HighestProbIdeas/Kimi 1.csv',
+                    'Kimi 2': 'HighestProbIdeas/Kimi 2.csv'
+                }
+            },
+            'MarketTop2025': {
+                folder: 'MarketTop2025',
+                llmFiles: {
+                    'ChatGPT 1': 'MarketTop2025/ChatGPT 1.csv',
+                    'ChatGPT 2': 'MarketTop2025/ChatGPT 2.csv',
+                    'Claude 1': 'MarketTop2025/Claude 1.csv',
+                    'Claude 2': 'MarketTop2025/Claude 2.csv',
+                    'Gemini 1': 'MarketTop2025/Gemini 1.csv',
+                    'Gemini 2': 'MarketTop2025/Gemini 2.csv',
+                    'Grok 1': 'MarketTop2025/Grok 1.csv',
+                    'Grok 2': 'MarketTop2025/Grok 2.csv',
+                    'Kimi 1': 'MarketTop2025/Kimi 1.csv',
+                    'Kimi 2': 'MarketTop2025/Kimi 2.csv'
+                }
+            }
+        };
+
+        let currentDataset = 'AGI IDEA GEN';
+        let csvData = {};
+        let selectedLLMs = new Set();
+        let removeOutliers = true;
+        let rocketOnly = false;
+        let updateTimeout;
+        let sortDirection = {};
+        let currentCombinedData = [];
+        let currentLLMData = {};
+
+        // Sound effects
+        const paperSounds = [
+            document.getElementById('paperSound1'),
+            document.getElementById('paperSound2'),
+            document.getElementById('paperSound3')
+        ];
+
+        function playPaperSound() {
+            const sound = paperSounds[Math.floor(Math.random() * paperSounds.length)];
+            sound.currentTime = 0;
+            sound.volume = 0.3;
+            sound.play().catch(e => console.log('Audio play prevented:', e));
+        }
+
+        // Generate random report number
+        function generateReportNumber() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const randomLetters = Array.from({length: 3}, () =>
+                letters[Math.floor(Math.random() * letters.length)]
+            ).join('');
+            const randomNumber = Math.floor(Math.random() * 9000) + 1000;
+            const year = new Date().getFullYear();
+            return `TS-${randomLetters}-${year}-${randomNumber}`;
+        }
+
+        // Show modal
+        function showModal(header, body) {
+            playPaperSound();
+            document.getElementById('modalHeader').innerHTML = header;
+            document.getElementById('modalBody').innerHTML = body;
+            document.getElementById('popupModal').classList.add('show');
+        }
+
+        // Close modal
+        function closeModal(event) {
+            if (!event || event.target === document.getElementById('popupModal')) {
+                playPaperSound();
+                document.getElementById('popupModal').classList.remove('show');
+            }
+        }
+
+        // Show comment popup
+        function showComment(ideaName, comment) {
+            showModal(`CLASSIFIED INTEL: ${ideaName}`, `<div style="line-height: 2;">${comment}</div>`);
+        }
+
+        // Show score calculation popup
+        function showScoreCalculation(ideaName, scoresWithLLM, rawScores, avgScore) {
+            let breakdown = '<div class="calculation-breakdown">';
+            scoresWithLLM.forEach(({ llm, score }) => {
+                breakdown += `<div class="calculation-item"><strong>${llm}:</strong> ${score}</div>`;
+            });
+            breakdown += '</div>';
+
+            let calculation = '';
+            if (removeOutliers && rawScores.length >= 3) {
+                const sorted = [...rawScores].sort((a, b) => a - b);
+                const lowest = sorted[0];
+                const highest = sorted[sorted.length - 1];
+                const used = sorted.slice(1, -1);
+                calculation = `
+                    <div class="calculation-summary">
+                        FORMULA: (${used.join(' + ')}) / ${used.length}<br>
+                        <small>Removed outliers: Lowest (${lowest}) and Highest (${highest})</small><br>
+                        <strong>FINAL SCORE: ${avgScore.toFixed(2)}</strong>
+                    </div>
+                `;
+            } else {
+                calculation = `
+                    <div class="calculation-summary">
+                        FORMULA: (${rawScores.join(' + ')}) / ${rawScores.length}<br>
+                        <strong>FINAL SCORE: ${avgScore.toFixed(2)}</strong>
+                    </div>
+                `;
+            }
+
+            showModal(`SCORE ANALYSIS: ${ideaName}`, breakdown + calculation);
+        }
+
+        // Show individual LLM score
+        function showIndividualScore(ideaName, llmName, score, reasoning) {
+            const content = `
+                <div style="margin-bottom: 20px;">
+                    <strong>ANALYST:</strong> ${llmName}<br>
+                    <strong>THREAT LEVEL:</strong> ${score}/10
+                </div>
+                <div style="background: rgba(139, 69, 19, 0.1); padding: 20px; border: 2px solid #8b4513; line-height: 2;">
+                    ${reasoning}
+                </div>
+            `;
+            showModal(`INTELLIGENCE REPORT: ${ideaName}`, content);
+        }
+
+        // Get row color based on score
+        function getRowColor(score) {
+            score = Math.max(0, Math.min(10, score));
+            if (score >= 7.5) {
+                const t = (score - 7.5) / 2.5;
+                const r = Math.round(255 - (111 * t));
+                const g = Math.round(255 - (17 * t));
+                const b = Math.round(255 - (111 * t));
+                return `rgba(${r}, ${g}, ${b}, 0.5)`;
+            } else {
+                const t = score / 7.5;
+                const r = 255;
+                const g = Math.round(182 + (73 * t));
+                const b = Math.round(193 + (62 * t));
+                return `rgba(${r}, ${g}, ${b}, 0.5)`;
+            }
+        }
+
+        // Parse CSV
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
+            const result = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i];
+                if (!line.trim()) continue;
+
+                const parts = [];
+                let current = '';
+                let inQuotes = false;
+
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        parts.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                parts.push(current.trim());
+
+                if (parts.length >= 3) {
+                    result.push({
+                        name: parts[0].replace(/^"|"$/g, ''),
+                        score: parseFloat(parts[1]),
+                        reasoning: parts[2].replace(/^"|"$/g, '')
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        // Load CSV files for current dataset
+        async function loadDataset() {
+            const dataset = DATASETS[currentDataset];
+            csvData = {};
+
+            for (const llm of Object.keys(dataset.llmFiles)) {
+                csvData[llm] = [];
+            }
+
+            selectedLLMs = new Set(Object.keys(dataset.llmFiles));
+
+            for (const [llm, file] of Object.entries(dataset.llmFiles)) {
+                try {
+                    const response = await fetch(file);
+                    const text = await response.text();
+                    csvData[llm] = parseCSV(text);
+                } catch (error) {
+                    console.error(`Error loading ${llm}:`, error);
+                }
+            }
+
+            initializeUI();
+        }
+
+        // Create score badge
+        function getScoreBadge(score) {
+            const rounded = score.toFixed(2);
+            if (score >= 8.5) return `<span class="score-high">${rounded}</span>`;
+            if (score >= 6.5) return `<span class="score-medium">${rounded}</span>`;
+            return `<span class="score-low">${rounded}</span>`;
+        }
+
+        // Calculate average with outlier removal
+        function calculateAverage(scores) {
+            if (scores.length === 0) return 0;
+            if (scores.length === 1) return scores[0];
+
+            if (removeOutliers && scores.length >= 3) {
+                const sorted = [...scores].sort((a, b) => a - b);
+                sorted.shift();
+                sorted.pop();
+                return sorted.reduce((a, b) => a + b, 0) / sorted.length;
+            }
+
+            return scores.reduce((a, b) => a + b, 0) / scores.length;
+        }
+
+        // Get combined data
+        function getCombinedData() {
+            const ideasMap = new Map();
+
+            for (const [llm, ideas] of Object.entries(csvData)) {
+                if (!selectedLLMs.has(llm)) continue;
+
+                for (const idea of ideas) {
+                    if (!ideasMap.has(idea.name)) {
+                        ideasMap.set(idea.name, {
+                            name: idea.name,
+                            scores: [],
+                            scoresWithLLM: [],
+                            comments: []
+                        });
+                    }
+
+                    const entry = ideasMap.get(idea.name);
+                    entry.scores.push(idea.score);
+                    entry.scoresWithLLM.push({ llm, score: idea.score });
+                    entry.comments.push(`<strong>${llm}:</strong> ${idea.reasoning}`);
+                }
+            }
+
+            const combined = [];
+            for (const [name, data] of ideasMap) {
+                const isRocket = name.includes('🚀');
+                if (rocketOnly && !isRocket) continue;
+
+                combined.push({
+                    name,
+                    avgScore: calculateAverage(data.scores),
+                    llmCount: data.scores.length,
+                    comments: data.comments.join('<br><br>'),
+                    scoresWithLLM: data.scoresWithLLM,
+                    rawScores: data.scores,
+                    isRocket
+                });
+            }
+
+            return combined.sort((a, b) => b.avgScore - a.avgScore);
+        }
+
+        // Sort LLM data
+        function sortLLMData(llm, direction) {
+            const data = [...csvData[llm]];
+            if (direction === 'desc') {
+                return data.sort((a, b) => b.score - a.score);
+            } else if (direction === 'asc') {
+                return data.sort((a, b) => a.score - b.score);
+            }
+            return data;
+        }
+
+        // Create table for individual LLM
+        function createLLMTable(llm) {
+            const currentSort = sortDirection[llm] || 'desc';
+            const data = sortLLMData(llm, currentSort);
+
+            const filteredData = data.filter(idea => {
+                const isRocket = idea.name.includes('🚀');
+                return !rocketOnly || isRocket;
+            });
+
+            currentLLMData[llm] = filteredData;
+
+            const sortClass = currentSort === 'desc' ? 'desc' : (currentSort === 'asc' ? 'asc' : '');
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="50%">Target/Idea Name</th>
+                            <th width="15%" class="sortable ${sortClass}" onclick="toggleSort('${llm}')">Threat Level</th>
+                            <th width="20%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            filteredData.forEach((idea, index) => {
+                const rowColor = getRowColor(idea.score);
+
+                html += `
+                    <tr style="background-color: ${rowColor};">
+                        <td><strong>${idea.name}</strong></td>
+                        <td>
+                            <span class="score-clickable" onclick="showLLMScore('${llm}', ${index})">
+                                ${getScoreBadge(idea.score)}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="show-comment-btn" onclick="showLLMComment('${llm}', ${index})">
+                                📋 View Intel
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            return html;
+        }
+
+        // Show LLM comment
+        function showLLMComment(llm, index) {
+            const idea = currentLLMData[llm]?.[index];
+            if (idea) {
+                showModal(`CLASSIFIED INTEL: ${idea.name}`, `<div style="line-height: 2;">${idea.reasoning}</div>`);
+            }
+        }
+
+        // Show LLM score
+        function showLLMScore(llm, index) {
+            const idea = currentLLMData[llm]?.[index];
+            if (idea) {
+                showIndividualScore(idea.name, llm, idea.score, idea.reasoning);
+            }
+        }
+
+        // Sort combined data
+        function sortCombinedData(data, direction) {
+            if (direction === 'desc') {
+                return data.sort((a, b) => b.avgScore - a.avgScore);
+            } else if (direction === 'asc') {
+                return data.sort((a, b) => a.avgScore - b.avgScore);
+            }
+            return data;
+        }
+
+        // Create combined table
+        function createCombinedTable() {
+            const currentSort = sortDirection['Combined'] || 'desc';
+            const data = sortCombinedData(getCombinedData(), currentSort);
+            currentCombinedData = data;
+
+            const sortClass = currentSort === 'desc' ? 'desc' : (currentSort === 'asc' ? 'asc' : '');
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40%">Target/Idea Name</th>
+                            <th width="12%" class="sortable ${sortClass}" onclick="toggleSort('Combined')">Avg Threat</th>
+                            <th width="12%">Analyst Count</th>
+                            <th width="20%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.forEach((idea, index) => {
+                const rowColor = getRowColor(idea.avgScore);
+
+                html += `
+                    <tr style="background-color: ${rowColor};">
+                        <td><strong>${idea.name}</strong></td>
+                        <td>
+                            <span class="score-clickable" onclick="showCombinedScore(${index})">
+                                ${getScoreBadge(idea.avgScore)}
+                            </span>
+                        </td>
+                        <td><span class="llm-count">${idea.llmCount} ANALYSTS</span></td>
+                        <td>
+                            <button class="show-comment-btn" onclick="showCombinedComment(${index})">
+                                📋 View Intel
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            return html;
+        }
+
+        // Show combined comment
+        function showCombinedComment(index) {
+            const idea = currentCombinedData[index];
+            if (idea) {
+                showModal(`ALL INTEL: ${idea.name}`, `<div style="line-height: 2;">${idea.comments}</div>`);
+            }
+        }
+
+        // Show combined score
+        function showCombinedScore(index) {
+            const idea = currentCombinedData[index];
+            if (idea) {
+                showScoreCalculation(idea.name, idea.scoresWithLLM, idea.rawScores, idea.avgScore);
+            }
+        }
+
+        // Switch tab
+        function switchTab(tabName) {
+            playPaperSound();
+
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`content-${tabName}`).classList.add('active');
+        }
+
+        // Toggle sort
+        function toggleSort(tabName) {
+            playPaperSound();
+
+            const current = sortDirection[tabName] || 'desc';
+            sortDirection[tabName] = current === 'desc' ? 'asc' : 'desc';
+
+            if (tabName === 'Combined') {
+                const combinedContent = document.getElementById('content-Combined');
+                if (combinedContent) {
+                    combinedContent.innerHTML = createCombinedTable();
+                }
+            } else {
+                const content = document.getElementById(`content-${tabName}`);
+                if (content) {
+                    content.innerHTML = createLLMTable(tabName);
+                }
+            }
+        }
+
+        // Update all tables
+        function updateAllTables() {
+            const combinedContent = document.getElementById('content-Combined');
+            if (combinedContent) {
+                combinedContent.innerHTML = createCombinedTable();
+            }
+
+            const dataset = DATASETS[currentDataset];
+            for (const llm of Object.keys(dataset.llmFiles)) {
+                const content = document.getElementById(`content-${llm}`);
+                if (content) {
+                    content.innerHTML = createLLMTable(llm);
+                }
+            }
+        }
+
+        // Schedule update
+        function scheduleUpdate() {
+            clearTimeout(updateTimeout);
+            updateTimeout = setTimeout(() => {
+                updateAllTables();
+            }, 500);
+        }
+
+        // Initialize UI
+        function initializeUI() {
+            const dataset = DATASETS[currentDataset];
+
+            // Clear existing UI
+            document.getElementById('llmCheckboxes').innerHTML = '';
+            document.getElementById('tabs').innerHTML = '';
+            document.getElementById('tabContents').innerHTML = '';
+
+            // Create LLM checkboxes
+            const checkboxContainer = document.getElementById('llmCheckboxes');
+            for (const llm of Object.keys(dataset.llmFiles)) {
+                const div = document.createElement('div');
+                div.className = 'llm-checkbox';
+                div.innerHTML = `
+                    <input type="checkbox" id="llm-${llm}" checked>
+                    <label for="llm-${llm}">${llm}</label>
+                `;
+                checkboxContainer.appendChild(div);
+
+                div.querySelector('input').addEventListener('change', (e) => {
+                    playPaperSound();
+                    if (e.target.checked) {
+                        selectedLLMs.add(llm);
+                    } else {
+                        selectedLLMs.delete(llm);
+                    }
+                    scheduleUpdate();
+                });
+            }
+
+            // Create tabs
+            const tabsContainer = document.getElementById('tabs');
+            const tabContents = document.getElementById('tabContents');
+
+            // Combined tab first
+            const combinedTab = document.createElement('button');
+            combinedTab.className = 'tab active';
+            combinedTab.textContent = '📊 COMBINED ANALYSIS';
+            combinedTab.dataset.tab = 'Combined';
+            combinedTab.addEventListener('click', () => switchTab('Combined'));
+            tabsContainer.appendChild(combinedTab);
+
+            const combinedContent = document.createElement('div');
+            combinedContent.id = 'content-Combined';
+            combinedContent.className = 'tab-content active';
+            combinedContent.innerHTML = createCombinedTable();
+            tabContents.appendChild(combinedContent);
+
+            // Individual LLM tabs
+            for (const llm of Object.keys(dataset.llmFiles)) {
+                const tab = document.createElement('button');
+                tab.className = 'tab';
+                tab.textContent = llm;
+                tab.dataset.tab = llm;
+                tab.addEventListener('click', () => switchTab(llm));
+                tabsContainer.appendChild(tab);
+
+                const content = document.createElement('div');
+                content.id = `content-${llm}`;
+                content.className = 'tab-content';
+                content.innerHTML = createLLMTable(llm);
+                tabContents.appendChild(content);
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set random report number
+            document.getElementById('reportNumber').textContent =
+                `REPORT NO: ${generateReportNumber()}`;
+
+            // Dataset selector event
+            document.getElementById('datasetSelector').addEventListener('change', (e) => {
+                playPaperSound();
+                currentDataset = e.target.value;
+                sortDirection = {}; // Reset sort directions
+                loadDataset();
+            });
+
+            // Outlier checkbox
+            document.getElementById('removeOutliers').addEventListener('change', (e) => {
+                playPaperSound();
+                removeOutliers = e.target.checked;
+                scheduleUpdate();
+            });
+
+            // Rocket only checkbox
+            document.getElementById('rocketOnly').addEventListener('change', (e) => {
+                playPaperSound();
+                rocketOnly = e.target.checked;
+                scheduleUpdate();
+            });
+
+            // Load initial dataset
+            loadDataset();
+        });
+    </script>
+</body>
+</html>
