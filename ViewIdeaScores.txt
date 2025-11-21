@@ -2,15 +2,17 @@
 PROJECT: Business Intelligence / Idea Analysis System
 COMPONENT: Centralized Idea Scores Viewer with Top Secret Theme
 CREATED: 2025-11-21
-LAST UPDATED: 2025-11-21 - Initial documentation
+LAST UPDATED: 2025-11-21 - Critical bug fixes: CSV validation, contextual labeling, and proper data formatting
 
 DATA SOURCES:
-- Folder: AGI IDEA GEN/*.csv - AGI-focused business ideas with LLM evaluations
-- Folder: FutureHighProbIdeas/*.csv - Future high-probability business ideas for AI age
-- Folder: HighestProbIdeas/*.csv - Highest probability business ideas
-- Folder: MarketTop2025/*.csv - Market top ideas for 2025
+- Folder: AGI IDEA GEN/*.csv - AGI-focused business ideas with LLM evaluations (Scores: 0-10)
+- Folder: FutureHighProbIdeas/*.csv - Future high-probability business ideas for AI age (Scores: 0-10)
+- Folder: HighestProbIdeas/*.csv - Highest probability business ideas (Scores: 0-10)
+- Folder: MarketTop2025/*.csv - Market top price predictions for 2025 (Values: Dollar amounts)
 - Each folder contains 10 CSV files (ChatGPT 1, ChatGPT 2, Claude 1, Claude 2, Gemini 1, Gemini 2, Grok 1, Grok 2, Kimi 1, Kimi 2)
-- CSV Format: "Idea Name", Score (0-10), "Reasoning/Comment"
+- CSV Format: "Name", Value, "Reasoning/Comment"
+  * Score datasets: Value is 0-10 rating
+  * Price datasets: Value is dollar amount
 
 FUNCTIONALITY:
 - Main Purpose: Consolidated view for all idea score reports from different research runs
@@ -52,6 +54,28 @@ CORRECTIONS & CLARIFICATIONS:
 - Actually: ViewIdeaScores.html consolidates ALL datasets into one interface
 - Why this matters: Reduces clutter as research operations scale, provides centralized reporting
 
+BUG FIXES (2025-11-21):
+1. **CSV Validation**: Added robust validation to filter out malformed data
+   - Filters entries with CSS code (font-family, rgba, etc.)
+   - Filters NaN and invalid score values
+   - Validates score ranges (0-10 for ideas, positive for prices)
+   - Prevents display of corrupted data in tables
+
+2. **Contextual Column Labels**: Fixed generic "Threat Level" labels
+   - Score datasets (AGI, Future, Highest): Now show "Score" and "Avg Score"
+   - Price datasets (MarketTop2025): Now show "Price Target" and "Avg Price Target"
+   - Item names adapt: "Idea Name" vs "Asset Name"
+
+3. **Proper Data Formatting**:
+   - Score datasets: Display as X.XX (e.g., "8.75")
+   - Price datasets: Display as $XXX,XXX (e.g., "$160,000")
+   - Calculation breakdowns show properly formatted values
+
+4. **Data Integrity**: All calculations and displays now use validated, properly formatted data
+   - No more NaN entries
+   - No more CSS code appearing as data
+   - Consistent formatting across all views
+
 NOTES:
 - This is a master viewer that prevents the need for 100+ separate HTML files
 - Users can switch between different research runs using tabs
@@ -59,4 +83,5 @@ NOTES:
 - Yellow legal pad theme creates engaging, spy-themed user experience
 - ASMR sounds enhance the tactile feel of browsing "secret files"
 - Random report numbers add fun element to data review process
+- Data accuracy prioritized over aesthetic theme (functionality > cuteness)
 ===

@@ -721,41 +721,50 @@
         function showScoreCalculation(ideaName, scoresWithLLM, rawScores, avgScore) {
             let breakdown = '<div class="calculation-breakdown">';
             scoresWithLLM.forEach(({ llm, score }) => {
-                breakdown += `<div class="calculation-item"><strong>${llm}:</strong> ${score}</div>`;
+                const formattedScore = formatValue(score);
+                breakdown += `<div class="calculation-item"><strong>${llm}:</strong> ${formattedScore}</div>`;
             });
             breakdown += '</div>';
+
+            const avgValueLabel = getAvgValueLabel();
+            const formattedAvg = formatValue(avgScore);
 
             let calculation = '';
             if (removeOutliers && rawScores.length >= 3) {
                 const sorted = [...rawScores].sort((a, b) => a - b);
-                const lowest = sorted[0];
-                const highest = sorted[sorted.length - 1];
+                const lowest = formatValue(sorted[0]);
+                const highest = formatValue(sorted[sorted.length - 1]);
                 const used = sorted.slice(1, -1);
+                const usedFormatted = used.map(s => formatValue(s)).join(' + ');
                 calculation = `
                     <div class="calculation-summary">
-                        FORMULA: (${used.join(' + ')}) / ${used.length}<br>
+                        FORMULA: (${usedFormatted}) / ${used.length}<br>
                         <small>Removed outliers: Lowest (${lowest}) and Highest (${highest})</small><br>
-                        <strong>FINAL SCORE: ${avgScore.toFixed(2)}</strong>
+                        <strong>FINAL ${avgValueLabel.toUpperCase()}: ${formattedAvg}</strong>
                     </div>
                 `;
             } else {
+                const rawFormatted = rawScores.map(s => formatValue(s)).join(' + ');
                 calculation = `
                     <div class="calculation-summary">
-                        FORMULA: (${rawScores.join(' + ')}) / ${rawScores.length}<br>
-                        <strong>FINAL SCORE: ${avgScore.toFixed(2)}</strong>
+                        FORMULA: (${rawFormatted}) / ${rawScores.length}<br>
+                        <strong>FINAL ${avgValueLabel.toUpperCase()}: ${formattedAvg}</strong>
                     </div>
                 `;
             }
 
-            showModal(`SCORE ANALYSIS: ${ideaName}`, breakdown + calculation);
+            showModal(`${avgValueLabel.toUpperCase()} ANALYSIS: ${ideaName}`, breakdown + calculation);
         }
 
         // Show individual LLM score
         function showIndividualScore(ideaName, llmName, score, reasoning) {
+            const valueLabel = getValueLabel();
+            const formattedValue = formatValue(score);
+
             const content = `
                 <div style="margin-bottom: 20px;">
                     <strong>ANALYST:</strong> ${llmName}<br>
-                    <strong>THREAT LEVEL:</strong> ${score}/10
+                    <strong>${valueLabel.toUpperCase()}:</strong> ${formattedValue}
                 </div>
                 <div style="background: rgba(139, 69, 19, 0.1); padding: 20px; border: 2px solid #8b4513; line-height: 2;">
                     ${reasoning}
@@ -782,7 +791,56 @@
             }
         }
 
-        // Parse CSV
+        // Dataset configuration helpers
+        function isMoneyDataset() {
+            return currentDataset === 'MarketTop2025';
+        }
+
+        function getValueLabel() {
+            return isMoneyDataset() ? 'Price Target' : 'Score';
+        }
+
+        function getAvgValueLabel() {
+            return isMoneyDataset() ? 'Avg Price Target' : 'Avg Score';
+        }
+
+        function getItemLabel() {
+            return isMoneyDataset() ? 'Asset' : 'Idea';
+        }
+
+        function formatValue(value) {
+            if (isMoneyDataset()) {
+                // Format as money
+                return '$' + value.toLocaleString('en-US', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            } else {
+                // Format as score with 2 decimals
+                return value.toFixed(2);
+            }
+        }
+
+        // Validate data entry
+        function isValidEntry(name, score) {
+            // Check for valid name (not CSS or HTML)
+            if (!name || name.trim().length === 0) return false;
+            if (name.includes('{') || name.includes('}') || name.includes(':') || name.includes(';')) return false;
+            if (name.includes('font-family') || name.includes('rgba') || name.includes('color:')) return false;
+
+            // Check for valid score
+            if (isNaN(score) || !isFinite(score)) return false;
+
+            // For score datasets, must be between 0 and 10
+            if (!isMoneyDataset() && (score < 0 || score > 10)) return false;
+
+            // For money dataset, must be positive
+            if (isMoneyDataset() && score <= 0) return false;
+
+            return true;
+        }
+
+        // Parse CSV with validation
         function parseCSV(text) {
             const lines = text.trim().split('\n');
             const result = [];
@@ -809,11 +867,20 @@
                 parts.push(current.trim());
 
                 if (parts.length >= 3) {
-                    result.push({
-                        name: parts[0].replace(/^"|"$/g, ''),
-                        score: parseFloat(parts[1]),
-                        reasoning: parts[2].replace(/^"|"$/g, '')
-                    });
+                    const name = parts[0].replace(/^"|"$/g, '');
+                    const score = parseFloat(parts[1]);
+                    const reasoning = parts[2].replace(/^"|"$/g, '');
+
+                    // Validate before adding
+                    if (isValidEntry(name, score)) {
+                        result.push({
+                            name,
+                            score,
+                            reasoning
+                        });
+                    } else {
+                        console.warn(`Skipping invalid entry: ${name}, score: ${score}`);
+                    }
                 }
             }
 
@@ -844,12 +911,20 @@
             initializeUI();
         }
 
-        // Create score badge
+        // Create score/value badge
         function getScoreBadge(score) {
-            const rounded = score.toFixed(2);
-            if (score >= 8.5) return `<span class="score-high">${rounded}</span>`;
-            if (score >= 6.5) return `<span class="score-medium">${rounded}</span>`;
-            return `<span class="score-low">${rounded}</span>`;
+            const formatted = formatValue(score);
+
+            // For money dataset, use different thresholds
+            if (isMoneyDataset()) {
+                // Simple styling for money - all get same treatment
+                return `<span class="score-medium">${formatted}</span>`;
+            }
+
+            // For score datasets (0-10 scale)
+            if (score >= 8.5) return `<span class="score-high">${formatted}</span>`;
+            if (score >= 6.5) return `<span class="score-medium">${formatted}</span>`;
+            return `<span class="score-low">${formatted}</span>`;
         }
 
         // Calculate average with outlier removal
@@ -935,12 +1010,16 @@
 
             const sortClass = currentSort === 'desc' ? 'desc' : (currentSort === 'asc' ? 'asc' : '');
 
+            // Get contextual labels
+            const itemLabel = getItemLabel();
+            const valueLabel = getValueLabel();
+
             let html = `
                 <table>
                     <thead>
                         <tr>
-                            <th width="50%">Target/Idea Name</th>
-                            <th width="15%" class="sortable ${sortClass}" onclick="toggleSort('${llm}')">Threat Level</th>
+                            <th width="50%">${itemLabel} Name</th>
+                            <th width="15%" class="sortable ${sortClass}" onclick="toggleSort('${llm}')">${valueLabel}</th>
                             <th width="20%">Actions</th>
                         </tr>
                     </thead>
@@ -1005,12 +1084,16 @@
 
             const sortClass = currentSort === 'desc' ? 'desc' : (currentSort === 'asc' ? 'asc' : '');
 
+            // Get contextual labels
+            const itemLabel = getItemLabel();
+            const avgValueLabel = getAvgValueLabel();
+
             let html = `
                 <table>
                     <thead>
                         <tr>
-                            <th width="40%">Target/Idea Name</th>
-                            <th width="12%" class="sortable ${sortClass}" onclick="toggleSort('Combined')">Avg Threat</th>
+                            <th width="40%">${itemLabel} Name</th>
+                            <th width="12%" class="sortable ${sortClass}" onclick="toggleSort('Combined')">${avgValueLabel}</th>
                             <th width="12%">Analyst Count</th>
                             <th width="20%">Actions</th>
                         </tr>
