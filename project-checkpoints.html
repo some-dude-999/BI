@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Checkpoints - Quest Board</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;700&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Merriweather:wght@400;700&display=swap');
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Cinzel', serif;
+            font-family: 'Merriweather', serif;
             background: linear-gradient(135deg, #2c1810 0%, #1a0f0a 100%);
             min-height: 100vh;
             padding: 20px;
@@ -159,7 +159,7 @@
             padding: 12px 24px;
             cursor: pointer;
             border-radius: 10px 10px 0 0;
-            font-family: 'Cinzel', serif;
+            font-family: 'Merriweather', serif;
             font-size: 1em;
             color: #c4a45e;
             transition: all 0.3s ease;
@@ -451,7 +451,7 @@
             border: 2px solid #8b6914;
             border-radius: 8px;
             color: #f4e4c1;
-            font-family: 'Cinzel', serif;
+            font-family: 'Merriweather', serif;
             font-size: 1em;
             text-align: center;
             transition: all 0.3s ease;
@@ -569,8 +569,8 @@
         }
 
         .daily-task {
-            background: rgba(74, 124, 47, 0.1);
-            border: 2px solid #4a7c2f;
+            background: rgba(90, 61, 43, 0.15);
+            border: 2px solid #5a3d2b;
             border-radius: 8px;
             padding: 12px 16px;
             margin: 12px 0;
@@ -580,27 +580,27 @@
 
         .daily-task .task-title {
             font-size: 1.05em;
-            color: #2d5016;
+            color: #3d2817;
             font-weight: 600;
         }
 
         .daily-task .task-project {
             font-size: 0.85em;
-            color: #4a7c2f;
+            color: #5a3d2b;
             margin-top: 4px;
         }
 
         .daily-task.passive {
-            border-color: #1a5a8b;
-            background: rgba(26, 90, 139, 0.1);
+            border-color: #6b4a35;
+            background: rgba(107, 74, 53, 0.15);
         }
 
         .daily-task.passive .task-title {
-            color: #0f2540;
+            color: #4d3322;
         }
 
         .daily-task.passive .task-project {
-            color: #1a5a8b;
+            color: #6b4a35;
         }
 
         .checkpoint.completed .checkpoint-text {
@@ -712,7 +712,7 @@
         }
         
         .modal-button {
-            font-family: 'Cinzel', serif;
+            font-family: 'Merriweather', serif;
             padding: 15px 30px;
             font-size: 1.1em;
             border: 3px solid;
@@ -1447,7 +1447,7 @@
             updateEffortRemaining();
         }
 
-        function createDurationInputs(checkpoint, savedData = null, isExpanded = false) {
+        function createDurationInputs(checkpoint, savedData = null, isExpanded = false, taskText = null) {
             // Only add duration inputs if checkpoint is active or inactive (not completed)
             const isCompleted = checkpoint.classList.contains('completed');
 
@@ -1458,9 +1458,11 @@
             const weeks = savedData ? savedData.weeks : 0;
             const months = savedData ? savedData.months : 0;
 
-            // Get text content
-            const checkpointText = checkpoint.querySelector('.checkpoint-text');
-            const taskText = checkpointText ? checkpointText.textContent : '';
+            // Get text content - use passed in text if available, otherwise query
+            if (!taskText) {
+                const checkpointText = checkpoint.querySelector('.checkpoint-text');
+                taskText = checkpointText ? checkpointText.textContent : '';
+            }
             const isSquatTask = taskText.includes('Daily squat and deadlift');
 
             // Determine status emoji
@@ -2078,6 +2080,10 @@
             const savedStarred = loadStarred();
 
             if (action === 'mark-done') {
+                // Get text BEFORE clearing
+                const checkpointTextEl = checkpoint.querySelector('.checkpoint-text');
+                const taskText = checkpointTextEl ? checkpointTextEl.textContent : '';
+
                 // Check if this task was starred before completing
                 const starIcon = checkpoint.querySelector('.star-icon');
                 const wasStarred = starIcon && starIcon.classList.contains('starred');
@@ -2092,7 +2098,7 @@
                     ? savedDurations[activePanel.id][index]
                     : null;
                 const isExpanded = savedExpanded[activePanel.id] && savedExpanded[activePanel.id][index];
-                createDurationInputs(checkpoint, savedData, isExpanded);
+                createDurationInputs(checkpoint, savedData, isExpanded, taskText);
 
                 // If this was a starred task, auto-star the next task
                 if (wasStarred) {
@@ -2102,6 +2108,10 @@
                 // Auto-activate next task
                 const nextCheckpoint = checkpoint.nextElementSibling;
                 if (nextCheckpoint && nextCheckpoint.classList.contains('checkpoint') && nextCheckpoint.classList.contains('inactive')) {
+                    // Get next checkpoint text BEFORE clearing
+                    const nextTextEl = nextCheckpoint.querySelector('.checkpoint-text');
+                    const nextTaskText = nextTextEl ? nextTextEl.textContent : '';
+
                     nextCheckpoint.classList.remove('inactive');
                     nextCheckpoint.classList.add('active');
 
@@ -2112,9 +2122,13 @@
                         : null;
                     const nextIsExpanded = savedExpanded[activePanel.id] && savedExpanded[activePanel.id][nextIndex];
                     nextCheckpoint.innerHTML = '';
-                    createDurationInputs(nextCheckpoint, nextSavedData, nextIsExpanded);
+                    createDurationInputs(nextCheckpoint, nextSavedData, nextIsExpanded, nextTaskText);
                 }
             } else if (action === 'mark-active') {
+                // Get text BEFORE clearing
+                const checkpointTextEl = checkpoint.querySelector('.checkpoint-text');
+                const taskText = checkpointTextEl ? checkpointTextEl.textContent : '';
+
                 // Change from inactive to active OR from completed to active
                 checkpoint.classList.remove('inactive', 'completed');
                 checkpoint.classList.add('active');
@@ -2125,7 +2139,7 @@
                     ? savedDurations[activePanel.id][index]
                     : null;
                 const isExpanded = savedExpanded[activePanel.id] && savedExpanded[activePanel.id][index];
-                createDurationInputs(checkpoint, savedData, isExpanded);
+                createDurationInputs(checkpoint, savedData, isExpanded, taskText);
 
                 // Restore starred state
                 const isStarred = savedStarred[activePanel.id] && savedStarred[activePanel.id][index];
