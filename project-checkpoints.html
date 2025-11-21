@@ -104,28 +104,36 @@
         .quest-board {
             max-width: 1200px;
             margin: 0 auto;
-            background: 
-                repeating-linear-gradient(
-                    0deg,
-                    rgba(61, 40, 23, 0.3) 0px,
-                    rgba(74, 52, 32, 0.3) 2px,
-                    rgba(61, 40, 23, 0.3) 4px,
-                    transparent 4px,
-                    transparent 40px
-                ),
+            background:
+                /* Wood grain texture */
                 repeating-linear-gradient(
                     90deg,
-                    #3d2817 0px,
-                    #4a3420 3px,
-                    #3d2817 6px,
-                    #352110 9px,
-                    #3d2817 12px
+                    #5a3d2b 0px,
+                    #6b4a35 2px,
+                    #5a3d2b 3px,
+                    #4d3322 8px,
+                    #5a3d2b 12px,
+                    #6b4a35 15px,
+                    #5a3d2b 20px
                 ),
-                linear-gradient(145deg, #3d2817 0%, #2a1810 100%);
+                /* Horizontal wood planks */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    transparent 98px,
+                    rgba(0, 0, 0, 0.4) 98px,
+                    rgba(0, 0, 0, 0.4) 100px,
+                    transparent 100px,
+                    transparent 198px,
+                    rgba(0, 0, 0, 0.4) 198px,
+                    rgba(0, 0, 0, 0.4) 200px
+                ),
+                /* Base wood color with depth */
+                linear-gradient(145deg, #6b4a35 0%, #5a3d2b 50%, #4d3322 100%);
             border: 8px solid #8b6914;
             border-radius: 20px;
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.8), 
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.8),
                 inset 0 2px 10px rgba(139, 105, 20, 0.3),
                 inset 0 0 100px rgba(0, 0, 0, 0.3);
             padding: 30px;
@@ -430,6 +438,77 @@
             color: #f4e4c1;
             position: relative;
             z-index: 2;
+        }
+
+        .duration-inputs {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #5a3d2b;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        .duration-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .duration-input-group label {
+            font-size: 0.9em;
+            color: #c4a45e;
+            font-weight: 600;
+        }
+
+        .duration-input-group input {
+            width: 80px;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #2a1810 0%, #1a0f0a 100%);
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            color: #f4e4c1;
+            font-family: 'Cinzel', serif;
+            font-size: 1em;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .duration-input-group input:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .duration-total {
+            font-size: 1em;
+            color: #d4af37;
+            font-weight: bold;
+            padding: 8px 15px;
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+        }
+
+        .effort-remaining {
+            margin-top: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #5a3d2b 0%, #3d2817 100%);
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1em;
+            color: #f4e4c1;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .effort-remaining strong {
+            color: #d4af37;
+            font-size: 1.2em;
         }
         
         .checkpoint.completed .checkpoint-text {
@@ -828,12 +907,12 @@
         <div class="tabs">
             <div class="tab active" data-project="overview">🗝️ Overview</div>
             <div class="tab blue" data-project="tavern">0. Tavern Upkeep 🍖</div>
-            <div class="tab green" data-project="productivity">1. Custom Tools</div>
-            <div class="tab green" data-project="language">2. Learn Language Game</div>
-            <div class="tab yellow" data-project="finance">3. Finance Education Vids</div>
-            <div class="tab yellow" data-project="stl">4. STL Files</div>
-            <div class="tab red" data-project="pod">5. POD</div>
-            <div class="tab red" data-project="music">6. Ambient Music</div>
+            <div class="tab green" data-project="productivity">1. Blue Anvil Labs</div>
+            <div class="tab green" data-project="language">2. Lingo Playground</div>
+            <div class="tab yellow" data-project="finance">3. RICH & LEGIT</div>
+            <div class="tab yellow" data-project="stl">4. StarForge Kits</div>
+            <div class="tab red" data-project="pod">5. Starship Drip</div>
+            <div class="tab red" data-project="music">6. Rockets & Rainbows</div>
         </div>
         
         <div class="quest-content">
@@ -855,7 +934,7 @@
                     </div>
                     
                     <div class="overview-project green">
-                        <h3><span class="icon">💰</span> 1. Custom Tools <span class="icon">💰</span></h3>
+                        <h3><span class="icon">💰</span> 1. Blue Anvil Labs <span class="icon">💰</span></h3>
                         <p class="energy-strategy" data-icon="💪🤖">Spend Full Time & Energy</p>
                         <div class="overview-progress">
                             <div class="overview-progress-bar">
@@ -865,21 +944,21 @@
                         </div>
                         <p class="overview-status">0/6 quests completed</p>
                     </div>
-                    
+
                     <div class="overview-project green">
-                        <h3><span class="icon">💰</span> 2. Learn Language Game <span class="icon">💰</span></h3>
+                        <h3><span class="icon">💰</span> 2. Lingo Playground <span class="icon">💰</span></h3>
                         <p class="energy-strategy" data-icon="💪🤖">Spend Full Time & Energy</p>
                         <div class="overview-progress">
                             <div class="overview-progress-bar">
-                                <div class="overview-progress-fill" style="width: 20%;"></div>
+                                <div class="overview-progress-fill" style="width: 17%;"></div>
                             </div>
-                            <span class="overview-percentage">20%</span>
+                            <span class="overview-percentage">17%</span>
                         </div>
-                        <p class="overview-status">1/5 quests completed</p>
+                        <p class="overview-status">1/6 quests completed</p>
                     </div>
-                    
+
                     <div class="overview-project yellow">
-                        <h3><span class="icon">🪙</span> 3. Finance Education Vids <span class="icon">🪙</span></h3>
+                        <h3><span class="icon">🪙</span> 3. RICH & LEGIT <span class="icon">🪙</span></h3>
                         <p class="energy-strategy" data-icon="🤖🤖">Automate, No Attention</p>
                         <div class="overview-progress">
                             <div class="overview-progress-bar">
@@ -889,9 +968,9 @@
                         </div>
                         <p class="overview-status">3/4 quests completed</p>
                     </div>
-                    
+
                     <div class="overview-project yellow">
-                        <h3><span class="icon">🪙</span> 4. STL Files <span class="icon">🪙</span></h3>
+                        <h3><span class="icon">🪙</span> 4. StarForge Kits <span class="icon">🪙</span></h3>
                         <p class="energy-strategy" data-icon="🤖🤖">Automate, No Attention</p>
                         <div class="overview-progress">
                             <div class="overview-progress-bar">
@@ -901,9 +980,9 @@
                         </div>
                         <p class="overview-status">3/5 quests completed</p>
                     </div>
-                    
+
                     <div class="overview-project red">
-                        <h3><span class="icon">✨</span> 5. POD <span class="icon">✨</span></h3>
+                        <h3><span class="icon">✨</span> 5. Starship Drip <span class="icon">✨</span></h3>
                         <p class="energy-strategy" data-icon="⏸️🤖">Paused Until Saturation</p>
                         <div class="overview-progress">
                             <div class="overview-progress-bar">
@@ -913,9 +992,9 @@
                         </div>
                         <p class="overview-status">2/4 quests completed</p>
                     </div>
-                    
+
                     <div class="overview-project red">
-                        <h3><span class="icon">✨</span> 6. Ambient Music <span class="icon">✨</span></h3>
+                        <h3><span class="icon">✨</span> 6. Rockets & Rainbows <span class="icon">✨</span></h3>
                         <p class="energy-strategy" data-icon="⏸️🤖">Paused Until Saturation</p>
                         <div class="overview-progress">
                             <div class="overview-progress-bar">
@@ -952,11 +1031,11 @@
                 </div>
             </div>
             
-            <!-- Custom Productivity Tools -->
+            <!-- Blue Anvil Labs -->
             <div class="project-panel" id="productivity">
                 <div class="coin-rain"></div>
                 <div class="project-header green-border">
-                    <h2 class="project-title">💰 Custom Productivity Tools - 6 Steps</h2>
+                    <h2 class="project-title">💰 Blue Anvil Labs - 6 Steps</h2>
                     <div class="project-strategy green-strategy">💪🤖 Spend Full Time & Energy 💪🤖</div>
                 </div>
                 <div class="progress-bar">
@@ -969,7 +1048,7 @@
                     <div class="checkpoint-text">2. Set up site</div>
                 </div>
                 <div class="checkpoint inactive">
-                    <div class="checkpoint-text">3. Upload sample tools</div>
+                    <div class="checkpoint-text">3. Build & Upload Extensive Leadmagnet Tools</div>
                 </div>
                 <div class="checkpoint inactive">
                     <div class="checkpoint-text">4. Make tutorials and funnel</div>
@@ -982,15 +1061,15 @@
                 </div>
             </div>
             
-            <!-- Learn Language Game -->
+            <!-- Lingo Playground -->
             <div class="project-panel" id="language">
                 <div class="coin-rain"></div>
                 <div class="project-header green-border">
-                    <h2 class="project-title">💰 Learn Language Game - 5 Steps</h2>
+                    <h2 class="project-title">💰 Lingo Playground - 6 Steps</h2>
                     <div class="project-strategy green-strategy">💪🤖 Spend Full Time & Energy 💪🤖</div>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: 20%;"></div>
+                    <div class="progress-fill" style="width: 17%;"></div>
                 </div>
                 <div class="checkpoint completed">
                     <div class="checkpoint-text">1. Get domain name</div>
@@ -1005,15 +1084,18 @@
                     <div class="checkpoint-text">4. Build games</div>
                 </div>
                 <div class="checkpoint inactive">
-                    <div class="checkpoint-text">5. Make gameplay videos</div>
+                    <div class="checkpoint-text">5. Set up patreon</div>
+                </div>
+                <div class="checkpoint inactive">
+                    <div class="checkpoint-text">6. Make gameplay videos</div>
                 </div>
             </div>
             
-            <!-- Finance Education Vids -->
+            <!-- RICH & LEGIT -->
             <div class="project-panel" id="finance">
                 <div class="coin-rain"></div>
                 <div class="project-header yellow-border">
-                    <h2 class="project-title">🪙 Finance Education Vids - 4 Steps</h2>
+                    <h2 class="project-title">🪙 RICH & LEGIT - 4 Steps</h2>
                     <div class="project-strategy yellow-strategy">🤖🤖 Automate, No Attention 🤖🤖</div>
                 </div>
                 <div class="progress-bar">
@@ -1033,11 +1115,11 @@
                 </div>
             </div>
             
-            <!-- POD -->
+            <!-- Starship Drip -->
             <div class="project-panel" id="pod">
                 <div class="coin-rain"></div>
                 <div class="project-header red-border">
-                    <h2 class="project-title">✨ POD - 4 Steps</h2>
+                    <h2 class="project-title">✨ Starship Drip - 4 Steps</h2>
                     <div class="project-strategy red-strategy">⏸️🤖 Paused Until Saturation ⏸️🤖</div>
                 </div>
                 <div class="progress-bar">
@@ -1057,11 +1139,11 @@
                 </div>
             </div>
             
-            <!-- STL Files -->
+            <!-- StarForge Kits -->
             <div class="project-panel" id="stl">
                 <div class="coin-rain"></div>
                 <div class="project-header yellow-border">
-                    <h2 class="project-title">🪙 STL Files - 5 Steps</h2>
+                    <h2 class="project-title">🪙 StarForge Kits - 5 Steps</h2>
                     <div class="project-strategy yellow-strategy">🤖🤖 Automate, No Attention 🤖🤖</div>
                 </div>
                 <div class="progress-bar">
@@ -1084,11 +1166,11 @@
                 </div>
             </div>
             
-            <!-- Ambient Music -->
+            <!-- Rockets & Rainbows -->
             <div class="project-panel" id="music">
                 <div class="coin-rain"></div>
                 <div class="project-header red-border">
-                    <h2 class="project-title">✨ Ambient Music - 3 Steps</h2>
+                    <h2 class="project-title">✨ Rockets & Rainbows - 3 Steps</h2>
                     <div class="project-strategy red-strategy">⏸️🤖 Paused Until Saturation ⏸️🤖</div>
                 </div>
                 <div class="progress-bar">
@@ -1142,18 +1224,19 @@
         // LOCAL STORAGE - Save/Load State
         // ========================================
         const STORAGE_KEY = 'questBoardState';
-        
+        const DURATION_STORAGE_KEY = 'questBoardDurations';
+
         function saveState() {
             const state = {};
             const panels = document.querySelectorAll('.project-panel');
-            
+
             panels.forEach(panel => {
                 const panelId = panel.id;
                 if (panelId === 'overview') return;
-                
+
                 const checkpoints = panel.querySelectorAll('.checkpoint');
                 state[panelId] = [];
-                
+
                 checkpoints.forEach(checkpoint => {
                     let status = 'inactive';
                     if (checkpoint.classList.contains('completed')) status = 'completed';
@@ -1161,22 +1244,22 @@
                     state[panelId].push(status);
                 });
             });
-            
+
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
-        
+
         function loadState() {
             const savedState = localStorage.getItem(STORAGE_KEY);
             if (!savedState) {
                 return;
             }
-            
+
             const state = JSON.parse(savedState);
-            
+
             Object.keys(state).forEach(panelId => {
                 const panel = document.getElementById(panelId);
                 if (!panel) return;
-                
+
                 const checkpoints = panel.querySelectorAll('.checkpoint');
                 state[panelId].forEach((status, index) => {
                     if (checkpoints[index]) {
@@ -1184,7 +1267,7 @@
                         checkpoints[index].classList.add(status);
                     }
                 });
-                
+
                 // Update progress bar
                 const allCheckpoints = panel.querySelectorAll('.checkpoint');
                 const completedCheckpoints = panel.querySelectorAll('.checkpoint.completed');
@@ -1194,9 +1277,201 @@
                     progressFill.style.width = completionPercent + '%';
                 }
             });
-            
+
             // Update overview after loading
             updateOverview();
+        }
+
+        // ========================================
+        // DURATION TRACKING
+        // ========================================
+        function saveDurations() {
+            const durations = {};
+            const panels = document.querySelectorAll('.project-panel');
+
+            panels.forEach(panel => {
+                const panelId = panel.id;
+                if (panelId === 'overview') return;
+
+                const checkpoints = panel.querySelectorAll('.checkpoint');
+                durations[panelId] = [];
+
+                checkpoints.forEach((checkpoint, index) => {
+                    const daysInput = checkpoint.querySelector('.duration-days');
+                    const weeksInput = checkpoint.querySelector('.duration-weeks');
+                    const monthsInput = checkpoint.querySelector('.duration-months');
+
+                    if (daysInput && weeksInput && monthsInput) {
+                        durations[panelId].push({
+                            days: parseInt(daysInput.value) || 0,
+                            weeks: parseInt(weeksInput.value) || 0,
+                            months: parseInt(monthsInput.value) || 0
+                        });
+                    } else {
+                        durations[panelId].push({ days: 0, weeks: 0, months: 0 });
+                    }
+                });
+            });
+
+            localStorage.setItem(DURATION_STORAGE_KEY, JSON.stringify(durations));
+        }
+
+        function loadDurations() {
+            const savedDurations = localStorage.getItem(DURATION_STORAGE_KEY);
+            if (!savedDurations) return {};
+            return JSON.parse(savedDurations);
+        }
+
+        function calculateTotalDays(days, weeks, months) {
+            return days + (weeks * 7) + (months * 30);
+        }
+
+        function updateDurationTotal(checkpoint) {
+            const daysInput = checkpoint.querySelector('.duration-days');
+            const weeksInput = checkpoint.querySelector('.duration-weeks');
+            const monthsInput = checkpoint.querySelector('.duration-months');
+            const totalDisplay = checkpoint.querySelector('.duration-total');
+
+            if (!daysInput || !weeksInput || !monthsInput || !totalDisplay) return;
+
+            const days = parseInt(daysInput.value) || 0;
+            const weeks = parseInt(weeksInput.value) || 0;
+            const months = parseInt(monthsInput.value) || 0;
+
+            const totalDays = calculateTotalDays(days, weeks, months);
+            totalDisplay.textContent = `Total: ${totalDays} days`;
+
+            saveDurations();
+            updateEffortRemaining();
+        }
+
+        function createDurationInputs(checkpoint, savedData = null) {
+            // Only add duration inputs if checkpoint is active or inactive (not completed)
+            if (checkpoint.classList.contains('completed')) return;
+
+            // Check if duration inputs already exist
+            if (checkpoint.querySelector('.duration-inputs')) return;
+
+            const durationDiv = document.createElement('div');
+            durationDiv.className = 'duration-inputs';
+
+            const days = savedData ? savedData.days : 0;
+            const weeks = savedData ? savedData.weeks : 0;
+            const months = savedData ? savedData.months : 0;
+
+            durationDiv.innerHTML = `
+                <div class="duration-input-group">
+                    <label>Days</label>
+                    <input type="number" class="duration-days" min="0" value="${days}" placeholder="0">
+                </div>
+                <div class="duration-input-group">
+                    <label>Weeks</label>
+                    <input type="number" class="duration-weeks" min="0" value="${weeks}" placeholder="0">
+                </div>
+                <div class="duration-input-group">
+                    <label>Months</label>
+                    <input type="number" class="duration-months" min="0" value="${months}" placeholder="0">
+                </div>
+                <div class="duration-total">Total: ${calculateTotalDays(days, weeks, months)} days</div>
+            `;
+
+            checkpoint.appendChild(durationDiv);
+
+            // Add event listeners to inputs
+            const daysInput = checkpoint.querySelector('.duration-days');
+            const weeksInput = checkpoint.querySelector('.duration-weeks');
+            const monthsInput = checkpoint.querySelector('.duration-months');
+
+            [daysInput, weeksInput, monthsInput].forEach(input => {
+                input.addEventListener('input', () => updateDurationTotal(checkpoint));
+                input.addEventListener('click', (e) => e.stopPropagation());
+            });
+        }
+
+        function updateEffortRemaining() {
+            const panels = document.querySelectorAll('.project-panel');
+            let totalDaysRemaining = 0;
+            let hasAnyDuration = false;
+
+            panels.forEach(panel => {
+                if (panel.id === 'overview') return;
+
+                const checkpoints = panel.querySelectorAll('.checkpoint');
+                checkpoints.forEach(checkpoint => {
+                    // Only count active and inactive (locked) tasks
+                    if (checkpoint.classList.contains('active') || checkpoint.classList.contains('inactive')) {
+                        const daysInput = checkpoint.querySelector('.duration-days');
+                        const weeksInput = checkpoint.querySelector('.duration-weeks');
+                        const monthsInput = checkpoint.querySelector('.duration-months');
+
+                        if (daysInput && weeksInput && monthsInput) {
+                            const days = parseInt(daysInput.value) || 0;
+                            const weeks = parseInt(weeksInput.value) || 0;
+                            const months = parseInt(monthsInput.value) || 0;
+                            const total = calculateTotalDays(days, weeks, months);
+
+                            if (total > 0) {
+                                hasAnyDuration = true;
+                                totalDaysRemaining += total;
+                            }
+                        }
+                    }
+                });
+
+                // Update or remove effort remaining display in panel
+                const projectHeader = panel.querySelector('.project-header');
+                if (projectHeader) {
+                    let effortDiv = projectHeader.querySelector('.effort-remaining');
+
+                    // Calculate this panel's remaining effort
+                    let panelDaysRemaining = 0;
+                    panel.querySelectorAll('.checkpoint').forEach(checkpoint => {
+                        if (checkpoint.classList.contains('active') || checkpoint.classList.contains('inactive')) {
+                            const daysInput = checkpoint.querySelector('.duration-days');
+                            const weeksInput = checkpoint.querySelector('.duration-weeks');
+                            const monthsInput = checkpoint.querySelector('.duration-months');
+
+                            if (daysInput && weeksInput && monthsInput) {
+                                const days = parseInt(daysInput.value) || 0;
+                                const weeks = parseInt(weeksInput.value) || 0;
+                                const months = parseInt(monthsInput.value) || 0;
+                                panelDaysRemaining += calculateTotalDays(days, weeks, months);
+                            }
+                        }
+                    });
+
+                    if (panelDaysRemaining > 0) {
+                        if (!effortDiv) {
+                            effortDiv = document.createElement('div');
+                            effortDiv.className = 'effort-remaining';
+                            projectHeader.appendChild(effortDiv);
+                        }
+                        effortDiv.innerHTML = `⚔️ Estimated Effort Remaining: <strong>${panelDaysRemaining} days</strong> ⚔️`;
+                    } else if (effortDiv) {
+                        effortDiv.remove();
+                    }
+                }
+            });
+        }
+
+        function initializeDurationInputs() {
+            const savedDurations = loadDurations();
+            const panels = document.querySelectorAll('.project-panel');
+
+            panels.forEach(panel => {
+                const panelId = panel.id;
+                if (panelId === 'overview') return;
+
+                const checkpoints = panel.querySelectorAll('.checkpoint');
+                checkpoints.forEach((checkpoint, index) => {
+                    const savedData = savedDurations[panelId] && savedDurations[panelId][index]
+                        ? savedDurations[panelId][index]
+                        : null;
+                    createDurationInputs(checkpoint, savedData);
+                });
+            });
+
+            updateEffortRemaining();
         }
         
         // ========================================
@@ -1240,29 +1515,84 @@
         }
         
         function playConfirmSound() {
-            // Pleasant ASMR-like confirmation sound
-            const oscillator1 = audioContext.createOscillator();
-            const oscillator2 = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator1.connect(gainNode);
-            oscillator2.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator1.type = 'sine';
-            oscillator2.type = 'sine';
-            
-            // Pleasant chord
-            oscillator1.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
-            oscillator2.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
-            
-            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-            
-            oscillator1.start(audioContext.currentTime);
-            oscillator2.start(audioContext.currentTime);
-            oscillator1.stop(audioContext.currentTime + 0.3);
-            oscillator2.stop(audioContext.currentTime + 0.3);
+            // Satisfying ascending chord progression with shimmer
+            const now = audioContext.currentTime;
+
+            // First chord (C major)
+            const osc1a = audioContext.createOscillator();
+            const osc1b = audioContext.createOscillator();
+            const osc1c = audioContext.createOscillator();
+            const gain1 = audioContext.createGain();
+
+            osc1a.connect(gain1);
+            osc1b.connect(gain1);
+            osc1c.connect(gain1);
+            gain1.connect(audioContext.destination);
+
+            osc1a.type = 'sine';
+            osc1b.type = 'sine';
+            osc1c.type = 'triangle';  // Add warmth
+
+            osc1a.frequency.setValueAtTime(523.25, now); // C5
+            osc1b.frequency.setValueAtTime(659.25, now); // E5
+            osc1c.frequency.setValueAtTime(783.99, now); // G5
+
+            gain1.gain.setValueAtTime(0.15, now);
+            gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+
+            osc1a.start(now);
+            osc1b.start(now);
+            osc1c.start(now);
+            osc1a.stop(now + 0.4);
+            osc1b.stop(now + 0.4);
+            osc1c.stop(now + 0.4);
+
+            // Second chord (G major - higher, brighter)
+            const osc2a = audioContext.createOscillator();
+            const osc2b = audioContext.createOscillator();
+            const osc2c = audioContext.createOscillator();
+            const gain2 = audioContext.createGain();
+
+            osc2a.connect(gain2);
+            osc2b.connect(gain2);
+            osc2c.connect(gain2);
+            gain2.connect(audioContext.destination);
+
+            osc2a.type = 'sine';
+            osc2b.type = 'sine';
+            osc2c.type = 'triangle';
+
+            osc2a.frequency.setValueAtTime(783.99, now + 0.12); // G5
+            osc2b.frequency.setValueAtTime(987.77, now + 0.12); // B5
+            osc2c.frequency.setValueAtTime(1174.66, now + 0.12); // D6
+
+            gain2.gain.setValueAtTime(0, now + 0.12);
+            gain2.gain.linearRampToValueAtTime(0.18, now + 0.15);
+            gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+
+            osc2a.start(now + 0.12);
+            osc2b.start(now + 0.12);
+            osc2c.start(now + 0.12);
+            osc2a.stop(now + 0.6);
+            osc2b.stop(now + 0.6);
+            osc2c.stop(now + 0.6);
+
+            // Shimmer/sparkle effect
+            const shimmer = audioContext.createOscillator();
+            const shimmerGain = audioContext.createGain();
+
+            shimmer.connect(shimmerGain);
+            shimmerGain.connect(audioContext.destination);
+
+            shimmer.type = 'sine';
+            shimmer.frequency.setValueAtTime(2093, now + 0.15); // C7 - very high sparkle
+
+            shimmerGain.gain.setValueAtTime(0, now + 0.15);
+            shimmerGain.gain.linearRampToValueAtTime(0.08, now + 0.18);
+            shimmerGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+
+            shimmer.start(now + 0.15);
+            shimmer.stop(now + 0.5);
         }
         
         // ========================================
@@ -1314,19 +1644,44 @@
                 // Change from active to completed
                 checkpoint.classList.remove('active');
                 checkpoint.classList.add('completed');
-                
+
+                // Remove duration inputs when task is completed
+                const durationDiv = checkpoint.querySelector('.duration-inputs');
+                if (durationDiv) {
+                    durationDiv.remove();
+                }
+
                 // Auto-activate next task
                 const nextCheckpoint = checkpoint.nextElementSibling;
                 if (nextCheckpoint && nextCheckpoint.classList.contains('checkpoint') && nextCheckpoint.classList.contains('inactive')) {
                     nextCheckpoint.classList.remove('inactive');
                     nextCheckpoint.classList.add('active');
+                    // Add duration inputs to newly activated task if it doesn't have them
+                    const savedDurations = loadDurations();
+                    const activePanel = document.querySelector('.project-panel.active');
+                    const checkpoints = activePanel.querySelectorAll('.checkpoint');
+                    const index = Array.from(checkpoints).indexOf(nextCheckpoint);
+                    const savedData = savedDurations[activePanel.id] && savedDurations[activePanel.id][index]
+                        ? savedDurations[activePanel.id][index]
+                        : null;
+                    createDurationInputs(nextCheckpoint, savedData);
                 }
             } else if (action === 'mark-active') {
                 // Change from inactive to active OR from completed to active
                 checkpoint.classList.remove('inactive', 'completed');
                 checkpoint.classList.add('active');
+
+                // Add duration inputs if they don't exist
+                const activePanel = document.querySelector('.project-panel.active');
+                const checkpoints = activePanel.querySelectorAll('.checkpoint');
+                const index = Array.from(checkpoints).indexOf(checkpoint);
+                const savedDurations = loadDurations();
+                const savedData = savedDurations[activePanel.id] && savedDurations[activePanel.id][index]
+                    ? savedDurations[activePanel.id][index]
+                    : null;
+                createDurationInputs(checkpoint, savedData);
             }
-            
+
             // Update progress bar
             const activePanel = document.querySelector('.project-panel.active');
             const allCheckpoints = activePanel.querySelectorAll('.checkpoint');
@@ -1334,21 +1689,25 @@
             const completionPercent = (completedCheckpoints.length / allCheckpoints.length) * 100;
             const progressFill = activePanel.querySelector('.progress-fill');
             progressFill.style.width = completionPercent + '%';
-            
+
             // Update the coin rain with new completion percentage
             const activeTab = document.querySelector('.tab.active');
             if (activePanel && activeTab) {
-                const tabColor = activeTab.classList.contains('green') ? 'green' : 
-                                activeTab.classList.contains('yellow') ? 'yellow' : 
+                const tabColor = activeTab.classList.contains('green') ? 'green' :
+                                activeTab.classList.contains('yellow') ? 'yellow' :
                                 activeTab.classList.contains('blue') ? 'blue' : 'red';
                 initCoinRain(activePanel, tabColor);
             }
-            
+
             // Update overview panel
             updateOverview();
-            
+
+            // Update effort remaining display
+            updateEffortRemaining();
+
             // Save state to localStorage
             saveState();
+            saveDurations();
         }
         
         function updateOverview() {
@@ -1584,24 +1943,27 @@
         
         // Initialize checkpoint click handlers
         initCheckpointClickHandlers();
-        
+
         // Load saved state from localStorage
         loadState();
+
+        // Initialize duration inputs
+        initializeDurationInputs();
         
         // Make overview project cards clickable
         document.querySelectorAll('.overview-project').forEach(card => {
             card.addEventListener('click', () => {
                 const projectName = card.querySelector('h3').textContent;
                 let projectId = '';
-                
+
                 if (projectName.includes('Tavern Upkeep')) projectId = 'tavern';
-                else if (projectName.includes('Custom Tools')) projectId = 'productivity';
-                else if (projectName.includes('Learn Language')) projectId = 'language';
-                else if (projectName.includes('Finance')) projectId = 'finance';
-                else if (projectName.includes('STL')) projectId = 'stl';
-                else if (projectName.includes('POD')) projectId = 'pod';
-                else if (projectName.includes('Ambient Music')) projectId = 'music';
-                
+                else if (projectName.includes('Blue Anvil Labs')) projectId = 'productivity';
+                else if (projectName.includes('Lingo Playground')) projectId = 'language';
+                else if (projectName.includes('RICH & LEGIT')) projectId = 'finance';
+                else if (projectName.includes('StarForge Kits')) projectId = 'stl';
+                else if (projectName.includes('Starship Drip')) projectId = 'pod';
+                else if (projectName.includes('Rockets & Rainbows')) projectId = 'music';
+
                 if (projectId) {
                     const targetTab = document.querySelector(`[data-project="${projectId}"]`);
                     if (targetTab) {
