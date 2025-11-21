@@ -1095,13 +1095,6 @@
             </div>
             <span class="debug-value" id="debugValue">0%</span>
         </div>
-        <div class="debug-controls" style="margin-top: 15px;">
-            <span class="debug-label">Icon Frequency:</span>
-            <div class="debug-slider">
-                <input type="range" id="frequencySlider" min="100" max="3000" value="500" step="100">
-            </div>
-            <span class="debug-value" id="frequencyValue">500ms</span>
-        </div>
     </div>
 
     <div class="quest-board">
@@ -1588,6 +1581,12 @@
                 `;
 
                 checkpoint.appendChild(durationDiv);
+
+                // Set initial icon state based on isExpanded
+                const icon = expanderButton.querySelector('.duration-expander-icon');
+                if (isExpanded && icon) {
+                    icon.classList.add('expanded');
+                }
 
                 expanderButton.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -2440,25 +2439,6 @@
                 initCoinRain(activePanel, tabColor);
             }
         });
-
-        // Frequency slider controls
-        const frequencySlider = document.getElementById('frequencySlider');
-        const frequencyValue = document.getElementById('frequencyValue');
-
-        frequencySlider.addEventListener('input', (e) => {
-            const interval = e.target.value;
-            frequencyValue.textContent = interval + 'ms';
-
-            // Update the active panel's coin rain with new frequency
-            const activePanel = document.querySelector('.project-panel.active');
-            const activeTab = document.querySelector('.tab.active');
-            if (activePanel && activeTab) {
-                const tabColor = activeTab.classList.contains('green') ? 'green' :
-                                activeTab.classList.contains('yellow') ? 'yellow' :
-                                activeTab.classList.contains('blue') ? 'blue' : 'red';
-                initCoinRain(activePanel, tabColor);
-            }
-        });
         
         // Tab switching functionality
         const tabs = document.querySelectorAll('.tab');
@@ -2505,9 +2485,25 @@
             // Reset position tracking
             lastPosition = -1;
 
-            // Get drop interval from frequency slider
-            const frequencySlider = document.getElementById('frequencySlider');
-            const dropInterval = frequencySlider ? parseInt(frequencySlider.value) : 500;
+            // Calculate completion percentage
+            const allCheckpoints = panel.querySelectorAll('.checkpoint');
+            const completedCheckpoints = panel.querySelectorAll('.checkpoint.completed');
+            const totalCheckpoints = allCheckpoints.length;
+            const completedCount = completedCheckpoints.length;
+
+            const completionPercent = totalCheckpoints > 0 ? (completedCount / totalCheckpoints) * 100 : 0;
+
+            // If 0% complete, don't drop anything
+            if (completionPercent === 0) {
+                return;
+            }
+
+            // Calculate drop interval based on completion percentage
+            // At 100%: baseInterval (500ms = 2 items/sec)
+            // At 90%: baseInterval + 1 * intervalIncrement (1000ms = 1 item/sec)
+            // At 80%: baseInterval + 2 * intervalIncrement (1500ms = 0.67 items/sec)
+            const percentNotComplete = 100 - completionPercent;
+            const dropInterval = DROP_CONFIG.baseInterval + (percentNotComplete / 10) * DROP_CONFIG.intervalIncrement;
             
             // Determine which emoji to use based on tab color
             let emoji = '🪙'; // default yellow
