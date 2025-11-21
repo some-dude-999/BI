@@ -2,17 +2,17 @@
 PROJECT: Business Intelligence / Idea Analysis System
 COMPONENT: Centralized Idea Scores Viewer with Top Secret Theme
 CREATED: 2025-11-21
-LAST UPDATED: 2025-11-21 - Critical bug fixes: CSV validation, contextual labeling, and proper data formatting
+LAST UPDATED: 2025-11-21 - Added date column support for MarketTop2025 predictions
 
 DATA SOURCES:
 - Folder: AGI IDEA GEN/*.csv - AGI-focused business ideas with LLM evaluations (Scores: 0-10)
 - Folder: FutureHighProbIdeas/*.csv - Future high-probability business ideas for AI age (Scores: 0-10)
 - Folder: HighestProbIdeas/*.csv - Highest probability business ideas (Scores: 0-10)
-- Folder: MarketTop2025/*.csv - Market top price predictions for 2025 (Values: Dollar amounts)
+- Folder: MarketTop2025/*.csv - Market top price predictions for 2025 (Values: Dollar amounts + Dates)
 - Each folder contains 10 CSV files (ChatGPT 1, ChatGPT 2, Claude 1, Claude 2, Gemini 1, Gemini 2, Grok 1, Grok 2, Kimi 1, Kimi 2)
-- CSV Format: "Name", Value, "Reasoning/Comment"
-  * Score datasets: Value is 0-10 rating
-  * Price datasets: Value is dollar amount
+- CSV Format varies by dataset:
+  * Score datasets (AGI, Future, Highest): 3 columns - "Name", Score (0-10), "Reasoning"
+  * Price dataset (MarketTop2025): 4 columns - "Name", Price, Date (YYYY-MM), "Reasoning"
 
 FUNCTIONALITY:
 - Main Purpose: Consolidated view for all idea score reports from different research runs
@@ -76,6 +76,15 @@ BUG FIXES (2025-11-21):
    - No more NaN entries
    - No more CSS code appearing as data
    - Consistent formatting across all views
+
+5. **Date Column Support (2025-11-21)**: Added full support for date predictions in MarketTop2025
+   - Parser now handles 4-column CSV format (name, price, date, reasoning)
+   - Individual LLM tables show "Predicted Date" column
+   - Combined table shows "Avg Predicted Date" calculated from all LLMs
+   - Date averaging uses numeric conversion (YYYY-MM -> decimal year)
+   - formatDate() displays dates as "MMM YYYY" (e.g., "Oct 2025")
+   - Modals show predicted dates for price targets
+   - ALL data from CSV is now preserved and displayed
 
 NOTES:
 - This is a master viewer that prevents the need for 100+ separate HTML files
