@@ -391,6 +391,14 @@
             color: #1a5a8b;
         }
 
+        .checkpoint.project-purple {
+            border-color: #9b59b6;
+        }
+
+        .checkpoint.project-purple .checkpoint-text {
+            color: #6c3483;
+        }
+
         .checkpoint.completed {
             background:
                 /* Paper texture */
@@ -1131,6 +1139,13 @@
                 strategyClass: 'blue-strategy',
                 tabClass: 'blue',
                 strategy: '🪚🪵 Daily Tavern Upkeep 🪚🪵'
+            },
+            purple: {
+                emoji: '🔮',
+                borderClass: 'purple-border',
+                strategyClass: 'purple-strategy',
+                tabClass: 'purple',
+                strategy: '♾️ Passive Always-Active ♾️'
             }
         };
 
@@ -1825,14 +1840,15 @@
 
             // Always add the daily squat task first (passive task - not tied to any project checkpoint)
             const passiveTaskDiv = document.createElement('div');
-            passiveTaskDiv.className = 'checkpoint completed project-blue';
+            passiveTaskDiv.className = 'checkpoint active project-purple';
             passiveTaskDiv.innerHTML = `
                 <div class="checkpoint-row">
                     <div class="checkpoint-text">🍖 Daily Squat and Deadlift</div>
-                    <div class="checkpoint-status-icon">🏰</div>
+                    <div class="checkpoint-status-icon">⚔️</div>
                 </div>
             `;
             passiveTaskDiv.style.cursor = 'default';
+            passiveTaskDiv.onclick = null; // Prevent any clicks
             dailyTasksList.appendChild(passiveTaskDiv);
 
             // Get all starred tasks
