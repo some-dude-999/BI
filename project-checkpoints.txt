@@ -1,0 +1,160 @@
+=== project-checkpoints.txt ===
+PROJECT: BI (Business Intelligence / Project Tracking)
+COMPONENT: Dynamic Quest Board - Project Checkpoint Tracker
+CREATED: 2025-11-29
+LAST UPDATED: 2025-11-29 - Complete architectural refactor to dynamic data-driven system
+
+DATA SOURCES:
+- JavaScript Object: ALL_PROJECTS - Centralized data structure containing all projects (active + inactive)
+- JavaScript Array: ACTIVE_PROJECTS - Controls which projects display and their order
+- localStorage: 'questBoardState' - Stores checkpoint states (active/inactive/completed)
+- localStorage: 'questBoardDurations' - Stores duration estimates for tasks
+- localStorage: 'questBoardStarred' - Stores starred/favorited tasks
+- User Input: Click interactions to change checkpoint states and star tasks
+
+ARCHITECTURE:
+
+1. **Data Structure** (Centralized & Dynamic):
+   - ALL_PROJECTS: Object containing all project definitions
+     * Each project has: id, name, type, steps array
+     * Inactive projects marked with inactive: true flag
+
+   - PROJECT_TYPES: Mapping of types to styling
+     * green: 💰 "Spend Full Time & Energy" (high priority)
+     * yellow: 🪙 "Automate, No Attention" (automated income)
+     * red: ✨ "Paused Until Saturation" (paused projects)
+     * blue: 🍖 "Daily Tavern Upkeep" (maintenance tasks)
+     * Each type defines: emoji, borderClass, strategyClass, tabClass, strategy
+
+   - ACTIVE_PROJECTS: Array of project IDs to display
+     * Order determines tab numbering (0, 1, 2, 3...)
+     * Reordering this array automatically renumbers everything
+
+2. **Dynamic Rendering System**:
+   - renderTabs(): Generates all tab HTML from ACTIVE_PROJECTS
+   - renderProjects(): Generates all project panel HTML from ACTIVE_PROJECTS
+   - Everything auto-generated: no hardcoded HTML for tabs or projects
+   - Type-based styling: changing project.type updates all colors/emojis/strategies
+
+3. **State Management**:
+   - localStorage stores checkpoint states by project ID
+   - State loaded after rendering, applied to dynamically generated elements
+   - Progress bars auto-calculated from checkpoint completion percentages
+
+FUNCTIONALITY:
+
+Main Purpose: Track multiple projects with visual quest board interface
+
+Key Functions:
+  * renderTabs() - Dynamically generates tab navigation with auto-numbering
+  * renderProjects() - Dynamically generates project panels with checkpoints
+  * setupTabSwitching() - Event delegation for tab navigation (supports dynamic content)
+  * saveState() - Persists checkpoint states to localStorage
+  * loadState() - Restores checkpoint states from localStorage
+  * initCoinRain() - Animated coin rain based on project completion percentage
+  * updateOverview() - Updates overview cards with project progress
+  * updateAdventuresOfDay() - Displays starred daily tasks
+
+Event Handlers:
+  - Tab clicks: Switch between project views (event delegation)
+  - Checkpoint clicks: Open modal to change state (active/locked/completed)
+  - Star clicks: Toggle tasks for "Adventures of the Day"
+  - Duration inputs: Track estimated time for tasks
+
+DEPENDENCIES:
+
+External Libraries: None (vanilla JavaScript)
+Google Fonts: 'MedievalSharp' (titles), 'Merriweather' (body)
+Project Files: None (standalone HTML file)
+APIs Required: None (localStorage only)
+
+INTEGRATION:
+
+Receives data from: User interactions, localStorage
+Sends data to: localStorage (state persistence)
+Triggers: Page load → render → load state → initialize features
+
+HOW TO MODIFY:
+
+**To Add a New Project:**
+1. Add to ALL_PROJECTS object with id, name, type, steps array
+2. Add id to ACTIVE_PROJECTS array in desired position
+3. Everything else auto-generates (tabs, colors, emojis, numbering)
+
+**To Delete a Project (soft delete):**
+1. Add `inactive: true` flag to project in ALL_PROJECTS
+2. Remove id from ACTIVE_PROJECTS array
+3. Project data preserved but hidden from display
+
+**To Restore a Deleted Project:**
+1. Remove `inactive: true` flag
+2. Add id back to ACTIVE_PROJECTS array
+
+**To Reorder Projects:**
+1. Simply reorder the ACTIVE_PROJECTS array
+2. Tabs automatically renumber (0, 1, 2, 3...)
+
+**To Change Project Priority/Color:**
+1. Change the `type` field in ALL_PROJECTS
+2. Valid types: 'green', 'yellow', 'red', 'blue'
+3. All colors, emojis, and strategies auto-update
+
+**To Add/Remove Steps:**
+1. Modify the `steps` array in ALL_PROJECTS
+2. Step count and numbering auto-update
+
+CURRENT PROJECTS:
+
+Active (in ACTIVE_PROJECTS):
+1. tavern - Tavern Upkeep (blue) - 3 steps - Daily maintenance
+2. productivity - Blue Anvil Labs (green) - 6 steps - Business/client work
+3. language - Lingo Playground (yellow) - 6 steps - Language learning platform
+4. stl - StarForge Kits (red) - 5 steps - 3D printing marketplace
+
+Inactive (not displayed):
+- aibioe - Get a Job in AI Bio E (green) - 1 step
+- finance - RICH & LEGIT (red) - 4 steps
+
+CORRECTIONS & CLARIFICATIONS:
+
+Initially thought: Projects and tabs were hardcoded in HTML with manual numbering
+Actually: Now fully dynamic - everything generated from centralized data structure
+Why this matters:
+  - Prevents numbering errors when reordering
+  - Makes adding/removing projects trivial
+  - Single source of truth (ALL_PROJECTS)
+  - Changing project type automatically updates all styling
+  - No more brittle hardcoded HTML
+
+Initially thought: Deleted projects should be removed from code
+Actually: Deleted projects stored as inactive in ALL_PROJECTS
+Why this matters:
+  - Easy to restore projects
+  - Historical record maintained
+  - Can temporarily hide/show projects
+
+NOTES:
+
+**For Future LLMs:**
+- NEVER hardcode projects in HTML - always use ALL_PROJECTS
+- To display a project: add to ACTIVE_PROJECTS array
+- To hide a project: remove from ACTIVE_PROJECTS (keep in ALL_PROJECTS)
+- Tab numbering is automatic based on ACTIVE_PROJECTS order
+- All styling comes from PROJECT_TYPES[project.type]
+- localStorage keys must match project IDs for state persistence
+
+**System Benefits:**
+- Extremely flexible: reorder/add/remove projects with 1-line changes
+- Type-safe styling: can't have mismatched colors/emojis
+- Auto-numbering: impossible to have wrong tab numbers
+- Single source of truth: ALL_PROJECTS defines everything
+- Easy debugging: all project data in one place
+
+**Potential Future Enhancements:**
+- Project categories/grouping
+- Project dependencies (unlock when others complete)
+- Export/import project data as JSON
+- Multiple project boards
+- Project templates
+- Drag-and-drop reordering
+===
