@@ -2,7 +2,7 @@
 PROJECT: BI (Business Intelligence / Project Tracking)
 COMPONENT: Dynamic Quest Board - Project Checkpoint Tracker
 CREATED: 2025-11-29
-LAST UPDATED: 2025-11-29 - Complete architectural refactor to dynamic data-driven system
+LAST UPDATED: 2025-11-29 - Added priority enforcement system for task management
 
 DATA SOURCES:
 - JavaScript Object: ALL_PROJECTS - Centralized data structure containing all projects (active + inactive)
@@ -41,6 +41,16 @@ ARCHITECTURE:
    - State loaded after rendering, applied to dynamically generated elements
    - Progress bars auto-calculated from checkpoint completion percentages
 
+4. **Priority Enforcement System**:
+   - Ensures work happens in priority order (Tab 0 → Tab 1 → Tab 2 → Tab 3)
+   - Rule: Cannot work on Tab N unless all higher priority tabs (0...N-1) with incomplete tasks have ≥1 active task
+   - Validation happens at two points:
+     * On modal open: Blocks interaction if trying to activate task in lower priority project
+     * On deactivation: Prevents removing last active task if lower priority projects are active
+   - Auto-activation helper: Offers to activate a task in the blocking project
+   - Clear error messages show tab numbers and project names
+   - Enforces focus on highest priority work first
+
 FUNCTIONALITY:
 
 Main Purpose: Track multiple projects with visual quest board interface
@@ -49,6 +59,8 @@ Key Functions:
   * renderTabs() - Dynamically generates tab navigation with auto-numbering
   * renderProjects() - Dynamically generates project panels with checkpoints
   * setupTabSwitching() - Event delegation for tab navigation (supports dynamic content)
+  * validatePriorityOrder() - Checks if priority rules are satisfied before allowing work on project
+  * autoActivateHigherPriorityTask() - Auto-activates first incomplete task in higher priority project
   * saveState() - Persists checkpoint states to localStorage
   * loadState() - Restores checkpoint states from localStorage
   * initCoinRain() - Animated coin rain based on project completion percentage
@@ -149,6 +161,15 @@ NOTES:
 - Auto-numbering: impossible to have wrong tab numbers
 - Single source of truth: ALL_PROJECTS defines everything
 - Easy debugging: all project data in one place
+
+**Priority Enforcement Rules:**
+- Work must happen in tab order (0 → 1 → 2 → 3...)
+- If Tab N has incomplete tasks, you MUST have ≥1 active task in Tab N before working on Tab N+1
+- Example: Cannot work on Tab 2 if Tab 0 or Tab 1 has incomplete tasks with no active tasks
+- When blocked: System offers to auto-activate a task in the blocking project
+- Cannot deactivate last active task if lower priority projects have active tasks
+- This ensures you always focus on highest priority work first
+- Reordering ACTIVE_PROJECTS array changes priority order automatically
 
 **Potential Future Enhancements:**
 - Project categories/grouping
