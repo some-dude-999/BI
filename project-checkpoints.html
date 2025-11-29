@@ -1109,124 +1109,11 @@
             </div>
         </div>
 
-        <div class="tabs">
-            <div class="tab blue active" data-project="tavern">0 🍖</div>
-            <div class="tab green" data-project="aibioe">1 💰</div>
-            <div class="tab yellow" data-project="productivity">2 🪙</div>
-            <div class="tab yellow" data-project="language">3 🪙</div>
-            <div class="tab red" data-project="finance">4 ✨</div>
-            <div class="tab red" data-project="stl">5 ✨</div>
-        </div>
+        <!-- Tabs will be dynamically generated -->
+        <div class="tabs"></div>
 
-        <div class="quest-content">
-            <!-- Tavern Upkeep -->
-            <div class="project-panel active" id="tavern">
-                <div class="coin-rain"></div>
-                <div class="project-header blue-border">
-                    <h2 class="project-title">🍖 Tavern Upkeep - 3 Steps</h2>
-                    <div class="project-strategy blue-strategy">🪚🪵 Daily Tavern Upkeep 🪚🪵</div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 0%;"></div>
-                </div>
-                <div class="checkpoint active">
-                    <div class="checkpoint-text">1. Clean Zen Pest Free House</div>
-                </div>
-                <div class="checkpoint inactive">
-                    <div class="checkpoint-text">2. Fix Water Leak</div>
-                </div>
-                <div class="checkpoint inactive">
-                    <div class="checkpoint-text">3. Collect Refunds & Payments</div>
-                </div>
-            </div>
-
-            <!-- Blue Anvil Labs -->
-            <div class="project-panel" id="productivity">
-                <div class="coin-rain"></div>
-                <div class="project-header green-border">
-                    <h2 class="project-title">💰 Blue Anvil Labs - 6 Steps</h2>
-                    <div class="project-strategy green-strategy">💪🤖 Spend Full Time & Energy 💪🤖</div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 0%;"></div>
-                </div>
-                <div class="checkpoint active">
-                    <div class="checkpoint-text">1. Get Domain Name</div>
-                </div>
-                <div class="checkpoint inactive">
-                    <div class="checkpoint-text">2. Set Up Site</div>
-                </div>
-                <div class="checkpoint inactive">
-                    <div class="checkpoint-text">3. Build & Upload Extensive Leadmagnet Tools</div>
-                </div>
-                <div class="checkpoint inactive">
-                    <div class="checkpoint-text">4. Make Tutorials and Funnel</div>
-                </div>
-                <div class="checkpoint inactive">
-                    <div class="checkpoint-text">5. Call Businesses to Get Clients</div>
-                </div>
-                <div class="checkpoint inactive">
-                    <div class="checkpoint-text">6. Hire People to Make Future Tools</div>
-                </div>
-            </div>
-            
-            <!-- Lingo Playground -->
-            <div class="project-panel" id="language">
-                <div class="coin-rain"></div>
-                <div class="project-header yellow-border">
-                    <h2 class="project-title">🪙 Lingo Playground - 6 Steps</h2>
-                    <div class="project-strategy yellow-strategy">🤖🤖 Automate, No Attention 🤖🤖</div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 17%;"></div>
-                </div>
-                <div class="checkpoint completed">
-                    <div class="checkpoint-text">1. Get Domain Name</div>
-                </div>
-                <div class="checkpoint active">
-                    <div class="checkpoint-text">2. Set Up Site</div>
-                </div>
-                <div class="checkpoint active">
-                    <div class="checkpoint-text">3. Build Wordpacks</div>
-                </div>
-                <div class="checkpoint inactive">
-                    <div class="checkpoint-text">4. Build Games</div>
-                </div>
-                <div class="checkpoint inactive">
-                    <div class="checkpoint-text">5. Set Up Patreon</div>
-                </div>
-                <div class="checkpoint inactive">
-                    <div class="checkpoint-text">6. Make Gameplay Videos</div>
-                </div>
-            </div>
-
-            <!-- StarForge Kits -->
-            <div class="project-panel" id="stl">
-                <div class="coin-rain"></div>
-                <div class="project-header red-border">
-                    <h2 class="project-title">✨ StarForge Kits - 5 Steps</h2>
-                    <div class="project-strategy red-strategy">⏸️🤖 Paused Until Saturation ⏸️🤖</div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 60%;"></div>
-                </div>
-                <div class="checkpoint completed">
-                    <div class="checkpoint-text">1. Set Up Website</div>
-                </div>
-                <div class="checkpoint completed">
-                    <div class="checkpoint-text">2. Automate Production</div>
-                </div>
-                <div class="checkpoint completed">
-                    <div class="checkpoint-text">3. Automate Upload to Site and Cults3d and Pinterest</div>
-                </div>
-                <div class="checkpoint active">
-                    <div class="checkpoint-text">4. Scale Out to 5k Designs</div>
-                </div>
-                <div class="checkpoint inactive">
-                    <div class="checkpoint-text">5. Scale Out to 10k Designs</div>
-                </div>
-            </div>
-        </div>
+        <!-- Projects will be dynamically generated -->
+        <div class="quest-content"></div>
     </div>
     
     <!-- Modal for task state changes -->
@@ -1246,6 +1133,171 @@
     </div>
     
     <script>
+        // ========================================
+        // CENTRALIZED PROJECT DATA STRUCTURE
+        // ========================================
+
+        // Type-to-Style Mapping
+        const PROJECT_TYPES = {
+            green: {
+                emoji: '💰',
+                borderClass: 'green-border',
+                strategyClass: 'green-strategy',
+                tabClass: 'green',
+                strategy: '💪🤖 Spend Full Time & Energy 💪🤖'
+            },
+            yellow: {
+                emoji: '🪙',
+                borderClass: 'yellow-border',
+                strategyClass: 'yellow-strategy',
+                tabClass: 'yellow',
+                strategy: '🤖🤖 Automate, No Attention 🤖🤖'
+            },
+            red: {
+                emoji: '✨',
+                borderClass: 'red-border',
+                strategyClass: 'red-strategy',
+                tabClass: 'red',
+                strategy: '⏸️🤖 Paused Until Saturation ⏸️🤖'
+            },
+            blue: {
+                emoji: '🍖',
+                borderClass: 'blue-border',
+                strategyClass: 'blue-strategy',
+                tabClass: 'blue',
+                strategy: '🪚🪵 Daily Tavern Upkeep 🪚🪵'
+            }
+        };
+
+        // All Projects (Active + Inactive)
+        const ALL_PROJECTS = {
+            tavern: {
+                id: 'tavern',
+                name: 'Tavern Upkeep',
+                type: 'blue',
+                steps: [
+                    'Clean Zen Pest Free House',
+                    'Fix Water Leak',
+                    'Collect Refunds & Payments'
+                ]
+            },
+            productivity: {
+                id: 'productivity',
+                name: 'Blue Anvil Labs',
+                type: 'green',
+                steps: [
+                    'Get Domain Name',
+                    'Set Up Site',
+                    'Build & Upload Extensive Leadmagnet Tools',
+                    'Make Tutorials and Funnel',
+                    'Call Businesses to Get Clients',
+                    'Hire People to Make Future Tools'
+                ]
+            },
+            language: {
+                id: 'language',
+                name: 'Lingo Playground',
+                type: 'yellow',
+                steps: [
+                    'Get Domain Name',
+                    'Set Up Site',
+                    'Build Wordpacks',
+                    'Build Games',
+                    'Set Up Patreon',
+                    'Make Gameplay Videos'
+                ]
+            },
+            stl: {
+                id: 'stl',
+                name: 'StarForge Kits',
+                type: 'red',
+                steps: [
+                    'Set Up Website',
+                    'Automate Production',
+                    'Automate Upload to Site and Cults3d and Pinterest',
+                    'Scale Out to 5k Designs',
+                    'Scale Out to 10k Designs'
+                ]
+            },
+            aibioe: {
+                id: 'aibioe',
+                name: 'Get a Job in AI Bio E',
+                type: 'green',
+                steps: [
+                    'Get a Job in AI Bio E'
+                ],
+                inactive: true
+            },
+            finance: {
+                id: 'finance',
+                name: 'RICH & LEGIT',
+                type: 'red',
+                steps: [
+                    'Make Youtube Channel',
+                    'Connect Opus Clips',
+                    'Make Custom Thumbnail Internal Tools',
+                    'Scale to 4 Videos a Day'
+                ],
+                inactive: true
+            }
+        };
+
+        // Display Order (determines tab order and numbering)
+        const ACTIVE_PROJECTS = ['tavern', 'productivity', 'language', 'stl'];
+
+        // ========================================
+        // DYNAMIC RENDERING FUNCTIONS
+        // ========================================
+
+        function renderTabs() {
+            const tabsContainer = document.querySelector('.tabs');
+            tabsContainer.innerHTML = '';
+
+            ACTIVE_PROJECTS.forEach((projectId, index) => {
+                const project = ALL_PROJECTS[projectId];
+                const typeConfig = PROJECT_TYPES[project.type];
+
+                const tab = document.createElement('div');
+                tab.className = `tab ${typeConfig.tabClass}${index === 0 ? ' active' : ''}`;
+                tab.setAttribute('data-project', projectId);
+                tab.textContent = `${index} ${typeConfig.emoji}`;
+
+                tabsContainer.appendChild(tab);
+            });
+        }
+
+        function renderProjects() {
+            const questContent = document.querySelector('.quest-content');
+            questContent.innerHTML = '';
+
+            ACTIVE_PROJECTS.forEach((projectId, index) => {
+                const project = ALL_PROJECTS[projectId];
+                const typeConfig = PROJECT_TYPES[project.type];
+
+                const panel = document.createElement('div');
+                panel.className = `project-panel${index === 0 ? ' active' : ''}`;
+                panel.id = projectId;
+
+                panel.innerHTML = `
+                    <div class="coin-rain"></div>
+                    <div class="project-header ${typeConfig.borderClass}">
+                        <h2 class="project-title">${typeConfig.emoji} ${project.name} - ${project.steps.length} Step${project.steps.length !== 1 ? 's' : ''}</h2>
+                        <div class="project-strategy ${typeConfig.strategyClass}">${typeConfig.strategy}</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                    ${project.steps.map((step, stepIndex) => `
+                        <div class="checkpoint ${stepIndex === 0 ? 'active' : 'inactive'}">
+                            <div class="checkpoint-text">${stepIndex + 1}. ${step}</div>
+                        </div>
+                    `).join('')}
+                `;
+
+                questContent.appendChild(panel);
+            });
+        }
+
         // ========================================
         // CONFIGURATION - Easy to modify
         // ========================================
@@ -2299,21 +2351,11 @@
         }
         
         function updateOverview() {
-            const projects = [
-                { id: 'tavern', index: 0 },
-                { id: 'productivity', index: 1 },
-                { id: 'language', index: 2 },
-                { id: 'finance', index: 3 },
-                { id: 'stl', index: 4 },
-                { id: 'pod', index: 5 },
-                { id: 'music', index: 6 }
-            ];
-            
             const overviewCards = document.querySelectorAll('.overview-project');
-            
-            projects.forEach(project => {
-                const panel = document.getElementById(project.id);
-                const card = overviewCards[project.index];
+
+            ACTIVE_PROJECTS.forEach((projectId, index) => {
+                const panel = document.getElementById(projectId);
+                const card = overviewCards[index];
                 
                 if (!panel || !card) return;
                 
@@ -2369,36 +2411,38 @@
             }
         });
         
-        // Tab switching functionality
-        const tabs = document.querySelectorAll('.tab');
-        const panels = document.querySelectorAll('.project-panel');
-        
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
+        // Tab switching functionality (using event delegation for dynamic tabs)
+        function setupTabSwitching() {
+            const tabsContainer = document.querySelector('.tabs');
+
+            tabsContainer.addEventListener('click', (e) => {
+                const tab = e.target.closest('.tab');
+                if (!tab) return;
+
                 // Play page turn sound
                 playPageTurnSound();
-                
+
                 // Remove active class from all tabs and panels
-                tabs.forEach(t => t.classList.remove('active'));
-                panels.forEach(p => p.classList.remove('active'));
-                
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.project-panel').forEach(p => p.classList.remove('active'));
+
                 // Add active class to clicked tab
                 tab.classList.add('active');
-                
+
                 // Show corresponding panel
                 const projectId = tab.getAttribute('data-project');
                 const activePanel = document.getElementById(projectId);
                 activePanel.classList.add('active');
 
-                // Get the tab color class
-                const tabColor = tab.classList.contains('green') ? 'green' : 
-                                tab.classList.contains('yellow') ? 'yellow' : 
-                                tab.classList.contains('blue') ? 'blue' : 'red';
-                
-                // Initialize coin rain for the active panel
-                initCoinRain(activePanel, tabColor);
+                // Get project type for coin rain
+                const project = ALL_PROJECTS[projectId];
+                if (project && activePanel) {
+                    initCoinRain(activePanel, project.type);
+                }
             });
-        });
+        }
+
+        setupTabSwitching();
         
         // Coin rain functionality
         function initCoinRain(panel, tabColor) {
@@ -2483,21 +2527,29 @@
             }, (duration + delay) * 1000);
         }
         
-        // Initialize coin rain for the first active panel on page load (skip if overview)
-        const initialPanel = document.querySelector('.project-panel.active');
-        const initialTab = document.querySelector('.tab.active');
-        if (initialPanel && initialTab && initialTab.getAttribute('data-project') !== 'overview') {
-            const tabColor = initialTab.classList.contains('green') ? 'green' : 
-                            initialTab.classList.contains('yellow') ? 'yellow' : 
-                            initialTab.classList.contains('blue') ? 'blue' : 'red';
-            initCoinRain(initialPanel, tabColor);
-        }
-        
-        // Initialize checkpoint click handlers
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+
+        // 1. Render tabs and projects dynamically
+        renderTabs();
+        renderProjects();
+
+        // 2. Initialize checkpoint click handlers
         initCheckpointClickHandlers();
 
-        // Load saved state from localStorage
+        // 3. Load saved state from localStorage
         loadState();
+
+        // 4. Initialize coin rain for the first active panel
+        const initialPanel = document.querySelector('.project-panel.active');
+        const initialTab = document.querySelector('.tab.active');
+        if (initialPanel && initialTab) {
+            const project = ALL_PROJECTS[initialTab.getAttribute('data-project')];
+            if (project) {
+                initCoinRain(initialPanel, project.type);
+            }
+        }
 
         // Initialize duration inputs
         initializeDurationInputs();
@@ -2507,18 +2559,10 @@
         updateAdventuresOfDay();
         
         // Make overview project cards clickable
-        document.querySelectorAll('.overview-project').forEach(card => {
+        document.querySelectorAll('.overview-project').forEach((card, index) => {
             card.addEventListener('click', () => {
-                const projectName = card.querySelector('h3').textContent;
-                let projectId = '';
-
-                if (projectName.includes('Tavern Upkeep')) projectId = 'tavern';
-                else if (projectName.includes('Blue Anvil Labs')) projectId = 'productivity';
-                else if (projectName.includes('Lingo Playground')) projectId = 'language';
-                else if (projectName.includes('RICH & LEGIT')) projectId = 'finance';
-                else if (projectName.includes('StarForge Kits')) projectId = 'stl';
-                else if (projectName.includes('Starship Drip')) projectId = 'pod';
-                else if (projectName.includes('Rockets & Rainbows')) projectId = 'music';
+                // Use index to map to ACTIVE_PROJECTS
+                const projectId = ACTIVE_PROJECTS[index];
 
                 if (projectId) {
                     const targetTab = document.querySelector(`[data-project="${projectId}"]`);
