@@ -2158,6 +2158,61 @@
         }
 
         // ========================================
+        // PRIORITY ENFORCEMENT
+        // ========================================
+
+        function validatePriorityOrder(targetProjectId, action) {
+            // Get the index of the current project
+            const currentProjectIndex = ACTIVE_PROJECTS.indexOf(targetProjectId);
+
+            // Check all higher priority projects (lower indices)
+            for (let i = 0; i < currentProjectIndex; i++) {
+                const higherPriorityProjectId = ACTIVE_PROJECTS[i];
+                const higherPriorityPanel = document.getElementById(higherPriorityProjectId);
+
+                if (!higherPriorityPanel) continue;
+
+                const allCheckpoints = higherPriorityPanel.querySelectorAll('.checkpoint');
+                const completedCheckpoints = higherPriorityPanel.querySelectorAll('.checkpoint.completed');
+                const activeCheckpoints = higherPriorityPanel.querySelectorAll('.checkpoint.active');
+
+                // Check if there are incomplete tasks
+                const hasIncompleteTasks = allCheckpoints.length > completedCheckpoints.length;
+
+                // If there are incomplete tasks but no active tasks, validation fails
+                if (hasIncompleteTasks && activeCheckpoints.length === 0) {
+                    const higherPriorityProject = ALL_PROJECTS[higherPriorityProjectId];
+                    return {
+                        valid: false,
+                        message: `⚠️ Priority Violation!\n\nYou must have at least 1 active task in "${higherPriorityProject.name}" (Tab ${i}) before working on "${ALL_PROJECTS[targetProjectId].name}" (Tab ${currentProjectIndex}).\n\nHigher priority projects must be worked on first!`,
+                        blockedBy: higherPriorityProjectId,
+                        blockedByIndex: i
+                    };
+                }
+            }
+
+            return { valid: true };
+        }
+
+        function autoActivateHigherPriorityTask(projectId) {
+            const panel = document.getElementById(projectId);
+            if (!panel) return false;
+
+            // Find the first incomplete task
+            const checkpoints = panel.querySelectorAll('.checkpoint');
+            for (const checkpoint of checkpoints) {
+                if (!checkpoint.classList.contains('completed')) {
+                    // Activate it
+                    checkpoint.classList.remove('inactive');
+                    checkpoint.classList.add('active');
+                    saveState();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // ========================================
         // MODAL FUNCTIONALITY
         // ========================================
         const modal = document.getElementById('taskModal');
@@ -2172,6 +2227,28 @@
 
         function showModal(checkpoint) {
             currentCheckpoint = checkpoint;
+
+            // Get the project this checkpoint belongs to
+            const activePanel = document.querySelector('.project-panel.active');
+            const projectId = activePanel.id;
+
+            // Validate priority order - only if trying to work on this project
+            const validation = validatePriorityOrder(projectId, 'show-modal');
+
+            if (!validation.valid) {
+                // Show error and offer to auto-activate higher priority task
+                if (confirm(validation.message + '\n\nWould you like to automatically activate a task in the higher priority project?')) {
+                    autoActivateHigherPriorityTask(validation.blockedBy);
+
+                    // Switch to that tab
+                    const higherPriorityTab = document.querySelector(`[data-project="${validation.blockedBy}"]`);
+                    if (higherPriorityTab) {
+                        higherPriorityTab.click();
+                    }
+                }
+                return; // Don't show modal
+            }
+
             modal.classList.add('active');
             playTaskClickSound();
         }
@@ -2293,6 +2370,39 @@
                     }
                 }
             } else if (action === 'mark-locked') {
+                // Check if this is the last active task in current project
+                const currentActiveCheckpoints = activePanel.querySelectorAll('.checkpoint.active');
+                const projectId = activePanel.id;
+                const currentProjectIndex = ACTIVE_PROJECTS.indexOf(projectId);
+
+                if (currentActiveCheckpoints.length === 1 && currentActiveCheckpoints[0] === checkpoint) {
+                    // This is the last active task - check if there are incomplete tasks
+                    const allCheckpoints = activePanel.querySelectorAll('.checkpoint');
+                    const completedCheckpoints = activePanel.querySelectorAll('.checkpoint.completed');
+                    const hasIncompleteTasks = allCheckpoints.length > completedCheckpoints.length;
+
+                    if (hasIncompleteTasks) {
+                        // Check if any lower priority projects have active tasks
+                        let lowerPriorityHasActiveTasks = false;
+                        for (let i = currentProjectIndex + 1; i < ACTIVE_PROJECTS.length; i++) {
+                            const lowerPriorityProjectId = ACTIVE_PROJECTS[i];
+                            const lowerPriorityPanel = document.getElementById(lowerPriorityProjectId);
+                            if (lowerPriorityPanel) {
+                                const lowerActiveCheckpoints = lowerPriorityPanel.querySelectorAll('.checkpoint.active');
+                                if (lowerActiveCheckpoints.length > 0) {
+                                    lowerPriorityHasActiveTasks = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (lowerPriorityHasActiveTasks) {
+                            alert(`⚠️ Cannot deactivate!\n\nThis is the last active task in "${ALL_PROJECTS[projectId].name}" (Tab ${currentProjectIndex}).\n\nYou cannot have 0 active tasks in a higher priority project while working on lower priority projects.\n\nComplete this task or activate another task first.`);
+                            return; // Abort the action
+                        }
+                    }
+                }
+
                 // Get text BEFORE clearing
                 const checkpointTextEl = checkpoint.querySelector('.checkpoint-text');
                 const taskText = checkpointTextEl ? checkpointTextEl.textContent : '';
