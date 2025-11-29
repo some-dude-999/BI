@@ -648,41 +648,6 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
 
-        .daily-task {
-            background: rgba(90, 61, 43, 0.15);
-            border: 2px solid #5a3d2b;
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin: 12px 0;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
-
-        .daily-task .task-title {
-            font-size: 1.05em;
-            color: #3d2817;
-            font-weight: 600;
-        }
-
-        .daily-task .task-project {
-            font-size: 0.85em;
-            color: #5a3d2b;
-            margin-top: 4px;
-        }
-
-        .daily-task.passive {
-            border-color: #6b4a35;
-            background: rgba(107, 74, 53, 0.15);
-        }
-
-        .daily-task.passive .task-title {
-            color: #4d3322;
-        }
-
-        .daily-task.passive .task-project {
-            color: #6b4a35;
-        }
-
         .checkpoint-text {
             flex: 1;
             font-size: 1.1em;
@@ -1859,55 +1824,40 @@
             dailyTasksList.innerHTML = '';
 
             // Always add the daily squat task first (passive task - not tied to any project checkpoint)
-            const taskDiv = document.createElement('div');
-            taskDiv.className = 'daily-task passive';
-            taskDiv.innerHTML = `
-                <div class="task-title">🍖 Daily Squat and Deadlift</div>
-                <div class="task-project">Tavern Upkeep - Daily Task</div>
+            const passiveTaskDiv = document.createElement('div');
+            passiveTaskDiv.className = 'checkpoint completed project-blue';
+            passiveTaskDiv.innerHTML = `
+                <div class="checkpoint-row">
+                    <div class="checkpoint-text">🍖 Daily Squat and Deadlift</div>
+                    <div class="checkpoint-status-icon">🏰</div>
+                </div>
             `;
-            dailyTasksList.appendChild(taskDiv);
+            passiveTaskDiv.style.cursor = 'default';
+            dailyTasksList.appendChild(passiveTaskDiv);
 
             // Get all starred tasks
             const starredTasks = [];
-            const projectPriority = ['tavern', 'productivity', 'language', 'finance', 'stl', 'pod', 'music'];
-            const projectNames = {
-                'tavern': 'Tavern Upkeep',
-                'productivity': 'Blue Anvil Labs',
-                'language': 'Lingo Playground',
-                'finance': 'RICH & LEGIT',
-                'stl': 'StarForge Kits',
-                'pod': 'Starship Drip',
-                'music': 'Rockets & Rainbows'
-            };
 
-            for (const projectId of projectPriority) {
+            for (const projectId of ACTIVE_PROJECTS) {
                 const panel = document.getElementById(projectId);
                 if (!panel) continue;
+
+                const project = ALL_PROJECTS[projectId];
+                const projectType = project.type;
 
                 const checkpoints = panel.querySelectorAll('.checkpoint');
                 checkpoints.forEach((checkpoint, index) => {
                     const starIcon = checkpoint.querySelector('.star-icon');
-                    const checkpointText = checkpoint.querySelector('.checkpoint-text');
 
                     if (starIcon && starIcon.classList.contains('starred') &&
                         (checkpoint.classList.contains('active') || checkpoint.classList.contains('inactive'))) {
 
-                        // Get duration data for this checkpoint
-                        const daysInput = checkpoint.querySelector('.duration-days');
-                        const weeksInput = checkpoint.querySelector('.duration-weeks');
-                        const monthsInput = checkpoint.querySelector('.duration-months');
-
-                        const days = daysInput ? parseInt(daysInput.value) || 0 : 0;
-                        const weeks = weeksInput ? parseInt(weeksInput.value) || 0 : 0;
-                        const months = monthsInput ? parseInt(monthsInput.value) || 0 : 0;
-
                         starredTasks.push({
-                            text: checkpointText ? checkpointText.textContent : '',
-                            project: projectNames[projectId] || projectId,
-                            isActive: checkpoint.classList.contains('active'),
-                            days: days,
-                            weeks: weeks,
-                            months: months
+                            checkpoint: checkpoint,
+                            projectId: projectId,
+                            projectName: project.name,
+                            projectType: projectType,
+                            isActive: checkpoint.classList.contains('active')
                         });
                     }
                 });
@@ -1915,36 +1865,27 @@
 
             // If no starred tasks, get top 3 active tasks by priority
             if (starredTasks.length === 0) {
-                for (const projectId of projectPriority) {
+                for (const projectId of ACTIVE_PROJECTS) {
                     if (starredTasks.length >= 3) break;
 
                     const panel = document.getElementById(projectId);
                     if (!panel) continue;
+
+                    const project = ALL_PROJECTS[projectId];
+                    const projectType = project.type;
 
                     const checkpoints = panel.querySelectorAll('.checkpoint');
                     for (let i = 0; i < checkpoints.length; i++) {
                         if (starredTasks.length >= 3) break;
 
                         const checkpoint = checkpoints[i];
-                        const checkpointText = checkpoint.querySelector('.checkpoint-text');
-
                         if (checkpoint.classList.contains('active')) {
-                            // Get duration data for this checkpoint
-                            const daysInput = checkpoint.querySelector('.duration-days');
-                            const weeksInput = checkpoint.querySelector('.duration-weeks');
-                            const monthsInput = checkpoint.querySelector('.duration-months');
-
-                            const days = daysInput ? parseInt(daysInput.value) || 0 : 0;
-                            const weeks = weeksInput ? parseInt(weeksInput.value) || 0 : 0;
-                            const months = monthsInput ? parseInt(monthsInput.value) || 0 : 0;
-
                             starredTasks.push({
-                                text: checkpointText ? checkpointText.textContent : '',
-                                project: projectNames[projectId] || projectId,
-                                isActive: true,
-                                days: days,
-                                weeks: weeks,
-                                months: months
+                                checkpoint: checkpoint,
+                                projectId: projectId,
+                                projectName: project.name,
+                                projectType: projectType,
+                                isActive: true
                             });
                         }
                     }
@@ -1958,22 +1899,35 @@
 
                 const parts = [];
                 if (months > 0) parts.push(`${months} Month${months > 1 ? 's' : ''}`);
-                if (weeks > 0) parts.push(`${weeks} Week${weeks > 1 ? 's' : ''}`);
+                if (weeks > 0) parts.push(`${weeks > 1 ? 's' : ''}`);
                 if (days > 0) parts.push(`${days} Day${days > 1 ? 's' : ''}`);
 
                 return parts.length > 0 ? ` - ${parts.join(', ')} Remaining` : '';
             }
 
-            // Add up to 3 starred tasks
+            // Clone the actual checkpoints for display
             starredTasks.slice(0, 3).forEach(task => {
-                const taskDiv = document.createElement('div');
-                taskDiv.className = 'daily-task';
-                const effortText = formatRemainingEffort(task.days || 0, task.weeks || 0, task.months || 0);
-                taskDiv.innerHTML = `
-                    <div class="task-title">⭐ ${task.text}</div>
-                    <div class="task-project">${task.project}${effortText}</div>
-                `;
-                dailyTasksList.appendChild(taskDiv);
+                // Clone the checkpoint
+                const clonedCheckpoint = task.checkpoint.cloneNode(true);
+
+                // Add the project type class for colored borders
+                clonedCheckpoint.classList.add(`project-${task.projectType}`);
+
+                // Make it non-clickable in the daily tasks view
+                clonedCheckpoint.style.cursor = 'default';
+                clonedCheckpoint.onclick = (e) => {
+                    e.stopPropagation();
+                    // Switch to the project tab and scroll to original checkpoint
+                    const targetTab = document.querySelector(`[data-project="${task.projectId}"]`);
+                    if (targetTab) {
+                        targetTab.click();
+                        setTimeout(() => {
+                            task.checkpoint.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 100);
+                    }
+                };
+
+                dailyTasksList.appendChild(clonedCheckpoint);
             });
         }
         
@@ -2407,6 +2361,15 @@
                 const checkpointTextEl = checkpoint.querySelector('.checkpoint-text');
                 const taskText = checkpointTextEl ? checkpointTextEl.textContent : '';
 
+                // Auto-unstar when locking
+                const wasStarred = savedStarred[activePanel.id] && savedStarred[activePanel.id][index];
+                if (wasStarred) {
+                    // Remove star from saved state
+                    if (!savedStarred[activePanel.id]) savedStarred[activePanel.id] = [];
+                    savedStarred[activePanel.id][index] = false;
+                    localStorage.setItem(STARRED_STORAGE_KEY, JSON.stringify(savedStarred));
+                }
+
                 // Change to locked/inactive
                 checkpoint.classList.remove('active', 'completed');
                 checkpoint.classList.add('inactive');
@@ -2419,14 +2382,7 @@
                 const isExpanded = savedExpanded[activePanel.id] && savedExpanded[activePanel.id][index];
                 createDurationInputs(checkpoint, savedData, isExpanded, taskText);
 
-                // Restore starred state
-                const isStarred = savedStarred[activePanel.id] && savedStarred[activePanel.id][index];
-                if (isStarred) {
-                    const starIcon = checkpoint.querySelector('.star-icon');
-                    if (starIcon) {
-                        starIcon.classList.add('starred');
-                    }
-                }
+                // Don't restore starred state - it's been unstarred
             }
 
             // Update progress bar
