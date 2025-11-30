@@ -1851,6 +1851,19 @@
             passiveTaskDiv.onclick = null; // Prevent any clicks
             dailyTasksList.appendChild(passiveTaskDiv);
 
+            // Add the diet passive task
+            const dietTaskDiv = document.createElement('div');
+            dietTaskDiv.className = 'checkpoint active project-purple';
+            dietTaskDiv.innerHTML = `
+                <div class="checkpoint-row">
+                    <div class="checkpoint-text">🥩 Eat 80% Meat and Vegetables</div>
+                    <div class="checkpoint-status-icon">⚔️</div>
+                </div>
+            `;
+            dietTaskDiv.style.cursor = 'default';
+            dietTaskDiv.onclick = null; // Prevent any clicks
+            dailyTasksList.appendChild(dietTaskDiv);
+
             // Get all starred tasks
             const starredTasks = [];
 
