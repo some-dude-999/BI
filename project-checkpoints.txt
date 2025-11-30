@@ -2,7 +2,7 @@
 PROJECT: BI (Business Intelligence / Project Tracking)
 COMPONENT: Dynamic Quest Board - Project Checkpoint Tracker
 CREATED: 2025-11-29
-LAST UPDATED: 2025-11-29 - Added priority enforcement system for task management
+LAST UPDATED: 2025-11-30 - Reduced starred item limit from 3 to 2 for better focus
 
 DATA SOURCES:
 - JavaScript Object: ALL_PROJECTS - Centralized data structure containing all projects (active + inactive)
@@ -70,7 +70,7 @@ Key Functions:
 Event Handlers:
   - Tab clicks: Switch between project views (event delegation)
   - Checkpoint clicks: Open modal to change state (active/locked/completed)
-  - Star clicks: Toggle tasks for "Adventures of the Day"
+  - Star clicks: Toggle tasks for "Adventures of the Day" (maximum 2 starred tasks)
   - Duration inputs: Track estimated time for tasks
 
 DEPENDENCIES:
@@ -144,6 +144,14 @@ Why this matters:
   - Easy to restore projects
   - Historical record maintained
   - Can temporarily hide/show projects
+
+Initially thought: Allow 3 starred tasks for "Adventures of the Day"
+Actually: Limit reduced to 2 starred tasks maximum
+Why this matters:
+  - Enforces better focus on highest priority work
+  - "Focus is key" - fewer concurrent priorities leads to better completion
+  - Prevents task overload and scattered attention
+  - UI automatically hides star icons when 2 tasks are already starred
 
 NOTES:
 
