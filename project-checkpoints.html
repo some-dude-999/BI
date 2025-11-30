@@ -1473,15 +1473,15 @@
             row.className = 'checkpoint-row';
 
             // Create star icon (except for completed tasks)
-            // Also hide if 3 tasks are already starred (unless this task is starred)
+            // Also hide if 2 tasks are already starred (unless this task is starred)
             let starHTML = '';
             if (!isCompleted) {
                 // Count currently starred tasks
                 const allStarred = document.querySelectorAll('.star-icon.starred');
                 const isThisStarred = checkpoint.querySelector('.star-icon')?.classList.contains('starred');
 
-                // Show star icon if: fewer than 3 stars exist OR this task is already starred
-                if (allStarred.length < 3 || isThisStarred) {
+                // Show star icon if: fewer than 2 stars exist OR this task is already starred
+                if (allStarred.length < 2 || isThisStarred) {
                     starHTML = '<div class="star-icon">⭐</div>';
                 }
             }
@@ -1741,9 +1741,9 @@
                 starIcon.classList.remove('starred');
                 playUnstarSound();
             } else {
-                // Check if we can star (max 3)
+                // Check if we can star (max 2)
                 const starredCount = getStarredCount();
-                if (starredCount >= 3) {
+                if (starredCount >= 2) {
                     // Show a brief warning - play error sound
                     starIcon.style.color = '#c92a2a';
                     playTaskClickSound(); // Error feedback
@@ -1775,8 +1775,8 @@
                 const isStarred = starIcon.classList.contains('starred');
                 const isCompleted = checkpoint.classList.contains('completed');
 
-                // Hide star icon if: 3 stars exist AND this task is not starred AND not completed
-                if (starredCount >= 3 && !isStarred && !isCompleted) {
+                // Hide star icon if: 2 stars exist AND this task is not starred AND not completed
+                if (starredCount >= 2 && !isStarred && !isCompleted) {
                     starIcon.style.display = 'none';
                 } else if (!isCompleted) {
                     starIcon.style.display = 'flex';
